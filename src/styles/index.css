@@ -1,0 +1,387 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--adbox-font-heading);
+  --font-sans: var(--adbox-font-sans);
+  --font-body: var(--adbox-font-body);
+  --font-caption: var(--adbox-font-caption);
+  --font-chart: var(--adbox-font-chart);
+
+  --text-h0: 4.25rem;
+  --text-h0--line-height: 6rem;
+  --text-h0--font-weight: 600;
+  --text-h1: 3.5rem;
+  --text-h1--line-height: 5.25rem;
+  --text-h1--font-weight: 600;
+  --text-h2: 2.875rem;
+  --text-h2--line-height: 4.3125rem;
+  --text-h2--font-weight: 600;
+  --text-h3: 2.625rem;
+  --text-h3--line-height: 3.75rem;
+  --text-h3--font-weight: 600;
+  --text-h4: 2rem;
+  --text-h4--line-height: 2rem;
+  --text-h4--font-weight: 600;
+  --text-h5: 1.375rem;
+  --text-h5--line-height: 1.375rem;
+  --text-h5--font-weight: 600;
+  --text-h6: 1.125rem;
+  --text-h6--line-height: 1.25rem;
+  --text-h6--font-weight: 600;
+  --text-b1: 1.125rem;
+  --text-b1--line-height: 1.6875rem;
+  --text-b2: 0.9375rem;
+  --text-b2--line-height: 1.25rem;
+  --text-b3: 0.75rem;
+  --text-b3--line-height: 0.8125rem;
+  --text-b4: 0.625rem;
+  --text-b4--line-height: 0.9375rem;
+
+  --color-white: var(--adbox-white);
+  --color-purple: var(--adbox-purple);
+  --color-cyan: var(--adbox-cyan);
+  --color-blue: var(--adbox-blue);
+  --color-auth-background: var(--adbox-accent-light-blue);
+  --color-accent-background: var(--adbox-accent-background);
+  --color-date-accent: var(--adbox-date-accent);
+  --color-date-range: var(--adbox-date-range);
+  --color-date-muted: var(--adbox-date-muted);
+  --color-secondary-grey-600: var(--adbox-secondary-grey-600);
+  --color-chart-cyan: var(--adbox-chart-cyan);
+  --color-chart-ink: var(--adbox-chart-ink);
+  --color-paragraph-text: var(--adbox-paragraph-text);
+  --color-divider: var(--adbox-divider);
+
+  --color-grey-50: var(--adbox-grey-50);
+  --color-grey-100: var(--adbox-grey-100);
+  --color-grey-200: var(--adbox-grey-200);
+  --color-grey-300: var(--adbox-grey-300);
+  --color-grey-400: var(--adbox-grey-400);
+  --color-grey-500: var(--adbox-grey-500);
+  --color-grey-600: var(--adbox-grey-600);
+  --color-grey-700: var(--adbox-grey-700);
+  --color-grey-800: var(--adbox-grey-800);
+  --color-grey-900: var(--adbox-grey-900);
+  --color-grey-1000: var(--adbox-grey-1000);
+
+  --color-error-50: var(--adbox-error-50);
+  --color-error-100: var(--adbox-error-100);
+  --color-error-200: var(--adbox-error-200);
+  --color-error-300: var(--adbox-error-300);
+  --color-error-400: var(--adbox-error-400);
+  --color-error-500: var(--adbox-error-500);
+  --color-error-600: var(--adbox-error-600);
+  --color-error-700: var(--adbox-error-700);
+  --color-error-800: var(--adbox-error-800);
+  --color-error-900: var(--adbox-error-900);
+  --color-error-1000: var(--adbox-error-1000);
+
+  --color-warning-50: var(--adbox-warning-50);
+  --color-warning-100: var(--adbox-warning-100);
+  --color-warning-200: var(--adbox-warning-200);
+  --color-warning-300: var(--adbox-warning-300);
+  --color-warning-400: var(--adbox-warning-400);
+  --color-warning-500: var(--adbox-warning-500);
+  --color-warning-600: var(--adbox-warning-600);
+  --color-warning-700: var(--adbox-warning-700);
+  --color-warning-800: var(--adbox-warning-800);
+  --color-warning-900: var(--adbox-warning-900);
+  --color-warning-1000: var(--adbox-warning-1000);
+
+  --color-success-50: var(--adbox-success-50);
+  --color-success-100: var(--adbox-success-100);
+  --color-success-200: var(--adbox-success-200);
+  --color-success-300: var(--adbox-success-300);
+  --color-success-400: var(--adbox-success-400);
+  --color-success-500: var(--adbox-success-500);
+  --color-success-600: var(--adbox-success-600);
+  --color-success-700: var(--adbox-success-700);
+  --color-success-800: var(--adbox-success-800);
+  --color-success-900: var(--adbox-success-900);
+  --color-success-1000: var(--adbox-success-1000);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --shadow-adbox-text-drop: var(--adbox-shadow-text-drop);
+  --shadow-adbox-small: var(--adbox-shadow-small);
+  --shadow-adbox-medium: var(--adbox-shadow-medium);
+  --shadow-adbox-large: var(--adbox-shadow-large);
+  --shadow-adbox-hover-primary: var(--adbox-shadow-hover-primary);
+  --shadow-adbox-hover-secondary: var(--adbox-shadow-hover-secondary);
+  --shadow-adbox-hover-error: var(--adbox-shadow-hover-error);
+  --shadow-adbox-hover-warning: var(--adbox-shadow-hover-warning);
+  --shadow-adbox-hover-success: var(--adbox-shadow-hover-success);
+  --shadow-adbox-focus-primary: var(--adbox-shadow-focus-primary);
+  --shadow-adbox-focus-secondary: var(--adbox-shadow-focus-secondary);
+  --shadow-adbox-focus-error: var(--adbox-shadow-focus-error);
+  --shadow-adbox-focus-warning: var(--adbox-shadow-focus-warning);
+  --shadow-adbox-focus-success: var(--adbox-shadow-focus-success);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --adbox-font-heading: "Outfit", "Manrope", sans-serif;
+  --adbox-font-sans: "Manrope", "Inter", sans-serif;
+  --adbox-font-body: "Manrope", "Inter", sans-serif;
+  --adbox-font-caption: "Inter", "Manrope", sans-serif;
+  --adbox-font-chart: "DM Sans", "Inter", sans-serif;
+
+  --adbox-white: #ffffff;
+  --adbox-purple: #d132fb;
+  --adbox-cyan: #1de5e7;
+  --adbox-blue: #6432ed;
+  --adbox-accent-light-blue: #f4f7fe;
+  --adbox-accent-background: #ededff;
+  --adbox-date-accent: #7a68ea;
+  --adbox-date-range: #f4ebf5;
+  --adbox-date-muted: rgb(24 30 48 / 32%);
+  --adbox-secondary-grey-600: #a3aed0;
+  --adbox-chart-cyan: #62d0ee;
+  --adbox-chart-ink: #1b2559;
+  --adbox-paragraph-text: #797979;
+  --adbox-divider: #cbcbcb;
+
+  --gradient-primary: linear-gradient(56.31deg, #d600e0 5.2%, #6f73eb 57.81%, #1cd0f4 100.35%);
+  --gradient-purple: linear-gradient(-29.2deg, #4727fc 1.72%, #ac37ec 97.05%);
+  --gradient-blue: linear-gradient(90deg, #40a7fa 0%, #1de5e7 99.99%);
+  --gradient-pink: linear-gradient(90deg, #b644f5 0.58%, #f85aef 99.98%);
+  --gradient-dark-blue: linear-gradient(83.05deg, #060619 8.05%, #160874 95.57%);
+
+  --adbox-shadow-text-drop: 1px 1px 0 rgb(0 0 0 / 30%);
+  --adbox-shadow-small: 0 1px 4px 1px rgb(78 17 94 / 10%);
+  --adbox-shadow-medium: 0 8px 16.9px rgb(201 76 255 / 20%);
+  --adbox-shadow-large: 0 17px 37.3px -1px rgb(158 26 192 / 26%);
+  --adbox-shadow-hover-primary:
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(0 0 0 / 64%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-secondary:
+    0 0 0 1px rgb(103 110 118 / 24%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-error:
+    0 2px 5px rgb(243 65 65 / 8%),
+    0 0 0 2px rgb(243 65 65 / 40%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-warning:
+    0 2px 5px rgb(233 162 59 / 8%),
+    0 0 0 2px rgb(233 162 59 / 40%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-success:
+    0 2px 5px rgb(83 180 131 / 8%),
+    0 0 0 2px rgb(83 180 131 / 40%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-focus-primary:
+    0 0 0 4px rgb(172 55 236 / 16%),
+    0 0 0 1px rgb(0 0 0 / 64%);
+  --adbox-shadow-focus-secondary:
+    0 0 0 4px rgb(206 70 252 / 16%),
+    0 0 0 1px rgb(103 110 118 / 16%);
+  --adbox-shadow-focus-error:
+    0 0 0 4px rgb(243 65 65 / 16%),
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(243 65 65 / 16%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-focus-warning:
+    0 0 0 4px rgb(233 162 59 / 16%),
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(233 162 59 / 16%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-focus-success:
+    0 0 0 4px rgb(83 180 131 / 16%),
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(83 180 131 / 16%),
+    0 1px 1px rgb(0 0 0 / 12%);
+
+  --adbox-grey-50: #fafafa;
+  --adbox-grey-100: #f4f6f9;
+  --adbox-grey-200: #e5e7ea;
+  --adbox-grey-300: #ced2d6;
+  --adbox-grey-400: #9ea5ad;
+  --adbox-grey-500: #676e76;
+  --adbox-grey-600: #596066;
+  --adbox-grey-700: #454c52;
+  --adbox-grey-800: #383f45;
+  --adbox-grey-900: #24292e;
+  --adbox-grey-1000: #1a1d1f;
+
+  --adbox-error-50: #fffbfa;
+  --adbox-error-100: #fef2f2;
+  --adbox-error-200: #fde9e9;
+  --adbox-error-300: #fac7c7;
+  --adbox-error-400: #f7a1a1;
+  --adbox-error-500: #f37373;
+  --adbox-error-600: #f34141;
+  --adbox-error-700: #cd3636;
+  --adbox-error-800: #a32e2e;
+  --adbox-error-900: #7c2323;
+  --adbox-error-1000: #601b1b;
+
+  --adbox-warning-50: #fffcf5;
+  --adbox-warning-100: #fefaf5;
+  --adbox-warning-200: #fbf2cb;
+  --adbox-warning-300: #fde57e;
+  --adbox-warning-400: #ffd16a;
+  --adbox-warning-500: #fbbc55;
+  --adbox-warning-600: #e9a23b;
+  --adbox-warning-700: #c8811a;
+  --adbox-warning-800: #a35c00;
+  --adbox-warning-900: #8b4400;
+  --adbox-warning-1000: #78310b;
+
+  --adbox-success-50: #f6fef9;
+  --adbox-success-100: #effdf6;
+  --adbox-success-200: #d9f9e6;
+  --adbox-success-300: #b8f1d2;
+  --adbox-success-400: #8ee4ba;
+  --adbox-success-500: #6ad09d;
+  --adbox-success-600: #53b483;
+  --adbox-success-700: #2f9461;
+  --adbox-success-800: #2f7657;
+  --adbox-success-900: #255e46;
+  --adbox-success-1000: #1e4d3a;
+
+  --background: var(--adbox-grey-50);
+  --foreground: var(--adbox-grey-1000);
+  --card: var(--adbox-white);
+  --card-foreground: var(--adbox-grey-1000);
+  --popover: var(--adbox-white);
+  --popover-foreground: var(--adbox-grey-1000);
+  --primary: var(--adbox-purple);
+  --primary-foreground: var(--adbox-white);
+  --secondary: var(--adbox-blue);
+  --secondary-foreground: var(--adbox-white);
+  --muted: var(--adbox-grey-100);
+  --muted-foreground: var(--adbox-grey-500);
+  --accent: var(--adbox-cyan);
+  --accent-foreground: var(--adbox-grey-1000);
+  --destructive: var(--adbox-error-600);
+  --border: var(--adbox-grey-200);
+  --input: var(--adbox-grey-300);
+  --ring: var(--adbox-blue);
+  --chart-1: var(--adbox-purple);
+  --chart-2: var(--adbox-blue);
+  --chart-3: var(--adbox-cyan);
+  --chart-4: var(--adbox-warning-500);
+  --chart-5: var(--adbox-success-600);
+  --radius: 0.625rem;
+  --sidebar: var(--adbox-white);
+  --sidebar-foreground: var(--adbox-grey-1000);
+  --sidebar-primary: var(--adbox-blue);
+  --sidebar-primary-foreground: var(--adbox-white);
+  --sidebar-accent: var(--adbox-grey-100);
+  --sidebar-accent-foreground: var(--adbox-grey-1000);
+  --sidebar-border: var(--adbox-grey-200);
+  --sidebar-ring: var(--adbox-blue);
+}
+
+.dark {
+  --background: #060619;
+  --foreground: var(--adbox-white);
+  --card: #160874;
+  --card-foreground: var(--adbox-white);
+  --popover: #160874;
+  --popover-foreground: var(--adbox-white);
+  --primary: var(--adbox-purple);
+  --primary-foreground: var(--adbox-white);
+  --secondary: var(--adbox-cyan);
+  --secondary-foreground: #060619;
+  --muted: #24292e;
+  --muted-foreground: var(--adbox-grey-300);
+  --accent: var(--adbox-blue);
+  --accent-foreground: var(--adbox-white);
+  --destructive: var(--adbox-error-400);
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 16%);
+  --ring: var(--adbox-cyan);
+  --chart-1: var(--adbox-cyan);
+  --chart-2: var(--adbox-purple);
+  --chart-3: var(--adbox-blue);
+  --chart-4: var(--adbox-warning-400);
+  --chart-5: var(--adbox-success-400);
+  --sidebar: #060619;
+  --sidebar-foreground: var(--adbox-white);
+  --sidebar-primary: var(--adbox-cyan);
+  --sidebar-primary-foreground: #060619;
+  --sidebar-accent: #160874;
+  --sidebar-accent-foreground: var(--adbox-white);
+  --sidebar-border: rgb(255 255 255 / 12%);
+  --sidebar-ring: var(--adbox-cyan);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  #root {
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  html {
+    @apply font-sans;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+    letter-spacing: 0;
+  }
+}
