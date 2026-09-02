@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adbox.example/schemas/rdi-cms-agent-contract-v1.json",
+  "contractVersion": "1.0.0",
+  "siteKey": "rdi",
+  "purpose": "Safe machine-readable contract for AI-assisted RichDad Investments CMS operations.",
+  "safety": {
+    "directDatabaseWritesAllowed": false,
+    "databaseCredentialsAllowed": false,
+    "publishRequiresExplicitCapability": true,
+    "materialChangesRequireApproval": true,
+    "optimisticConcurrencyRequired": true,
+    "idempotencyRequiredForMutations": true,
+    "auditEventRequiredForMutations": true,
+    "allowedPatchMediaType": "application/json-patch+json"
+  },
+  "capabilities": [
+    "cms:read",
+    "cms:draft:propose",
+    "cms:draft:apply-approved",
+    "cms:publish",
+    "cms:asset:create",
+    "cms:revision:read",
+    "cms:rollback:propose"
+  ],
+  "knownPages": [
+    { "key": "home", "slug": "/" },
+    { "key": "about", "slug": "/about" },
+    { "key": "construction", "slug": "/construction" },
+    { "key": "media", "slug": "/media" },
+    { "key": "solar", "slug": "/solar" },
+    { "key": "contact", "slug": "/contact" }
+  ],
+  "resourceModel": {
+    "site": {
+      "collection": "rdi_cms_sites",
+      "identifier": "key",
+      "draftRoot": "/draft/settings",
+      "publishedRoot": "/published/settings"
+    },
+    "page": {
+      "collection": "rdi_cms_pages",
+      "identifier": "key",
+      "draftRoot": "/draft/content",
+      "publishedRoot": "/published/content"
+    },
+    "block": {
+      "identifier": "key",
+      "allowedTypes": ["hero", "split", "cards", "stats", "cta"],
+      "semanticPathTemplate": "/blocksByKey/{blockKey}"
+    },
+    "item": {
+      "identifier": "key",
+      "semanticPathTemplate": "/blocksByKey/{blockKey}/itemsByKey/{itemKey}"
+    },
+    "asset": {
+      "collection": "rdi_cms_assets",
+      "identifier": "_id",
+      "bytesStoredInMongoDB": false
+    }
+  },
+  "operations": [
+    {
+      "name": "readSite",
+      "method": "GET",
+      "path": "/api/v1/cms/sites/{siteKey}",
+      "requiredCapability": "cms:read",
+      "query": { "view": ["draft", "published"] }
+    },
+    {
+      "name": "listPages",
+      "method": "GET",
+      "path": "/api/v1/cms/sites/{siteKey}/pages",
+      "requiredCapability": "cms:read",
+      "query": { "view": ["draft", "published"] }
+    },
+    {
+      "name": "readPage",
+      "method": "GET",
+      "path": "/api/v1/cms/sites/{siteKey}/pages/{pageKey}",
+      "requiredCapability": "cms:read",
+      "query": { "view": ["draft", "published"] }
+    },
+    {
+      "name": "proposeAgentOperation",
+      "method": "POST",
+      "path": "/api/v1/cms/agent-operations",
+      "requiredCapability": "cms:draft:propose",
+      "requiredRequestFields": ["siteKey", "entityType", "entityKey", "baseVersion", "idempotencyKey", "operations", "changeSummary"]
+    },
+    {
+      "name": "applyApprovedAgentOperation",
+      "method": "POST",
+      "path": "/api/v1/cms/agent-operations/{operationId}/apply",
+      "requiredCapability": "cms:draft:apply-approved",
+      "preconditions": ["operation.status == approved", "currentDraft.version == operation.baseVersion"]
+    },
+    {
+      "name": "publishPage",
+      "method": "POST",
+      "path": "/api/v1/cms/sites/{siteKey}/pages/{pageKey}/publish",
+      "requiredCapability": "cms:publish",
+      "requiredRequestFields": ["baseVersion", "idempotencyKey"]
+    },
+    {
+      "name": "createAssetUploadIntent",
+      "method": "POST",
+      "path": "/api/v1/cms/assets/upload-intents",
+      "requiredCapability": "cms:asset:create",
+      "requiredRequestFields": ["siteKey", "kind", "fileName", "mimeType", "byteSize", "sha256"]
+    },
+    {
+      "name": "listRevisions",
+      "method": "GET",
+      "path": "/api/v1/cms/sites/{siteKey}/pages/{pageKey}/revisions",
+      "requiredCapability": "cms:revision:read"
+    }
+  ],
+  "patchProtocol": {
+    "standard": "RFC 6902",
+    "allowedOperations": ["test", "add", "replace", "remove", "move"],
+    "disallowedPaths": [
+      "/_id",
+      "/siteId",
+      "/createdAt",
+      "/createdBy",
+      "/published",
+      "/draft/version"
+    ],
+    "requiredHeaders": ["Authorization", "X-Request-Id", "Idempotency-Key", "If-Match"],
+    "pathRules": [
+      "Use semantic blocksByKey and itemsByKey paths.",
+      "Include a test operation before replacing or removing existing content.",
+      "Do not send raw MongoDB operators, filters, pipelines, or JavaScript.",
+      "Do not patch published content directly.",
+      "Do not set asset URLs before the asset is ready."
+    ],
+    "example": {
+      "baseVersion": 17,
+      "idempotencyKey": "agent-home-title-001",
+      "changeSummary": "Update the homepage hero title",
+      "operations": [
+        {
+          "op": "test",
+          "path": "/blocksByKey/home-hero/content/title",
+          "value": "Welcome to RichDad Investments"
+        },
+        {
+          "op": "replace",
+          "path": "/blocksByKey/home-hero/content/title",
+          "value": "Welcome to RichDad Investments"
+        }
+      ]
+    }
+  },
+  "agentWorkflow": [
+    "Read the latest draft and record version plus ETag.",
+    "Select the smallest entity scope using stable semantic keys.",
+    "Create test operations for values that will change.",
+    "Create a minimal patch and a human-readable change summary.",
+    "Submit the proposal with a unique idempotency key.",
+    "Wait for validation and required approval.",
+    "Apply only an approved operation with the original base version.",
+    "Re-read and verify the new draft version and intended values.",
+    "Publish only when explicitly requested and authorized."
+  ],
+  "errorCodes": {
+    "CMS_VALIDATION_FAILED": 422,
+    "CMS_VERSION_CONFLICT": 409,
+    "CMS_IDEMPOTENCY_CONFLICT": 409,
+    "CMS_APPROVAL_REQUIRED": 403,
+    "CMS_CAPABILITY_REQUIRED": 403,
+    "CMS_ENTITY_NOT_FOUND": 404,
+    "CMS_ASSET_NOT_READY": 409,
+    "CMS_PATCH_PATH_FORBIDDEN": 403,
+    "CMS_RATE_LIMITED": 429
+  }
+}
