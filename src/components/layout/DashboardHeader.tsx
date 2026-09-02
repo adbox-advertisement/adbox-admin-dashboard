@@ -14,13 +14,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 
-export function DashboardHeader() {
+export function DashboardHeader({ title = "Dashboard" }: { title?: string }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
 
   return (
     <header className="grid min-h-[101px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 bg-auth-background px-4 py-6 sm:px-6 md:grid-cols-[auto_minmax(0,415px)_auto] md:gap-6 lg:grid-cols-[minmax(0,1fr)_415px]">
-      <h1 className="min-w-0 truncate font-heading text-h5 font-semibold text-grey-1000 md:text-h4">
-        Dashboard
+      <h1 className="min-w-0 truncate py-1 font-heading text-h5 font-semibold leading-tight text-grey-1000 md:text-h4">
+        {title}
       </h1>
 
       <div className="justify-self-end md:col-start-3 lg:hidden">

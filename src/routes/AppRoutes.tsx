@@ -6,6 +6,7 @@ import {
 
 import { LoginPage } from "@/features/auth"
 import { DashboardPage } from "@/features/dashboard"
+import { RdiPage } from "@/features/rdi"
 import { APP_ROUTES } from "@/routes/paths"
 
 const router = createBrowserRouter([
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: APP_ROUTES.dashboard,
     element: <DashboardPage />,
+  },
+  {
+    path: APP_ROUTES.rdi,
+    element: <RdiPage />,
   },
   {
     path: "*",

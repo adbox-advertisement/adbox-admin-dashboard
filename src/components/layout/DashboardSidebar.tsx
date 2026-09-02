@@ -4,11 +4,13 @@ import {
   ChevronDown,
   CircleHelp,
   CirclePlay,
+  Globe,
   LayoutDashboard,
   LogOut,
   Settings,
   UserRound,
   UsersRound,
+  Video,
 } from "lucide-react"
 import { Link, NavLink } from "react-router-dom"
 
@@ -37,6 +39,15 @@ const navItems: DashboardNavItem[] = [
     label: "Ads Management",
     icon: CirclePlay,
     children: ["Ad Requests", "Reported Ads"],
+  },
+  {
+    label: "Video Management",
+    icon: Video,
+  },
+  {
+    label: "RDI",
+    icon: Globe,
+    to: APP_ROUTES.rdi,
   },
   {
     label: "Financials",
@@ -97,11 +108,13 @@ function DashboardNavigationContent({
                     />
                   ) : null}
                   <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                  <ChevronDown
-                    aria-hidden="true"
-                    className="size-5 shrink-0"
-                    strokeWidth={1.7}
-                  />
+                  {item.children ? (
+                    <ChevronDown
+                      aria-hidden="true"
+                      className="size-5 shrink-0"
+                      strokeWidth={1.7}
+                    />
+                  ) : null}
                 </NavLink>
               ) : (
                 <button
