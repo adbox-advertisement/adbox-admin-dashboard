@@ -21,6 +21,11 @@ import { DashboardPage } from "@/features/dashboard"
 import { PendingFeaturePage, type PendingFeaturePageProps } from "@/features/pending"
 import { RdiPage } from "@/features/rdi"
 import { APP_ROUTES } from "@/routes/paths"
+import { hasAdminSession } from "@/api/client"
+
+function requireAdminSession() {
+  return hasAdminSession() ? null : redirect(APP_ROUTES.login)
+}
 
 const pendingRoutes: Array<PendingFeaturePageProps & { path: string }> = [
   {
@@ -106,14 +111,17 @@ const router = createBrowserRouter([
   },
   {
     path: APP_ROUTES.dashboard,
+    loader: requireAdminSession,
     element: <DashboardPage />,
   },
   {
     path: APP_ROUTES.rdi,
+    loader: requireAdminSession,
     element: <RdiPage />,
   },
   ...pendingRoutes.map(({ path, ...pageProps }) => ({
     path,
+    loader: requireAdminSession,
     element: <PendingFeaturePage {...pageProps} />,
   })),
   {

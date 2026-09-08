@@ -5,6 +5,7 @@ import {
   ChevronRight,
   CircleCheck,
   Copy,
+  Download,
   Eye,
   EyeOff,
   FileText,
@@ -19,10 +20,11 @@ import {
   Plus,
   RotateCcw,
   Save,
+  Smartphone,
   Tablet,
   Trash2,
 } from "lucide-react"
-import { useMemo, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 import {
   DashboardSheetNavigation,
@@ -40,7 +42,9 @@ import {
 } from "@/components/ui/sheet"
 import { RdiMediaField } from "@/features/rdi/components/RdiMediaField"
 import { RdiWebsitePreview } from "@/features/rdi/components/RdiWebsitePreview"
-import { initialRdiSiteContent, RDI_STORAGE_KEY } from "@/features/rdi/data"
+import { initialRdiSiteContent } from "@/features/rdi/data"
+import { useRdiCms } from "@/features/rdi/hooks"
+import { cmsSnapshotToEditor } from "@/features/rdi/mappers"
 import type {
   RdiBlockType,
   RdiContentBlock,
@@ -70,6 +74,7 @@ const previewSizeOptions: Array<{
 }> = [
   { id: "desktop", label: "Desktop", icon: Monitor },
   { id: "tablet", label: "Tablet", icon: Tablet },
+  { id: "mobile", label: "Mobile", icon: Smartphone },
 ]
 
 function makeId(prefix: string) {
@@ -82,28 +87,6 @@ function makeId(prefix: string) {
 
 function cloneInitialContent() {
   return JSON.parse(JSON.stringify(initialRdiSiteContent)) as RdiSiteContent
-}
-
-function readSavedContent() {
-  if (typeof window === "undefined") return cloneInitialContent()
-
-  try {
-    const savedContent = window.localStorage.getItem(RDI_STORAGE_KEY)
-    if (!savedContent) return cloneInitialContent()
-
-    const parsedContent = JSON.parse(savedContent) as RdiSiteContent
-    if (
-      parsedContent.version !== initialRdiSiteContent.version ||
-      !parsedContent.pages?.length ||
-      !parsedContent.settings
-    ) {
-      return cloneInitialContent()
-    }
-
-    return parsedContent
-  } catch {
-    return cloneInitialContent()
-  }
 }
 
 function createBlock(type: RdiBlockType): RdiContentBlock {
@@ -414,6 +397,22 @@ function ItemEditor({
       </summary>
 
       <div className="space-y-5 border-t border-grey-200 p-4">
+        {blockId === "solar-solutions" || blockId === "media-work" ? (
+          <FieldLabel label="Filter category">
+            <select
+              aria-label="Filter category"
+              value={item.category ?? ""}
+              onChange={(event) => onChange({ category: event.target.value })}
+              className="h-11 w-full rounded-md border border-grey-200 bg-white px-3 text-sm text-grey-900"
+            >
+              <option value="">Uncategorized</option>
+              {(blockId === "solar-solutions"
+                ? [["generation", "Solar & inverters"], ["home", "Home batteries"], ["business", "Business storage"]]
+                : [["video", "Video Production"], ["commercial", "Commercials"], ["branding", "Branding"], ["animation", "Animation"]]
+              ).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </FieldLabel>
+        ) : null}
         {!isStat && !isHomeDivision && item.eyebrow !== undefined ? (
           <EditorInput
             label="Item label"
@@ -686,7 +685,8 @@ function RdiMobileNavigationButton() {
 }
 
 export function RdiCmsPage() {
-  const [content, setContent] = useState<RdiSiteContent>(readSavedContent)
+  const cms = useRdiCms()
+  const [content, setContent] = useState<RdiSiteContent>(cloneInitialContent)
   const [selectedPageId, setSelectedPageId] = useState(() => content.pages[0]?.id ?? "home")
   const [selectedBlockId, setSelectedBlockId] = useState(() => content.pages[0]?.blocks[0]?.id ?? "")
   const [editorTarget, setEditorTarget] = useState<EditorTarget>("page")
@@ -694,7 +694,25 @@ export function RdiCmsPage() {
   const [previewSize, setPreviewSize] = useState<RdiPreviewSize>("desktop")
   const [newBlockType, setNewBlockType] = useState<RdiBlockType>("split")
   const [isDirty, setIsDirty] = useState(false)
-  const [saveMessage, setSaveMessage] = useState("All changes saved locally")
+  const [saveMessage, setSaveMessage] = useState("Loading server content…")
+
+  useEffect(() => {
+    if (!cms.query.data || isDirty) return
+    const serverContent = cmsSnapshotToEditor(cms.query.data)
+    setContent(serverContent)
+    setSelectedPageId((current) =>
+      serverContent.pages.some(({ id }) => id === current)
+        ? current
+        : (serverContent.pages[0]?.id ?? "home"),
+    )
+    setSaveMessage("All changes saved to the RDI CMS")
+  }, [cms.query.data, isDirty])
+
+  useEffect(() => {
+    if (cms.query.isError) {
+      setSaveMessage("Could not load the RDI CMS. Check your access and connection.")
+    }
+  }, [cms.query.isError])
 
   const selectedPage = content.pages.find((page) => page.id === selectedPageId) ?? content.pages[0]
   const selectedBlock = selectedPage?.blocks.find((block) => block.id === selectedBlockId)
@@ -758,6 +776,15 @@ export function RdiCmsPage() {
     setSelectedBlockId(blockId)
     setEditorTarget("page")
     setWorkspaceView("editor")
+  }
+
+  const loadWebsiteContent = () => {
+    const websitePage = initialRdiSiteContent.pages.find((page) => page.id === selectedPageId)
+    if (!websitePage) return
+    updatePage({ blocks: structuredClone(websitePage.blocks) })
+    setSelectedBlockId(websitePage.blocks[0]?.id ?? "")
+    setEditorTarget("page")
+    setSaveMessage("Website content loaded into this draft. Review before saving.")
   }
 
   const addBlock = () => {
@@ -824,45 +851,81 @@ export function RdiCmsPage() {
     updateBlock({ items: selectedBlock.items?.filter((item) => item.id !== itemId) })
   }
 
-  const persistContent = (nextContent: RdiSiteContent, message: string) => {
+  const saveDraft = async (): Promise<number | undefined> => {
+    if (!cms.query.data) {
+      setSaveMessage("The CMS is not ready yet. Reload and try again.")
+      return undefined
+    }
+
+    setSaveMessage("Saving draft…")
     try {
-      window.localStorage.setItem(RDI_STORAGE_KEY, JSON.stringify(nextContent))
+      const result =
+        editorTarget === "footer"
+          ? await cms.saveSettings.mutateAsync({
+              current: cms.query.data.site,
+              settings: content.settings,
+            })
+          : await cms.savePage.mutateAsync({
+              current:
+                cms.query.data.pages.find(({ key }) => key === selectedPage.id) ??
+                (() => {
+                  throw new Error("Selected page is not available from the CMS")
+                })(),
+              page: selectedPage,
+            })
+
       setIsDirty(false)
-      setSaveMessage(message)
+      setSaveMessage("Draft saved to the RDI CMS")
+      await cms.query.refetch()
+      return result.version
     } catch {
-      setSaveMessage("Could not save. A media upload may be too large for local storage.")
+      setSaveMessage("The draft could not be saved. Reload if another editor changed it.")
+      return undefined
     }
   }
 
-  const saveDraft = () => persistContent(content, "Draft saved locally")
+  const publishPage = async () => {
+    if (!cms.query.data) return
+    setSaveMessage("Preparing publication…")
+    let version =
+      editorTarget === "footer"
+        ? cms.query.data.site.version
+        : cms.query.data.pages.find(({ key }) => key === selectedPage.id)?.version
 
-  const publishPage = () => {
-    if (editorTarget !== "page") {
-      persistContent(content, "Global footer published across all pages")
-      return
-    }
+    if (isDirty) version = await saveDraft()
+    if (!version) return
 
-    const nextContent = {
-      ...content,
-      pages: content.pages.map((page) =>
-        page.id === selectedPage.id ? { ...page, status: "Published" as const } : page
-      ),
+    try {
+      if (editorTarget === "footer") {
+        await cms.publishSettings.mutateAsync(version)
+        setSaveMessage("Global footer published")
+      } else {
+        await cms.publishPage.mutateAsync({ pageKey: selectedPage.id, version })
+        setSaveMessage(`${selectedPage.navigationLabel} page published`)
+      }
+      setIsDirty(false)
+      await cms.query.refetch()
+    } catch {
+      setSaveMessage("Publishing failed. Your saved draft is still safe.")
     }
-    setContent(nextContent)
-    persistContent(nextContent, `${selectedPage.navigationLabel} page published`)
   }
 
-  const restoreSaved = () => {
+  const restoreSaved = async () => {
     if (isDirty && !window.confirm("Discard the unsaved RDI changes in this editing session?")) return
 
-    const savedContent = readSavedContent()
+    const refreshed = await cms.query.refetch()
+    if (!refreshed.data) {
+      setSaveMessage("Could not reload the saved CMS draft")
+      return
+    }
+    const savedContent = cmsSnapshotToEditor(refreshed.data)
     setContent(savedContent)
     const firstPage = savedContent.pages[0]
     setSelectedPageId(firstPage?.id ?? "home")
     setSelectedBlockId(firstPage?.blocks[0]?.id ?? "")
     setEditorTarget("page")
     setIsDirty(false)
-    setSaveMessage("Saved version restored")
+    setSaveMessage("Latest CMS draft restored")
   }
 
   if (!selectedPage) return null
@@ -907,7 +970,7 @@ export function RdiCmsPage() {
                         )}
                       >
                         {view === "editor" ? <LayoutTemplate className="size-3.5" /> : <Eye className="size-3.5" />}
-                        {view}
+                        {view === "editor" ? "Editor" : "Preview"}
                       </button>
                     ))}
                   </div>
@@ -915,8 +978,8 @@ export function RdiCmsPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={saveDraft}
-                    disabled={!isDirty}
+                    onClick={() => void saveDraft()}
+                    disabled={!isDirty || cms.savePage.isPending || cms.saveSettings.isPending}
                     className="h-10 border-grey-200 bg-white text-grey-700"
                   >
                     <Save className="size-4" />
@@ -924,7 +987,8 @@ export function RdiCmsPage() {
                   </Button>
                   <Button
                     type="button"
-                    onClick={publishPage}
+                    onClick={() => void publishPage()}
+                    disabled={cms.publishPage.isPending || cms.publishSettings.isPending}
                     className="h-10 bg-purple text-white hover:bg-purple/90"
                   >
                     <CircleCheck className="size-4" />
@@ -1097,7 +1161,18 @@ export function RdiCmsPage() {
 
                   <button
                     type="button"
-                    onClick={restoreSaved}
+                    onClick={loadWebsiteContent}
+                    disabled={isDirty}
+                    title={isDirty ? "Save or restore your changes before loading website content" : "Load the website content reviewed on 8 September 2026 into this page’s draft"}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-grey-200 bg-white px-3 py-2 text-xs font-semibold text-grey-700 transition-colors hover:bg-grey-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Download className="size-3.5" />
+                    Load website content
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void restoreSaved()}
                     className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-grey-400 transition-colors hover:bg-white hover:text-grey-700"
                   >
                     <RotateCcw className="size-3.5" />
@@ -1112,7 +1187,7 @@ export function RdiCmsPage() {
                     <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-xl bg-white px-4 py-3">
                       <div>
                         <p className="text-sm font-semibold text-grey-900">{selectedPage.navigationLabel} page preview</p>
-                        <p className="mt-1 text-xs text-grey-400">Click any section or the footer in the preview to edit it.</p>
+                        <p className="mt-1 text-xs text-grey-400">Explore the website, or use a section’s Edit button to change its content.</p>
                       </div>
                       <div className="flex rounded-lg bg-grey-100 p-1" aria-label="Preview width">
                         {previewSizeOptions.map((option) => (
@@ -1142,6 +1217,7 @@ export function RdiCmsPage() {
                         page={selectedPage}
                         previewSize={previewSize}
                         onSelectBlock={selectBlock}
+                        onNavigatePage={selectPage}
                         onEditFooter={() => {
                           setEditorTarget("footer")
                           setWorkspaceView("editor")
@@ -1182,7 +1258,7 @@ export function RdiCmsPage() {
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-grey-100 bg-white px-4 py-3 text-xs text-grey-400 shadow-adbox-small">
               <span className="flex items-center gap-2">
                 <Laptop className="size-3.5" />
-                Frontend CMS prototype · Changes are stored in this browser
+                Production CMS · Drafts, publishing, and media are stored securely on the server
               </span>
               <a
                 href="https://www.richdadinvestments.org/"

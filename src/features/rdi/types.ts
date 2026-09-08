@@ -4,16 +4,19 @@ export type RdiBlockType = "hero" | "split" | "cards" | "stats" | "cta"
 
 export type RdiPageStatus = "Published" | "Draft"
 
-export type RdiPreviewSize = "desktop" | "tablet"
+export type RdiPreviewSize = "desktop" | "tablet" | "mobile"
 
 export type RdiMedia = {
   type: RdiMediaType
   url: string
   alt: string
+  assetId?: string
 }
 
 export type RdiContentItem = {
   id: string
+  category?: string
+  visible?: boolean
   eyebrow?: string
   title: string
   description: string

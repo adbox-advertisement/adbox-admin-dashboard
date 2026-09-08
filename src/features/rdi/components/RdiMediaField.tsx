@@ -4,9 +4,8 @@ import { useId, useState, type ChangeEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { RdiMedia } from "@/features/rdi/types"
+import { uploadRdiAsset } from "@/features/rdi/api"
 import { cn } from "@/lib/utils"
-
-const MAX_EMBEDDED_FILE_SIZE = 5 * 1024 * 1024
 
 function getEmbeddedVideoUrl(url: string) {
   if (!url) return null
@@ -105,17 +104,13 @@ export function RdiMediaField({
 }) {
   const inputId = useId()
   const [fileError, setFileError] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ""
 
     if (!file) return
-
-    if (file.size > MAX_EMBEDDED_FILE_SIZE) {
-      setFileError("Files saved in this prototype must be 5 MB or smaller. Use a hosted URL for larger media.")
-      return
-    }
 
     const requiredPrefix = media.type === "image" ? "image/" : "video/"
 
@@ -124,19 +119,25 @@ export function RdiMediaField({
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result !== "string") return
-
+    setIsUploading(true)
+    try {
+      const uploaded = await uploadRdiAsset(
+        file,
+        media.type,
+        media.alt || file.name.replace(/\.[^/.]+$/, ""),
+      )
       setFileError("")
       onChange({
         ...media,
-        url: reader.result,
+        url: uploaded.url,
+        assetId: uploaded.assetId,
         alt: media.alt || file.name.replace(/\.[^/.]+$/, ""),
       })
+    } catch {
+      setFileError("This file could not be uploaded. Check the file and try again.")
+    } finally {
+      setIsUploading(false)
     }
-    reader.onerror = () => setFileError("This file could not be read. Try another file or use a hosted URL.")
-    reader.readAsDataURL(file)
   }
 
   return (
@@ -155,7 +156,7 @@ export function RdiMediaField({
               <button
                 key={type}
                 type="button"
-                onClick={() => onChange({ type, url: "", alt: media.alt })}
+              onClick={() => onChange({ type, url: "", alt: media.alt, assetId: undefined })}
                 className={cn(
                   "flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-semibold capitalize transition-colors",
                   media.type === type
@@ -179,7 +180,7 @@ export function RdiMediaField({
               type="button"
               variant="secondary"
               size="icon"
-              onClick={() => onChange({ ...media, url: "" })}
+              onClick={() => onChange({ ...media, url: "", assetId: undefined })}
               className="absolute right-2 top-2 size-8 rounded-full bg-white/95 text-grey-700 shadow-adbox-small hover:bg-white"
               aria-label="Remove media"
             >
@@ -197,7 +198,9 @@ export function RdiMediaField({
             <Input
               type="url"
               value={media.url.startsWith("data:") ? "" : media.url}
-              onChange={(event) => onChange({ ...media, url: event.target.value })}
+              onChange={(event) =>
+                onChange({ ...media, url: event.target.value, assetId: undefined })
+              }
               placeholder={
                 media.type === "image"
                   ? "https://example.com/image.jpg"
@@ -216,6 +219,7 @@ export function RdiMediaField({
           <input
             id={inputId}
             type="file"
+            disabled={isUploading}
             accept={media.type === "image" ? "image/*" : "video/*"}
             onChange={handleFileChange}
             className="sr-only"
@@ -225,7 +229,7 @@ export function RdiMediaField({
             className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-grey-300 bg-grey-50 px-4 text-sm font-semibold text-grey-700 transition-colors hover:border-purple hover:bg-accent-background hover:text-purple focus-within:ring-2 focus-within:ring-purple/20"
           >
             <Upload aria-hidden="true" className="size-4" />
-            Upload {media.type}
+            {isUploading ? "Uploading…" : `Upload ${media.type}`}
           </label>
 
           <label className="block space-y-2">
