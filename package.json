@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
+    "check:architecture": "node scripts/check-architecture.mjs",
+    "check": "npm run check:architecture && npm run lint && npm run build",
+    "test:smoke": "node tests/smoke/app.smoke.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { DateRangeDropdown } from "@/features/dashboard/components/DateRangeDropdown"
+import { DateRangeDropdown } from "./DateRangeDropdown"
 
 export function DashboardFilters() {
   return (

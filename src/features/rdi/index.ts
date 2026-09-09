@@ -1,2 +1,1 @@
-export { RdiPage } from "./pages/RdiPage"
-export { useRdiCms } from "./hooks"
+export { rdiRoutes } from "./routes"

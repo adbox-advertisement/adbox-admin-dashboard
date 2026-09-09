@@ -1,17 +1,5 @@
-import {
-  Bar,
-  BarChart,
-  ReferenceLine,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts"
-
-type UserOverviewDatum = {
-  month: string
-  users: number
-  highlight?: number
-}
+import { Bar, BarChart, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { type UserOverviewDatum, userOverviewData } from "../data/user-overview"
 
 type BarShapeProps = {
   x?: number
@@ -20,21 +8,6 @@ type BarShapeProps = {
   height?: number
   payload?: UserOverviewDatum
 }
-
-const userOverviewData: UserOverviewDatum[] = [
-  { month: "Jan", users: 58 },
-  { month: "Feb", users: 142 },
-  { month: "Mar", users: 98 },
-  { month: "Apr", users: 112 },
-  { month: "May", users: 90 },
-  { month: "Jun", users: 161, highlight: 90 },
-  { month: "Jul", users: 78, highlight: 53 },
-  { month: "Aug", users: 142 },
-  { month: "Sep", users: 39 },
-  { month: "Oct", users: 112 },
-  { month: "Nov", users: 63 },
-  { month: "Dec", users: 98 },
-]
 
 function UserOverviewBar({ x = 0, y = 0, width = 0, height = 0, payload }: BarShapeProps) {
   const highlightHeight =

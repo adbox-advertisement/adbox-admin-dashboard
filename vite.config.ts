@@ -6,6 +6,17 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Keep shared class-name helpers out of the on-demand chart bundle.
+          framework: ['react', 'react-dom/client', 'react-router-dom', 'clsx'],
+          charts: ['recharts'],
+        },
+      },
+    },
+  },
   server: {
     host: '127.0.0.1',
     port: 5173,

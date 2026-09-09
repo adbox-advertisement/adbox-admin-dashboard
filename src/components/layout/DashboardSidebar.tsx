@@ -1,90 +1,11 @@
-import type { LucideIcon } from "lucide-react"
-import {
-  Banknote,
-  ChevronDown,
-  CircleHelp,
-  CirclePlay,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  UserRound,
-  UsersRound,
-  Video,
-} from "lucide-react"
-import { useState } from "react"
-import { Link, NavLink, useLocation } from "react-router-dom"
+import { ChevronDown, LogOut } from "lucide-react"
+import { useEffect, useId, useState } from "react"
+import { Form, Link, NavLink, useLocation, useNavigation } from "react-router-dom"
 
-import mainLogo from "@/assets/mainlogo.svg"
-import rdiMark from "@/assets/rdi-mark.svg"
+import mainLogo from "@/assets/brand/mainlogo.svg"
+import { navItems } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
-
-type DashboardNavItem = {
-  label: string
-  icon?: LucideIcon
-  imageSrc?: string
-  to: string
-  children?: Array<{
-    label: string
-    to: string
-  }>
-}
-
-const navItems: DashboardNavItem[] = [
-  {
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    to: APP_ROUTES.dashboard,
-  },
-  {
-    label: "Manage Users",
-    icon: UserRound,
-    to: APP_ROUTES.manageUsers,
-  },
-  {
-    label: "Ads Management",
-    icon: CirclePlay,
-    to: APP_ROUTES.adsManagement,
-    children: [
-      { label: "Ad Requests", to: APP_ROUTES.adRequests },
-      { label: "Reported Ads", to: APP_ROUTES.reportedAds },
-    ],
-  },
-  {
-    label: "Video Management",
-    icon: Video,
-    to: APP_ROUTES.videoManagement,
-  },
-  {
-    label: "RDI",
-    imageSrc: rdiMark,
-    to: APP_ROUTES.rdi,
-  },
-  {
-    label: "Financials",
-    icon: Banknote,
-    to: APP_ROUTES.financials,
-    children: [
-      { label: "Advertisers Payment", to: APP_ROUTES.advertisersPayment },
-      { label: "Withdrawals", to: APP_ROUTES.withdrawals },
-    ],
-  },
-  {
-    label: "Support",
-    icon: CircleHelp,
-    to: APP_ROUTES.support,
-  },
-  {
-    label: "Manage Admins",
-    icon: UsersRound,
-    to: APP_ROUTES.manageAdmins,
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    to: APP_ROUTES.settings,
-  },
-]
 
 function DashboardNavigationContent({
   onNavigate,
@@ -92,6 +13,9 @@ function DashboardNavigationContent({
   onNavigate?: () => void
 }) {
   const { pathname } = useLocation()
+  const navigation = useNavigation()
+  const navigationId = useId()
+  const isLoggingOut = navigation.state !== "idle" && navigation.formAction === APP_ROUTES.logout
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
     () =>
       new Set(
@@ -103,6 +27,13 @@ function DashboardNavigationContent({
           .map((item) => item.label)
       )
   )
+
+  useEffect(() => {
+    setExpandedGroups((current) => {
+      const active = navItems.find((item) => item.to === pathname || item.children?.some((child) => child.to === pathname))
+      return active?.children && !current.has(active.label) ? new Set([...current, active.label]) : current
+    })
+  }, [pathname])
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((currentGroups) => {
@@ -134,7 +65,7 @@ function DashboardNavigationContent({
         <nav aria-label="Dashboard navigation" className="flex w-full flex-col gap-1.5">
           {navItems.map((item) => {
             const isExpanded = expandedGroups.has(item.label)
-            const groupId = `${item.label.toLowerCase().replace(/\s+/g, "-")}-subnavigation`
+            const groupId = `${navigationId}-${item.label.toLowerCase().replace(/\s+/g, "-")}-subnavigation`
             const isGroupActive =
               pathname === item.to || item.children?.some((child) => pathname === child.to)
 
@@ -171,72 +102,74 @@ function DashboardNavigationContent({
                     onClick={onNavigate}
                     end
                     className={({ isActive }) =>
-                    cn(
-                      "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                      isActive
-                        ? "bg-purple/10 text-purple"
-                        : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
-                    )
-                  }
-                >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-grey-50 transition-colors group-hover:bg-white group-aria-[current=page]:bg-white">
-                    {item.imageSrc ? (
-                      <img src={item.imageSrc} alt="" className="size-5 object-contain" />
-                    ) : item.icon ? (
-                      <item.icon aria-hidden="true" className="size-5" strokeWidth={1.65} />
-                    ) : null}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                      cn(
+                        "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                        isActive
+                          ? "bg-purple/10 text-purple"
+                          : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
+                      )
+                    }
+                  >
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-grey-50 transition-colors group-hover:bg-white group-aria-[current=page]:bg-white">
+                      {item.imageSrc ? (
+                        <img src={item.imageSrc} alt="" className="size-5 object-contain" />
+                      ) : item.icon ? (
+                        <item.icon aria-hidden="true" className="size-5" strokeWidth={1.65} />
+                      ) : null}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">{item.label}</span>
                   </NavLink>
                 )}
 
-              {item.children ? (
-                <div
-                  className={cn(
-                    "grid transition-[grid-template-rows] duration-200 ease-out",
-                    isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                  )}
-                >
-                  <div className="overflow-hidden">
-                    <div id={groupId} className="ml-7 flex flex-col gap-0.5 border-l border-grey-200 py-1 pl-4">
-                      {item.children.map((child) => (
-                        <NavLink
-                          key={child.to}
-                          to={child.to}
-                          onClick={onNavigate}
-                          className={({ isActive }) =>
-                            cn(
-                              "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",
-                              isActive
-                                ? "bg-auth-background font-semibold text-grey-1000"
-                                : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
-                            )
-                          }
-                        >
-                          <span className="size-1.5 shrink-0 rounded-full bg-grey-300 transition-colors group-aria-[current=page]/child:bg-purple" />
-                          <span className="truncate">{child.label}</span>
-                        </NavLink>
-                      ))}
+                {item.children ? (
+                  <div
+                    className={cn(
+                      "grid transition-[grid-template-rows] duration-200 ease-out",
+                      isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    )}
+                  >
+                    <div className="overflow-hidden" inert={!isExpanded}>
+                      <div id={groupId} className="ml-7 flex flex-col gap-0.5 border-l border-grey-200 py-1 pl-4">
+                        {item.children.map((child) => (
+                          <NavLink
+                            key={child.to}
+                            to={child.to}
+                            onClick={onNavigate}
+                            className={({ isActive }) =>
+                              cn(
+                                "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",
+                                isActive
+                                  ? "bg-auth-background font-semibold text-grey-1000"
+                                  : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
+                              )
+                            }
+                          >
+                            <span className="size-1.5 shrink-0 rounded-full bg-grey-300 transition-colors group-aria-[current=page]/child:bg-purple" />
+                            <span className="truncate">{child.label}</span>
+                          </NavLink>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : null}
-            </div>
+                ) : null}
+              </div>
             )
           })}
         </nav>
       </div>
 
-      <Link
-        to={APP_ROUTES.login}
-        onClick={onNavigate}
-        className="flex h-11 w-full items-center gap-3 rounded-xl border border-transparent px-3 text-b2 text-error-500 outline-none transition-colors hover:border-error-100 hover:bg-error-50 focus-visible:ring-2 focus-visible:ring-error-300"
-      >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-error-50">
-          <LogOut aria-hidden="true" className="size-5" strokeWidth={1.65} />
-        </span>
-        <span>Log Out</span>
-      </Link>
+      <Form method="post" action={APP_ROUTES.logout} onSubmit={onNavigate}>
+        <button
+          type="submit"
+          disabled={isLoggingOut}
+          className="flex h-11 w-full items-center gap-3 rounded-xl border border-transparent px-3 text-b2 text-error-500 outline-none transition-colors hover:border-error-100 hover:bg-error-50 focus-visible:ring-2 focus-visible:ring-error-300"
+        >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-error-50">
+            <LogOut aria-hidden="true" className="size-5" strokeWidth={1.65} />
+          </span>
+          <span>{isLoggingOut ? "Logging out…" : "Log Out"}</span>
+        </button>
+      </Form>
     </>
   )
 }

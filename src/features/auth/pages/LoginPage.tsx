@@ -1,31 +1,28 @@
-import { useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 
-import mainLogo from "@/assets/mainlogo.svg"
+import mainLogo from "@/assets/brand/mainlogo.svg"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { APP_ROUTES } from "@/routes/paths"
-import { loginAdmin } from "@/features/auth/api"
+import { useLogin } from "../hooks"
 
 export function LoginPage() {
   const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const login = useLogin()
+  const isSubmitting = login.isPending
+  const error = login.isError ? "Sign in failed. Check your email and password, then try again." : ""
 
-  const handleSignIn = async (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => { document.title = "Sign in | AdBox" }, [])
+
+  const handleSignIn = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setError("")
-    setIsSubmitting(true)
-    try {
-      await loginAdmin(email, password)
-      navigate(APP_ROUTES.dashboard, { replace: true })
-    } catch {
-      setError("Sign in failed. Check your email and password, then try again.")
-    } finally {
-      setIsSubmitting(false)
-    }
+    if (isSubmitting) return
+    login.mutate({ email: email.trim(), password }, {
+      onSuccess: () => navigate(APP_ROUTES.dashboard, { replace: true }),
+    })
   }
 
   return (

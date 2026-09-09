@@ -1,15 +1,5 @@
-import { UsersGlyph } from "@/features/dashboard/components/DashboardMetricCards"
-
-const audienceStats = [
-  {
-    label: "Total Publishers",
-    value: "321",
-  },
-  {
-    label: "Total Viewers",
-    value: "321",
-  },
-]
+import { UsersGlyph } from "./DashboardMetricCards"
+import { audienceStats } from "../data/audience"
 
 export function DashboardAudienceCards() {
   return (

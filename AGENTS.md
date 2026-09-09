@@ -11,8 +11,9 @@ Before making structural decisions, read `docs/PROJECT_SPEC.md`. It is the produ
 architecture source of truth. Before making layout decisions, read `docs/grid.md` and use it as
 the responsive grid guidance.
 
-Current implementation note: the login screen is implemented under `src/features/auth/` and
-`src/App.tsx` currently renders that auth feature page.
+Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
+Auth, Dashboard, Video Management, and RDI own their lazy routes under `src/features/`.
+Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
 
 ## Architecture Rules
 
@@ -91,8 +92,12 @@ Axios client -> services -> TanStack Query hooks -> components
 - `npm run build` runs `tsc -b` and creates a production build.
 - `npm run lint` runs ESLint.
 - `npm run preview` serves the production build locally.
+- `npm run check:architecture` validates feature boundaries and runtime import cycles.
+- `npm run check` runs architecture checks, ESLint, and the production build.
 
-There is no test runner configured yet.
+`npm run test:smoke` runs the Playwright browser smoke script against an already running
+local server and an installed Chrome browser. It mocks all API calls. See README for overrides.
+There is no unit-test runner configured.
 
 ## Validation Expectations
 

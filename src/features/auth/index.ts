@@ -1,2 +1,2 @@
-export { LoginPage } from "./pages/LoginPage"
-export { loginAdmin, logoutAdmin } from "./api"
+export { authRoutes } from "./routes"
+export { logoutAdmin } from "./api"

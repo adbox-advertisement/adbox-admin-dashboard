@@ -1,26 +1,20 @@
-import { clearTokens, storeTokens, superAdminApi } from "@/api/client"
-
-export type AdminSession = {
-  accessToken: string
-  refreshToken: string
-  tokenType: string
-  expiresIn: number
-}
+import { superAdminApi } from "@/api/client"
+import { clearSession, sessionSchema, storeSession } from "@/lib/auth-session"
 
 export async function loginAdmin(email: string, password: string) {
-  const { data } = await superAdminApi.post<AdminSession>("/auth/login", {
+  const { data } = await superAdminApi.post<unknown>("/auth/login", {
     email,
     password,
   })
-  storeTokens(data)
-  return data
+  const session = sessionSchema.parse(data)
+  storeSession(session)
+  return session
 }
 
 export async function logoutAdmin() {
   try {
     await superAdminApi.post("/auth/logout")
   } finally {
-    clearTokens()
+    clearSession()
   }
 }
-

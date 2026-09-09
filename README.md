@@ -1,54 +1,64 @@
-# React + TypeScript + Vite
+# AdBox Admin Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19, TypeScript, Vite, Tailwind CSS v4, and shadcn/Radix frontend for the AdBox administration workspace.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Use Node.js 22 and npm. Install the locked dependencies, then start Vite:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app opens at `http://127.0.0.1:5173`. API requests use `/api/v1` by default; Vite proxies `/api` to the separate backend at `http://localhost:3005`. To use a different backend, copy `.env.example` to `.env.local` and set `VITE_SUPER_ADMIN_API_URL`. Restart Vite after changing environment variables.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+All `VITE_*` values are public browser configuration. Keep credentials out of environment files committed to the repository. Sign-in requires an available backend and a valid administrator account.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## Project structure
+
+| Location | Responsibility |
+| --- | --- |
+| `src/app/` | App entry, providers, QueryClient configuration |
+| `src/routes/` | Router composition, route guards, paths, route metadata |
+| `src/layouts/` | Shared authenticated page shell |
+| `src/config/` | Navigation, environment values, planned page definitions |
+| `src/features/auth/` | Sign-in and session API operations |
+| `src/features/dashboard/` | Dashboard widgets and display datasets |
+| `src/features/videos/` | School selection, upload folders, media composers, post collections |
+| `src/features/rdi/` | CMS API, content editor, website previews, page templates |
+| `src/components/` | Shared UI primitives, navigation, feedback screens |
+| `src/api/`, `src/lib/` | HTTP transport, session storage, shared utilities |
+| `src/assets/`, `src/styles/` | Brand/media assets and shared design tokens |
+| `database/rdi-cms/` | CMS schema documentation and database installation reference |
+| `scripts/` | Repository validation tooling |
+
+Read [Architecture](docs/ARCHITECTURE.md) before adding modules, [Project spec](docs/PROJECT_SPEC.md) for product requirements, and [Grid guidance](docs/grid.md) for responsive layouts.
+
+## Validation
+
+```bash
+npm run check
 ```
+
+This checks feature boundaries and runtime import cycles, runs ESLint, type-checks the application, and creates the production build. Individual commands are `npm run check:architecture`, `npm run lint`, `npm run typecheck`, and `npm run build`. GitHub Actions runs the same check on pull requests and pushes to `main` or `master`.
+
+With the dev server running and Google Chrome installed, run `npm run test:smoke` for browser checks of authentication, protected routes, mobile navigation, the CMS editor, and session refresh. API calls are mocked and never change live content. Set `ADBOX_TEST_URL=http://127.0.0.1:4173` to check a running production preview, or `ADBOX_BROWSER_CHANNEL` to use another installed Playwright browser channel. Folder creation, media composition, and Posts filters also need verification after changes to those workflows.
+
+## Current integrations
+
+- Authentication and RDI CMS use the configured API. The backend remains responsible for authorization.
+- Dashboard widgets and Posts currently use local display data.
+- Upload folder names and the selected folder persist in this browser. Selected files and composer drafts stay in memory and reset when the upload page is unmounted or reloaded. Upload publishing is not connected to a backend.
+- Other sidebar modules show their existing pending pages. Header search and notifications await integration.
+
+## Build and deployment
+
+```bash
+npm run build
+npm run preview
+```
+
+Deploy `dist/` to a static host. Configure SPA fallback to `index.html` for application paths such as `/video-management/upload`, while preserving real `/api/*` responses and asset paths. Serve the API at `/api/v1` behind the same origin, or set `VITE_SUPER_ADMIN_API_URL` when building and configure backend CORS for that origin.
+
+`npm run preview` is a local build check. Database scripts under `database/rdi-cms/` are separate operational tools; frontend commands never execute them.

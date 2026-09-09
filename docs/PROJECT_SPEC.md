@@ -6,6 +6,9 @@ Google Ads, Meta Ads Manager, LinkedIn Campaign Manager, and TikTok Ads.
 
 The architecture prioritizes modularity, accessibility, developer experience, and performance.
 
+This document describes the product target. See [ARCHITECTURE.md](ARCHITECTURE.md) for the
+implemented folder structure, module ownership, and current integration status.
+
 ---
 
 ## Tech Stack
