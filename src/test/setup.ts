@@ -54,3 +54,18 @@ if (!window.crypto.randomUUID) {
   let counter = 0
   window.crypto.randomUUID = (() => `00000000-0000-4000-8000-${String(counter++).padStart(12, "0")}`) as typeof window.crypto.randomUUID
 }
+
+// Radix Select/Combobox call these during pointer interaction; jsdom has no
+// pointer-capture or scroll implementation at all.
+if (!Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = () => false
+}
+if (!Element.prototype.setPointerCapture) {
+  Element.prototype.setPointerCapture = () => {}
+}
+if (!Element.prototype.releasePointerCapture) {
+  Element.prototype.releasePointerCapture = () => {}
+}
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {}
+}

@@ -4,6 +4,7 @@ import type { QueryClient } from "@tanstack/react-query"
 import { AppLoading } from "@/components/feedback/AppLoading"
 import { RouteErrorPage } from "@/components/feedback/RouteErrorPage"
 import { pendingPages } from "@/config/pending-pages"
+import { adminsRoutes } from "@/features/admins"
 import { authRoutes, logoutAdmin } from "@/features/auth"
 import { dashboardRoutes } from "@/features/dashboard"
 import { rdiRoutes, rdiPreviewRoutes } from "@/features/rdi"
@@ -36,7 +37,7 @@ export function createAppRouter(queryClient: QueryClient) {
         loader: requireAdminSession,
         shouldRevalidate: () => true,
         children: [
-          ...dashboardRoutes, ...videoRoutes, ...rdiRoutes,
+          ...dashboardRoutes, ...videoRoutes, ...rdiRoutes, ...adminsRoutes,
           ...pendingPages.map(({ path, ...page }) => ({
             path,
             handle: { title: page.title },

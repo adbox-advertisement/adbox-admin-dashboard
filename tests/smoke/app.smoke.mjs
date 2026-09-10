@@ -4,6 +4,7 @@ import { checkRdiScreens, checkRdiTouchScreens } from './rdi.smoke.mjs'
 import { checkRdiCms } from './rdi-cms.smoke.mjs'
 import { checkVideoManagement } from './video-management.smoke.mjs'
 import { checkDashboardContent } from './dashboard.smoke.mjs'
+import { checkManageAdmins } from './manage-admins.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
@@ -62,7 +63,7 @@ try {
     ['/manage-users', 'Manage Users'], ['/ads-management', 'Ads Management'],
     ['/ads-management/ad-requests', 'Ad Requests'], ['/ads-management/reported-ads', 'Reported Ads'],
     ['/financials', 'Financials'], ['/financials/advertisers-payment', 'Advertisers Payment'],
-    ['/financials/withdrawals', 'Withdrawals'], ['/support', 'Support'], ['/manage-admins', 'Manage Admins'], ['/settings', 'Settings'],
+    ['/financials/withdrawals', 'Withdrawals'], ['/support', 'Support'], ['/settings', 'Settings'],
   ]) {
     await page.goto(baseUrl + path)
     await page.getByRole('heading', { name: title, exact: true }).waitFor()
@@ -85,6 +86,7 @@ try {
 
   await checkDashboardContent(page, baseUrl)
   await checkVideoManagement(page, baseUrl)
+  await checkManageAdmins(page, baseUrl)
   await checkRdiScreens(page, baseUrl)
   await checkRdiTouchScreens(browser, baseUrl, sessionKey, session)
   await checkRdiCms(page, baseUrl)
