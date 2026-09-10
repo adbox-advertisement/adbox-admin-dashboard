@@ -114,14 +114,24 @@ Axios client -> services -> TanStack Query hooks -> components
 - `npm run lint` runs ESLint.
 - `npm run preview` serves the production build locally.
 - `npm run check:architecture` validates feature boundaries and runtime import cycles.
-- `npm run check` runs architecture checks, ESLint, and the production build.
+- `npm run check` runs architecture checks, ESLint, the test-file type check, the Vitest suite,
+  and the production build.
+- `npm run test` runs the Vitest unit/component suite once (`npm run test:watch` for watch mode).
+- `npm run typecheck:test` type-checks `*.test.ts(x)` files and `src/test/` against
+  `tsconfig.test.json`. Test files are excluded from `tsconfig.app.json` and `npm run build`'s
+  `tsc -b` step, so this is the gate that catches type errors in tests.
 - `npm run ai:codex` starts Codex in the project.
 - `npm run ai:claude` starts Claude Code in the project.
 - `npm run ai:check` checks shared guidance and local CLI availability without contacting models.
 
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
 local server and an installed Chrome browser. It mocks all API calls. See README for overrides.
-There is no unit-test runner configured.
+
+Unit and component tests live beside the code they cover as `*.test.ts`/`*.test.tsx` (Vitest +
+React Testing Library, jsdom environment). Shared test setup and render helpers live in
+`src/test/` (`setup.ts`, `test-utils.tsx`); import `renderWithProviders` from
+`@/test/test-utils` for components that need `QueryClientProvider`/`MemoryRouter`, or
+`@testing-library/react`'s plain `render` for components that don't.
 
 ## Validation Expectations
 
@@ -130,7 +140,12 @@ After code changes, run:
 ```bash
 npm run build
 npm run lint
+npm run test
 ```
+
+Add or update `*.test.ts(x)` files alongside logic you add or change (Zustand stores, validation
+schemas, hooks, and interactive components are the highest-value targets). Extend the relevant
+`tests/smoke/*.smoke.mjs` file for new end-to-end user flows instead of only adding unit tests.
 
 If a command cannot be run, say why. If lint reports pre-existing warnings, call that out without
 mixing them into the change unless the task asks for cleanup.

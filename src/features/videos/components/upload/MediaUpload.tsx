@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react"
-import { Check, FileImage, FileVideo, ImagePlus, Images, RefreshCw, Upload, Video, X } from "lucide-react"
+import { useEffect, useId, useRef, useState } from "react"
+import { Check, Eye, FileImage, FileText, FileVideo, Hash, ImagePlus, Images, RefreshCw, Send, Smartphone, Upload, Video, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import type { MediaKind, SelectedMediaFile, UploadDestination } from "../../types/uploads"
+import { AdboxTextPostPreview } from "./AdboxPostPreview"
 import { PhotoComposer } from "./PhotoComposer"
 
 type Props = UploadDestination & { onCountChange: (kind: MediaKind, count: number) => void }
@@ -30,7 +34,7 @@ const mediaOptions = {
   },
 }
 
-function UploadPanel({ kind, schoolId, folderId, onCountChange }: Props & { kind: MediaKind }) {
+function UploadPanel({ kind, schoolId, folderId, onCountChange }: Props & { kind: "videos" | "photos" }) {
   const config = mediaOptions[kind]
   const inputRef = useRef<HTMLInputElement>(null)
   const objectUrls = useRef(new Set<string>())
@@ -148,16 +152,89 @@ function UploadPanel({ kind, schoolId, folderId, onCountChange }: Props & { kind
   )
 }
 
+function TextPanel({ schoolId, onCountChange }: Props) {
+  const formId = useId()
+  const [text, setText] = useState("")
+  const [reference, setReference] = useState("")
+  const textRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => { onCountChange("text", text.trim().length > 0 ? 1 : 0) }, [text, onCountChange])
+
+  function insertHashtag() {
+    const field = textRef.current
+    const start = field?.selectionStart ?? text.length
+    const end = field?.selectionEnd ?? start
+    const prefix = start > 0 && !/\s/.test(text[start - 1]) ? " #" : "#"
+    const next = text.slice(0, start) + prefix + text.slice(end)
+    if (next.length > 4000) return
+    setText(next)
+    requestAnimationFrame(() => { field?.focus(); field?.setSelectionRange(start + prefix.length, start + prefix.length) })
+  }
+
+  return (
+    <div className="p-4 sm:p-5">
+      <div className="video-composer video-reveal">
+        <div className="min-w-0">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div><h3 className="font-heading text-xl font-semibold">Create text post</h3><p className="mt-1.5 text-xs leading-5 text-muted-foreground">Share an update with a reference code, no media required.</p></div>
+            <Dialog>
+              <DialogTrigger asChild><Button type="button" variant="outline" className="video-preview-trigger h-11 rounded-xl px-3"><Eye className="size-4" aria-hidden="true" />Preview</Button></DialogTrigger>
+              <DialogContent className="video-management-ui rounded-3xl">
+                <DialogTitle>Post preview</DialogTitle>
+                <DialogDescription className="sr-only">See how your text and reference look on AdBox.</DialogDescription>
+                <AdboxTextPostPreview schoolId={schoolId} text={text} reference={reference} />
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="space-y-5">
+            <div>
+              <label htmlFor={formId + "-text"} className="mb-2 block text-sm font-semibold">Text</label>
+              <div className="overflow-hidden rounded-xl border border-border bg-card focus-within:border-secondary focus-within:shadow-adbox-focus-secondary">
+                <Textarea ref={textRef} id={formId + "-text"} maxLength={4000} placeholder="Write your post…" value={text} onChange={(event) => setText(event.target.value)} className="min-h-40 resize-y rounded-none border-0 px-3.5 py-3 focus-visible:shadow-none" aria-describedby={formId + "-text-count"} />
+                <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-muted/30 px-2 py-1.5">
+                  <Button type="button" variant="ghost" onClick={insertHashtag} disabled={text.length >= 4000} className="h-10 rounded-lg text-xs text-secondary"><Hash aria-hidden="true" />Add hashtag</Button>
+                  <span id={formId + "-text-count"} className="pr-2 text-xs tabular-nums text-muted-foreground">{text.length}/4000</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <label htmlFor={formId + "-reference"} className="text-sm font-semibold">Reference</label>
+                <span id={formId + "-reference-count"} className="text-xs tabular-nums text-muted-foreground">{reference.length}/40</span>
+              </div>
+              <Input id={formId + "-reference"} maxLength={40} placeholder="e.g. REF-2049" value={reference} onChange={(event) => setReference(event.target.value)} className="h-12 rounded-xl border-border px-3.5" aria-describedby={formId + "-reference-count"} />
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">A tracking or document reference code for this post.</p>
+            </div>
+          </div>
+          <div className="mt-6 border-t border-border pt-5">
+            <div className="flex flex-wrap gap-3">
+              <Button type="button" variant="secondary" disabled className="h-11 min-w-32 rounded-xl"><Send aria-hidden="true" />Post</Button>
+              <Button type="button" variant="ghost" onClick={() => { setText(""); setReference("") }} className="h-11 rounded-xl px-4 text-muted-foreground">Discard</Button>
+            </div>
+            <p className="mt-3 text-xs leading-6 text-muted-foreground">Text stays on this device. Posting will be available when uploads are connected.</p>
+          </div>
+        </div>
+        <aside aria-label="AdBox mobile preview" className="video-inline-preview min-w-0">
+          <div className="mb-4 flex items-center justify-between gap-2"><h3 className="font-heading text-base font-semibold">Live preview</h3><Smartphone className="size-4 text-secondary" aria-hidden="true" /></div>
+          <AdboxTextPostPreview schoolId={schoolId} text={text} reference={reference} />
+        </aside>
+      </div>
+    </div>
+  )
+}
+
 export function MediaUpload(props: Props) {
   const mediaRef = useRef<HTMLDivElement>(null)
   return (
-    <Tabs ref={mediaRef} defaultValue="videos" onValueChange={() => mediaRef.current?.querySelectorAll("video").forEach((video) => video.pause())} className="video-media-workspace">
+    <Tabs ref={mediaRef} defaultValue="photos" onValueChange={() => mediaRef.current?.querySelectorAll("video").forEach((video) => video.pause())} className="video-media-workspace">
       <TabsList aria-label="Media type" className="mx-4 mt-4 gap-1 rounded-xl border-0 bg-muted/70 p-1 sm:mx-5">
-        <TabsTrigger value="videos" className="flex-1 justify-center rounded-lg border-0 px-3 py-3 data-[state=active]:bg-card data-[state=active]:text-secondary data-[state=active]:shadow-adbox-small"><Video className="size-4" aria-hidden="true" /> Videos</TabsTrigger>
         <TabsTrigger value="photos" className="flex-1 justify-center rounded-lg border-0 px-3 py-3 data-[state=active]:bg-card data-[state=active]:text-secondary data-[state=active]:shadow-adbox-small"><Images className="size-4" aria-hidden="true" /> Photos</TabsTrigger>
+        <TabsTrigger value="videos" className="flex-1 justify-center rounded-lg border-0 px-3 py-3 data-[state=active]:bg-card data-[state=active]:text-secondary data-[state=active]:shadow-adbox-small"><Video className="size-4" aria-hidden="true" /> Videos</TabsTrigger>
+        <TabsTrigger value="text" className="flex-1 justify-center rounded-lg border-0 px-3 py-3 data-[state=active]:bg-card data-[state=active]:text-secondary data-[state=active]:shadow-adbox-small"><FileText className="size-4" aria-hidden="true" /> Text</TabsTrigger>
       </TabsList>
-      <TabsContent value="videos" forceMount className="data-[state=inactive]:hidden"><UploadPanel kind="videos" {...props} /></TabsContent>
       <TabsContent value="photos" forceMount className="data-[state=inactive]:hidden"><UploadPanel kind="photos" {...props} /></TabsContent>
+      <TabsContent value="videos" forceMount className="data-[state=inactive]:hidden"><UploadPanel kind="videos" {...props} /></TabsContent>
+      <TabsContent value="text" forceMount className="data-[state=inactive]:hidden"><TextPanel {...props} /></TabsContent>
     </Tabs>
   )
 }

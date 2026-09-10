@@ -9,6 +9,7 @@ import { useUploadFolderStore } from "../../store/folder-store"
 import type { UploadSchoolId } from "../../data/schools"
 import type { MediaSelectionCounts } from "../../types/uploads"
 import { CreateFolderDialog } from "./CreateFolderDialog"
+import { RenameFolderDialog } from "./RenameFolderDialog"
 
 const PAGE_SIZE = 6
 
@@ -20,10 +21,11 @@ type Props = {
 }
 
 function describeSelection(counts?: MediaSelectionCounts) {
-  if (!counts || counts.videos + counts.photos === 0) return "No files selected"
+  if (!counts || counts.videos + counts.photos + counts.text === 0) return "No files selected"
   return [
     counts.videos > 0 && (counts.videos + (counts.videos === 1 ? " video" : " videos")),
     counts.photos > 0 && (counts.photos + (counts.photos === 1 ? " photo" : " photos")),
+    counts.text > 0 && "text note",
   ].filter(Boolean).join(" · ") + " selected"
 }
 
@@ -134,6 +136,7 @@ export function UploadFolders({ schoolId, selectedId, selectionCounts, onSelect 
                         <span className="block truncate font-heading text-sm font-semibold" title={folder.name}>{folder.name}</span>
                         <span id={browserId + "-count-" + folder.id} className="mt-1.5 block text-xs leading-5 text-muted-foreground">{describeSelection(selectionCounts[folder.id])}</span>
                       </span>
+                      {folder.id !== "general" && "schoolId" in folder && <RenameFolderDialog folder={folder} />}
                       <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-full border", selected ? "border-secondary bg-secondary text-secondary-foreground" : "border-border")} aria-hidden="true">
                         {selected && <Check className="size-3.5" strokeWidth={2.5} />}
                       </span>

@@ -54,7 +54,7 @@ export function SchoolUploadWorkspace({ schoolId, active }: { schoolId: UploadSc
 
   const updateCount = useCallback<CountChangeHandler>((folderId, kind, count) => {
     setSelectionCounts((current) => {
-      const previous = current[folderId] ?? { videos: 0, photos: 0 }
+      const previous = current[folderId] ?? { videos: 0, photos: 0, text: 0 }
       if (previous[kind] === count) return current
       return { ...current, [folderId]: { ...previous, [kind]: count } }
     })

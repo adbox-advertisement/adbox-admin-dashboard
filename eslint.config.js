@@ -34,4 +34,12 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Test helpers and specs are never loaded by Vite's dev server, so Fast
+    // Refresh's "only export components" constraint does not apply to them.
+    files: ['**/*.test.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 )

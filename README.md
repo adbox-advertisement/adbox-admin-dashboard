@@ -55,9 +55,11 @@ Follow [AI workflow](docs/AI_WORKFLOW.md) for installation and switching tools, 
 npm run check
 ```
 
-This checks feature boundaries and runtime import cycles, runs ESLint, type-checks the application, and creates the production build. Individual commands are `npm run check:architecture`, `npm run lint`, `npm run typecheck`, and `npm run build`. GitHub Actions runs the same check on pull requests and pushes to `main` or `master`.
+This checks feature boundaries and runtime import cycles, runs ESLint, type-checks `*.test.ts(x)` files, runs the Vitest unit/component suite, type-checks the application, and creates the production build. Individual commands are `npm run check:architecture`, `npm run lint`, `npm run typecheck:test`, `npm run test`, `npm run typecheck`, and `npm run build`. GitHub Actions runs the same check on pull requests and pushes to `main` or `master`.
 
-With the dev server running and Google Chrome installed, run `npm run test:smoke` for browser checks of authentication, protected routes, mobile navigation, the six RDI screens, and CMS editing, previews, images, backups, and storage recovery. API calls are mocked and never change live content. Set `ADBOX_TEST_URL=http://127.0.0.1:4173` to check a running production preview, or `ADBOX_BROWSER_CHANNEL` to use another installed Playwright browser channel. Folder creation, media composition, and Posts filters also need verification after changes to those workflows.
+Vitest and React Testing Library cover logic-heavy code (Zustand stores, validation schemas, hooks) and interactive components, as `*.test.ts`/`*.test.tsx` files next to the code they cover; run `npm run test` once or `npm run test:watch` while iterating. Shared setup and render helpers live in `src/test/`.
+
+With the dev server running and Google Chrome installed, run `npm run test:smoke` for browser checks of authentication, protected routes, mobile navigation, the Dashboard, Video Management (school selection incl. search, folder create/rename, the Photos/Videos/Text upload tabs, and Posts), the six RDI screens, and CMS editing, previews, images, backups, and storage recovery. API calls are mocked and never change live content. Set `ADBOX_TEST_URL=http://127.0.0.1:4173` to check a running production preview, or `ADBOX_BROWSER_CHANNEL` to use another installed Playwright browser channel.
 
 ## Current integrations
 

@@ -50,6 +50,7 @@ export const useUploadFolderStore = create<{
   selectionError: string
   selectFolder: (schoolId: UploadSchoolId, id: string) => void
   createFolder: (schoolId: UploadSchoolId, name: string) => CreateFolderResult
+  renameFolder: (schoolId: UploadSchoolId, id: string, name: string) => CreateFolderResult
 }>((set, get) => ({
   folders: readFolders(),
   selectedBySchool: readSelection(),
@@ -74,6 +75,24 @@ export const useUploadFolderStore = create<{
     }
     const folder: UploadFolder = { id: crypto.randomUUID(), schoolId, name: parsed.data }
     const folders = [...get().folders, folder]
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(folders))
+    } catch {
+      return { error: "This browser couldn't save the folder. Check that browser storage is available and try again." }
+    }
+    set({ folders })
+    return { folder }
+  },
+  renameFolder: (schoolId, id, name) => {
+    const parsed = folderNameSchema.safeParse(name)
+    if (!parsed.success) return { error: parsed.error.issues[0].message }
+    const normalizedName = parsed.data.toLocaleLowerCase()
+    if (normalizedName === "general" || get().folders.some((folder) => folder.schoolId === schoolId && folder.id !== id && folder.name.toLocaleLowerCase() === normalizedName)) {
+      return { error: "A folder with this name already exists in this school." }
+    }
+    const folders = get().folders.map((folder) => folder.id === id ? { ...folder, name: parsed.data } : folder)
+    const folder = folders.find((entry) => entry.id === id)
+    if (!folder) return { error: "This folder no longer exists." }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(folders))
     } catch {

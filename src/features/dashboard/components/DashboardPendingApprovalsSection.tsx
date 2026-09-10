@@ -39,7 +39,7 @@ function ApprovePill() {
 
 function PendingApprovalsTable() {
   return (
-    <article className="min-h-[615px] max-w-full overflow-hidden rounded-[20px] bg-white">
+    <article className="min-h-[615px] max-w-full overflow-hidden rounded-[20px] bg-white shadow-adbox-small">
       <header className="flex min-h-[76px] items-center justify-between gap-4 px-6 sm:px-[26px]">
         <h2 className="font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
           Pending Approvals
@@ -86,7 +86,7 @@ function PendingApprovalsTable() {
             {pendingApprovals.map((approval, index) => (
               <tr
                 key={`${approval.title}-${index}`}
-                className="h-[91px] text-b3 md:text-b2"
+                className="h-[91px] text-b3 transition-colors hover:bg-grey-50/70 md:text-b2"
               >
                 <td className="px-6 py-4 sm:px-[26px]">
                   <div className="flex min-w-0 items-center gap-3">
@@ -136,7 +136,7 @@ function EarningBreakdownCard() {
   )
 
   return (
-    <article className="flex min-h-[425px] flex-col overflow-hidden rounded-[20px] bg-white px-6 py-9">
+    <article className="flex min-h-[425px] flex-col overflow-hidden rounded-[20px] bg-white px-6 py-9 shadow-adbox-small">
       <header className="mb-6 flex items-start justify-between gap-4">
         <h2 className="font-heading text-h6 font-semibold text-grey-1000 md:text-h5 md:leading-[27px] lg:text-h6 xl:text-h5">
           Earning Breakdown

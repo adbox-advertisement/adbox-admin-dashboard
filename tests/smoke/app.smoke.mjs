@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { checkRdiScreens, checkRdiTouchScreens } from './rdi.smoke.mjs'
 import { checkRdiCms } from './rdi-cms.smoke.mjs'
+import { checkVideoManagement } from './video-management.smoke.mjs'
+import { checkDashboardContent } from './dashboard.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
@@ -81,6 +83,8 @@ try {
   await page.getByRole('heading', { name: 'Dashboard', exact: true }).waitFor()
   console.log('All planned routes, shared page shell, mobile navigation, and responsive layouts passed')
 
+  await checkDashboardContent(page, baseUrl)
+  await checkVideoManagement(page, baseUrl)
   await checkRdiScreens(page, baseUrl)
   await checkRdiTouchScreens(browser, baseUrl, sessionKey, session)
   await checkRdiCms(page, baseUrl)

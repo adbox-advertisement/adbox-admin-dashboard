@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640" role="img" aria-label="">
+  <defs>
+    <radialGradient id="gis-bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0%" stop-color="#f6f1fd" />
+      <stop offset="100%" stop-color="#e9e1fa" />
+    </radialGradient>
+    <linearGradient id="gis-island" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c9bdf0" />
+      <stop offset="100%" stop-color="#b6a7ea" />
+    </linearGradient>
+    <linearGradient id="gis-building" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b5bdb" />
+      <stop offset="100%" stop-color="#2c46b3" />
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="640" fill="url(#gis-bg)" />
+
+  <ellipse cx="480" cy="470" rx="330" ry="110" fill="url(#gis-island)" opacity="0.55" />
+
+  <g transform="translate(345,205)">
+    <rect x="0" y="90" width="270" height="170" rx="18" fill="url(#gis-building)" />
+    <rect x="30" y="40" width="210" height="60" rx="14" fill="#4c6bec" />
+    <polygon points="15,90 255,90 135,20" fill="#f4b13d" />
+    <rect x="120" y="150" width="30" height="110" rx="6" fill="#f4b13d" />
+    <rect x="35" y="150" width="34" height="34" rx="6" fill="#e8edff" />
+    <rect x="90" y="150" width="34" height="34" rx="6" fill="#e8edff" />
+    <rect x="205" y="150" width="34" height="34" rx="6" fill="#e8edff" />
+    <rect x="35" y="200" width="34" height="34" rx="6" fill="#e8edff" />
+    <rect x="205" y="200" width="34" height="34" rx="6" fill="#e8edff" />
+    <circle cx="135" cy="8" r="10" fill="#f4b13d" />
+  </g>
+
+  <g transform="translate(250,430)" opacity="0.9">
+    <circle cx="0" cy="0" r="34" fill="#7cc98f" />
+    <rect x="-6" y="20" width="12" height="26" rx="4" fill="#8a6a4d" />
+  </g>
+  <g transform="translate(700,420)" opacity="0.9">
+    <circle cx="0" cy="0" r="40" fill="#6fc07f" />
+    <rect x="-7" y="24" width="14" height="30" rx="4" fill="#8a6a4d" />
+  </g>
+  <g transform="translate(620,470)" opacity="0.85">
+    <circle cx="0" cy="0" r="24" fill="#8ad198" />
+    <rect x="-5" y="16" width="10" height="20" rx="3" fill="#8a6a4d" />
+  </g>
+
+  <g transform="translate(600,235) rotate(-8)" opacity="0.95">
+    <polygon points="0,0 70,26 0,52 -70,26" fill="#1b2559" />
+    <rect x="-6" y="26" width="12" height="34" fill="#1b2559" />
+    <circle cx="0" cy="60" r="6" fill="#f4b13d" />
+  </g>
+
+  <g transform="translate(310,320) rotate(6)" opacity="0.95">
+    <rect x="-40" y="-28" width="80" height="56" rx="8" fill="#ffffff" />
+    <rect x="-32" y="-16" width="64" height="8" rx="4" fill="#3b5bdb" />
+    <rect x="-32" y="-2" width="64" height="8" rx="4" fill="#c9bdf0" />
+    <rect x="-32" y="12" width="40" height="8" rx="4" fill="#c9bdf0" />
+  </g>
+
+</svg>

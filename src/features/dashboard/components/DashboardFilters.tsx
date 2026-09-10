@@ -6,7 +6,7 @@ import { DateRangeDropdown } from "./DateRangeDropdown"
 export function DashboardFilters() {
   return (
     <section className="px-4 sm:px-6">
-      <div className="rounded-2xl bg-white p-6">
+      <div className="rounded-2xl bg-white p-6 shadow-adbox-small">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <button

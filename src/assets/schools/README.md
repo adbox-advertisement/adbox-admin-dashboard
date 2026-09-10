@@ -15,3 +15,9 @@ The card assets are locally bundled 960 × 640 JPEGs.
 The full final prompt set is saved in [prompts.json](./prompts.json).
 UG was generated first and used as the style reference for the remaining four assets.
 The generated art replaces the previous web-sourced photos.
+
+## Placeholder asset
+
+| Asset | Status |
+| --- | --- |
+| `gis.svg` | Hand-drawn flat placeholder for Ghana International School (GIS), not generated with `image_gen`. Swap for a clay-render illustration matching the series above (see `prompts.json` for the shared style template) when one is available. |

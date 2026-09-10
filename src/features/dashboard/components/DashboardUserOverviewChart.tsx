@@ -44,7 +44,7 @@ function UserOverviewBar({ x = 0, y = 0, width = 0, height = 0, payload }: BarSh
 export function DashboardUserOverviewChart() {
   return (
     <section className="px-4 sm:px-6">
-      <article className="min-h-[364px] max-w-full overflow-hidden rounded-[20px] bg-white pb-[30px] pl-6 pr-2 pt-7 sm:pl-8">
+      <article className="min-h-[364px] max-w-full overflow-hidden rounded-[20px] bg-white pb-[30px] pl-6 pr-2 pt-7 shadow-adbox-small sm:pl-8">
         <div className="mb-[21px]">
           <p className="text-b2 font-semibold text-secondary-grey-600 md:text-b1 md:leading-[19px]">
             User Overview

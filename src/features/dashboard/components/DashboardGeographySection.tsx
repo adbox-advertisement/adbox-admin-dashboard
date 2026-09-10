@@ -158,7 +158,7 @@ function TopRegionsTable({
 
 function TopPublishersTable() {
   return (
-    <article className="flex min-h-[326px] flex-col overflow-hidden rounded-[14px] bg-white">
+    <article className="flex min-h-[326px] flex-col overflow-hidden rounded-[14px] bg-white shadow-adbox-small">
       <div className="px-4 pb-2 pt-6 sm:px-5">
         <h2 className="font-heading text-h6 font-semibold text-black md:text-h5">
           Top Publishers
@@ -183,7 +183,7 @@ function TopPublishersTable() {
             {publishers.map((publisher) => (
               <tr
                 key={publisher.name}
-                className="text-b3 text-grey-500 md:text-b2"
+                className="text-b3 text-grey-500 transition-colors hover:bg-grey-50/70 md:text-b2"
               >
                 <td className="px-4 py-2 sm:px-5">
                   <div className="flex items-center gap-[10px]">
@@ -218,7 +218,7 @@ export function DashboardGeographySection() {
   return (
     <section className="px-4 sm:px-6">
       <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-12">
-        <article className="overflow-hidden rounded-[20px] bg-white px-5 pb-[30px] pt-7 sm:px-8 lg:col-span-8">
+        <article className="overflow-hidden rounded-[20px] bg-white px-5 pb-[30px] pt-7 shadow-adbox-small sm:px-8 lg:col-span-8">
           <div className="mb-[21px] flex items-start gap-6">
             <h2 className="min-w-0 flex-1 font-heading text-h6 font-semibold text-black md:text-h5">
               Geographical Performance

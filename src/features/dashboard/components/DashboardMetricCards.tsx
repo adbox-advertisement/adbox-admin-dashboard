@@ -1,3 +1,6 @@
+import { ArrowDownRight, ArrowUpRight } from "lucide-react"
+
+import { cn } from "@/lib/utils"
 import revenueSparkline from "@/assets/dashboard/revenue-sparkline.svg"
 import userIconBg from "@/assets/dashboard/user-icon-bg.svg"
 import userIconGroup1 from "@/assets/dashboard/user-icon-group-1.svg"
@@ -6,6 +9,8 @@ import userIconGroup3 from "@/assets/dashboard/user-icon-group-3.svg"
 import userIconGroup4 from "@/assets/dashboard/user-icon-group-4.svg"
 
 const paymentBars = [82, 52, 69, 91, 24]
+
+export type TrendDirection = "up" | "down"
 
 export function UsersGlyph() {
   return (
@@ -41,6 +46,35 @@ export function UsersGlyph() {
   )
 }
 
+export function TrendBadge({
+  direction,
+  value,
+  tone = "default",
+}: {
+  direction: TrendDirection
+  value: string
+  tone?: "default" | "inverse"
+}) {
+  const isUp = direction === "up"
+  const Icon = isUp ? ArrowUpRight : ArrowDownRight
+
+  return (
+    <span
+      className={cn(
+        "inline-flex w-fit items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none",
+        tone === "inverse"
+          ? "bg-white/15 text-white"
+          : isUp
+            ? "bg-success-100 text-success-700"
+            : "bg-error-100 text-error-700",
+      )}
+    >
+      <Icon className="size-3" strokeWidth={2.5} aria-hidden="true" />
+      {value}
+    </span>
+  )
+}
+
 function MiniBarChart() {
   return (
     <div
@@ -62,16 +96,25 @@ function MiniBarChart() {
   )
 }
 
+const cardBase =
+  "min-h-[112px] overflow-hidden rounded-[20px] shadow-adbox-small transition-all duration-200 hover:-translate-y-0.5 hover:shadow-adbox-medium"
+
 export function DashboardMetricCards() {
   return (
     <section className="px-4 sm:px-6">
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-12">
-        <article className="col-span-1 flex min-h-[90px] items-center gap-4 overflow-hidden rounded-[20px] bg-[image:var(--gradient-primary)] p-4 sm:col-span-4 md:col-span-3 xl:col-span-3">
-          <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <article
+          className={cn(
+            cardBase,
+            "col-span-1 flex items-center gap-4 bg-[image:var(--gradient-primary)] p-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+          )}
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
             <p className="truncate text-b3 text-accent-background md:text-b2">Total Revenue</p>
             <p className="truncate font-heading text-h6 font-semibold text-white md:text-h5">
               $2421,682
             </p>
+            <TrendBadge direction="up" value="12.4%" tone="inverse" />
           </div>
           <img
             src={revenueSparkline}
@@ -80,34 +123,52 @@ export function DashboardMetricCards() {
           />
         </article>
 
-        <article className="col-span-1 flex min-h-[90px] items-center gap-4 overflow-hidden rounded-[20px] bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3">
+        <article
+          className={cn(
+            cardBase,
+            "col-span-1 flex items-center gap-4 bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+          )}
+        >
           <UsersGlyph />
-          <div className="flex min-w-0 flex-1 flex-col gap-4">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
             <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">Total Users</p>
             <p className="truncate font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
               321
             </p>
+            <TrendBadge direction="up" value="8.1%" />
           </div>
         </article>
 
-        <article className="col-span-1 flex min-h-[90px] items-center gap-4 overflow-hidden rounded-[20px] bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3">
-          <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <article
+          className={cn(
+            cardBase,
+            "col-span-1 flex items-center gap-4 bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+          )}
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
             <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">Ad Payment</p>
             <p className="truncate font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
               $9,2421,682
             </p>
+            <TrendBadge direction="up" value="4.6%" />
           </div>
           <MiniBarChart />
         </article>
 
-        <article className="col-span-1 flex min-h-[90px] items-center gap-4 overflow-hidden rounded-[20px] bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3">
-          <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <article
+          className={cn(
+            cardBase,
+            "col-span-1 flex items-center gap-4 bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+          )}
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
             <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">
               Reward Payment
             </p>
             <p className="truncate font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
               $9,2421
             </p>
+            <TrendBadge direction="down" value="2.3%" />
           </div>
           <MiniBarChart />
         </article>
