@@ -100,7 +100,7 @@ function DashboardNavigationContent({
                   <NavLink
                     to={item.to}
                     onClick={onNavigate}
-                    end
+                    end={item.to !== APP_ROUTES.rdi}
                     className={({ isActive }) =>
                       cn(
                         "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white",

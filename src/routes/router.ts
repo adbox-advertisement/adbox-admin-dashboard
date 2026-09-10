@@ -6,7 +6,7 @@ import { RouteErrorPage } from "@/components/feedback/RouteErrorPage"
 import { pendingPages } from "@/config/pending-pages"
 import { authRoutes, logoutAdmin } from "@/features/auth"
 import { dashboardRoutes } from "@/features/dashboard"
-import { rdiRoutes } from "@/features/rdi"
+import { rdiRoutes, rdiPreviewRoutes } from "@/features/rdi"
 import { videoRoutes } from "@/features/videos"
 import { DashboardLayout } from "@/layouts/DashboardLayout"
 import { requireAdminSession, redirectToWorkspace } from "./guards"
@@ -29,6 +29,7 @@ export function createAppRouter(queryClient: QueryClient) {
           return redirect(APP_ROUTES.login)
         },
       },
+      { loader: requireAdminSession, shouldRevalidate: () => true, children: rdiPreviewRoutes },
       {
         id: "dashboard-layout",
         Component: DashboardLayout,

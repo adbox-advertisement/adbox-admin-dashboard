@@ -1,6 +1,22 @@
 # AGENTS.md
 
-Project guidance for Codex and other coding agents working in this repository.
+Shared project guidance for Codex and Claude Code working in this repository.
+Codex reads this file directly; `CLAUDE.md` imports it for Claude Code. Keep shared rules here.
+
+## Starting And Handing Off Work
+
+- Read `docs/AI_HANDOFF.md` at the start of a task, then check `git status --short` and the
+  relevant diff. The working tree may contain unfinished user work or changes from the other tool.
+- Continue from the files on disk. Preserve unrelated changes and do not reset, clean, stash,
+  commit, push, or deploy work unless the user requests that action.
+- Before switching tools or ending a substantive task, update `docs/AI_HANDOFF.md` with the
+  result, relevant files, checks actually run, remaining work, and any blockers. Keep it concise;
+  do not store credentials, private account details, or chat transcripts.
+- The two tools share repository files, not conversation history or account credentials.
+  Follow the latest user request when it changes the handoff's scope.
+- Use one editing session per checkout. If the user requests simultaneous work, use separate
+  branches and worktrees with distinct tasks; do not have both tools edit the same files at once.
+- See `docs/AI_WORKFLOW.md` for launch commands and the switching workflow.
 
 ## Project Context
 
@@ -14,6 +30,11 @@ the responsive grid guidance.
 Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
 Auth, Dashboard, Video Management, and RDI own their lazy routes under `src/features/`.
 Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
+
+RDI is a browser-only CMS and website UI. Preserve its local drafts, bundled images, backups,
+and previews. Do not add RDI APIs, remote uploads, publishing, or contact delivery without a new
+user request. Authentication uses the existing API independently. Historical database scripts
+under `database/rdi-cms/` are disconnected from the frontend; do not run them during setup.
 
 ## Architecture Rules
 
@@ -94,6 +115,9 @@ Axios client -> services -> TanStack Query hooks -> components
 - `npm run preview` serves the production build locally.
 - `npm run check:architecture` validates feature boundaries and runtime import cycles.
 - `npm run check` runs architecture checks, ESLint, and the production build.
+- `npm run ai:codex` starts Codex in the project.
+- `npm run ai:claude` starts Claude Code in the project.
+- `npm run ai:check` checks shared guidance and local CLI availability without contacting models.
 
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
 local server and an installed Chrome browser. It mocks all API calls. See README for overrides.

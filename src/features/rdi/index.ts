@@ -1,1 +1,1 @@
-export { rdiRoutes } from "./routes"
+export { rdiRoutes, rdiPreviewRoutes } from "./routes"

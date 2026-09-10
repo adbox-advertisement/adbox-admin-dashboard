@@ -1,34 +1,15 @@
 import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
+import { checkRdiScreens, checkRdiTouchScreens } from './rdi.smoke.mjs'
+import { checkRdiCms } from './rdi-cms.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
-const labels = ['Home', 'About', 'Construction', 'Media', 'Solar', 'Contact']
-let pages = labels.map(label => ({
-  id: label.toLowerCase(), key: label.toLowerCase(), name: label, navigationLabel: label,
-  slug: label === 'Home' ? '/' : '/' + label.toLowerCase(), version: 1,
-  content: {
-    seo: { title: label, description: 'Browser test fixture', noIndex: true },
-    blocks: [{ key: label.toLowerCase() + '-hero', type: 'hero', name: label + ' introduction', visible: true, order: 0,
-      content: { eyebrow: 'Welcome', title: 'Explore ' + label, description: 'A local browser test.' }, items: [] }],
-  },
-}))
-const site = {
-  id: 'rdi', key: 'rdi', version: 1,
-  settings: {
-    branding: { siteName: 'RDI' }, navigation: [],
-    footer: { description: 'Local test footer', columns: [], socialLinks: [], copyright: 'RDI',
-      contact: { heading: 'Contact', address: 'Accra', phone: '+233000000000', email: 'test@example.com' } },
-  },
-}
 let loginAllowed = false
 let refreshCount = 0
-let refreshCms = false
-let failAfterRefresh = false
-let saveCount = 0
 const unexpectedRequests = []
 const runtimeErrors = []
 
@@ -46,25 +27,6 @@ try {
         await new Promise(resolve => setTimeout(resolve, 100))
         return reply({ ...session, accessToken: 'smoke-refreshed' })
       }
-      if (url.pathname.includes('/cms/sites/rdi')) {
-        if (refreshCms && request.headers().authorization !== 'Bearer smoke-refreshed') return reply({}, 401)
-        if (refreshCms && failAfterRefresh) { failAfterRefresh = false; return reply({}, 500) }
-        if (request.method() === 'PATCH' && url.pathname.endsWith('/draft')) {
-          const body = request.postDataJSON()
-          const key = url.pathname.split('/').at(-2)
-          const current = pages.find(page => page.key === key)
-          assert.equal(body.baseVersion, current.version)
-          assert.equal(request.headers()['if-match'], '"draft:' + current.version + '"')
-          assert.ok(request.headers()['idempotency-key'])
-          const blocks = body.operations.find(operation => operation.op === 'replace' && operation.path === '/blocks').value
-          const saved = { ...current, version: current.version + 1, content: { ...current.content, blocks } }
-          pages = pages.map(page => page.key === key ? saved : page)
-          saveCount++
-          return reply(saved)
-        }
-        if (request.method() === 'GET' && url.pathname.endsWith('/pages')) return reply(pages)
-        if (request.method() === 'GET' && url.pathname.endsWith('/rdi')) return reply(site)
-      }
       unexpectedRequests.push(request.method() + ' ' + url.pathname)
       return reply({}, 500)
     }
@@ -74,11 +36,12 @@ try {
   const page = await context.newPage()
   page.setDefaultTimeout(15_000)
   page.on('pageerror', error => runtimeErrors.push(error.message))
+  page.on('console', message => { if (message.type() === 'error' && /same key|unique.*key/i.test(message.text())) runtimeErrors.push(message.text()) })
   const startupScripts = []
   page.on('request', request => { if (request.resourceType() === 'script') startupScripts.push(request.url()) })
   await page.goto(baseUrl + '/login')
   await page.getByRole('button', { name: 'Sign in', exact: true }).waitFor()
-  assert.equal(startupScripts.some(url => /DashboardPage|RdiCmsPage|VideoUploadPage|charts-/.test(url)), false, 'Feature bundles should load on demand')
+  assert.equal(startupScripts.some(url => /DashboardPage|RdiWebsiteLayout|RdiHomePage|VideoUploadPage|charts-/.test(url)), false, 'Feature bundles should load on demand')
   await page.goto(baseUrl + '/video-management/upload')
   await page.waitForURL('**/login')
   await page.getByRole('textbox', { name: 'Email', exact: true }).fill('admin@example.com')
@@ -118,36 +81,9 @@ try {
   await page.getByRole('heading', { name: 'Dashboard', exact: true }).waitFor()
   console.log('All planned routes, shared page shell, mobile navigation, and responsive layouts passed')
 
-  await page.setViewportSize({ width: 1440, height: 1000 })
-  await page.goto(baseUrl + '/rdi')
-  await page.getByText('All changes saved to the RDI CMS', { exact: true }).waitFor()
-  assert.equal(await page.getByRole('navigation', { name: 'RDI website pages' }).getByRole('button').count(), 6)
-  await page.getByRole('button', { name: 'Editor', exact: true }).click()
-  await page.getByRole('textbox', { name: 'Heading', exact: true }).fill('Reviewed browser draft')
-  await page.getByText('Unsaved changes', { exact: true }).waitFor()
-  const savedResponse = page.waitForResponse(response => response.request().method() === 'PATCH')
-  await page.getByRole('button', { name: 'Save draft', exact: true }).click()
-  await savedResponse
-  await page.getByText(/^(All changes saved to the RDI CMS|Draft saved to the RDI CMS)$/).waitFor()
-  assert.equal(saveCount, 1)
-  assert.equal(pages[0].content.blocks[0].content.title, 'Reviewed browser draft')
-  await page.getByRole('button', { name: 'Preview', exact: true }).click()
-  await page.frameLocator('iframe[title="RDI website desktop preview"]').getByRole('heading', { name: 'Reviewed browser draft', exact: true }).waitFor()
-  await page.getByRole('button', { name: /Global footer/ }).click()
-  await page.getByRole('heading', { name: 'Footer navigation', exact: true }).waitFor()
-  await page.setViewportSize({ width: 390, height: 1000 })
-  await page.getByRole('button', { name: 'Open dashboard navigation', exact: true }).click()
-  await page.getByRole('dialog').getByRole('link', { name: 'Dashboard', exact: true }).click()
-  await page.getByRole('heading', { name: 'Dashboard', exact: true }).waitFor()
-  console.log('CMS loading, editor changes, versioned draft save, preview, footer, and mobile navigation passed')
-
-  refreshCms = true
-  failAfterRefresh = true
-  await page.goto(baseUrl + '/rdi')
-  await page.getByText('All changes saved to the RDI CMS', { exact: true }).waitFor()
-  assert.equal(refreshCount, 1, 'Concurrent unauthorized requests should share one refresh')
-  assert.equal(await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).accessToken, sessionKey), 'smoke-refreshed')
-  console.log('Concurrent token refresh and recoverable API failure passed')
+  await checkRdiScreens(page, baseUrl)
+  await checkRdiTouchScreens(browser, baseUrl, sessionKey, session)
+  await checkRdiCms(page, baseUrl)
 
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.getByRole('button', { name: 'Log Out', exact: true }).click()

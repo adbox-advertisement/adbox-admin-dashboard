@@ -11,7 +11,10 @@
     "check:architecture": "node scripts/check-architecture.mjs",
     "check": "npm run check:architecture && npm run lint && npm run build",
     "test:smoke": "node tests/smoke/app.smoke.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ai:codex": "codex",
+    "ai:claude": "claude",
+    "ai:check": "node scripts/check-ai-tools.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

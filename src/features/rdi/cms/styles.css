@@ -1,0 +1,16 @@
+.rdi-cms { container: cms / inline-size; }
+:is(.rdi-cms, .rdi-cms-dialog) :is(button, a, [role="button"], select) { cursor: pointer; }
+:is(.rdi-cms, .rdi-cms-dialog) :is(input, textarea) { cursor: text; }
+:is(.rdi-cms, .rdi-cms-dialog) :is(button, a, input, textarea, select, [tabindex]):focus-visible { outline: 2px solid var(--adbox-blue); outline-offset: 3px; }
+:is(.rdi-cms, .rdi-cms-dialog) :disabled { cursor: not-allowed; }
+.rdi-cms .cms-page-cover { background-image: var(--gradient-purple); }
+.cms-editor-grid { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+.cms-preview-column { display: none; }
+@container cms (min-width: 880px) {
+  .cms-editor-grid { grid-template-columns: minmax(170px, 3fr) minmax(0, 5fr) minmax(0, 4fr); gap: 16px; }
+  .cms-preview-column { display: block; }
+}
+@container cms (min-width: 1200px) {
+  .cms-editor-grid { grid-template-columns: minmax(185px, 2fr) minmax(0, 5fr) minmax(0, 5fr); gap: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { :is(.rdi-cms, .rdi-cms-dialog) *, :is(.rdi-cms, .rdi-cms-dialog) *::before, :is(.rdi-cms, .rdi-cms-dialog) *::after { transition-duration: 0ms !important; animation: none !important; scroll-behavior: auto !important; } }
