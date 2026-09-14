@@ -5,12 +5,20 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { downloadRolesCsv } from "../lib/export"
-import { useRolesStore } from "../store/roles-store"
+import { useRbacAccess, useRoles } from "../hooks"
+import { rbacErrorMessage } from "../lib/errors"
+import type { Role } from "../types"
+import { RolePermissionsDialog } from "./RolePermissionsDialog"
 import { RoleFormDialog } from "./RoleFormDialog"
 import { RoleRowMenu } from "./RoleRowMenu"
 
+const emptyRoles: Role[] = []
+
 export function RolesTable() {
-  const roles = useRolesStore((state) => state.roles)
+  const rolesQuery = useRoles()
+  const roles = rolesQuery.data ?? emptyRoles
+  const can = useRbacAccess()
+  const [createdRole, setCreatedRole] = useState<Role | null>(null)
   const [query, setQuery] = useState("")
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [addOpen, setAddOpen] = useState(false)
@@ -45,13 +53,13 @@ export function RolesTable() {
     <article className="overflow-hidden rounded-[20px] bg-white shadow-adbox-small">
       <div className="flex flex-wrap items-center gap-3 border-b border-grey-200 p-4 sm:p-5">
         <div className="relative min-w-[220px] flex-1">
-          <label htmlFor={searchId} className="sr-only">Search user by name/user name</label>
+          <label htmlFor={searchId} className="sr-only">Search roles by name or description</label>
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-grey-400" />
           <Input
             id={searchId}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search user by name/user name"
+            placeholder="Search roles by name or description"
             autoComplete="off"
             className="h-11 rounded-full border-grey-200 bg-grey-50 pl-10 pr-10 text-b3 focus-visible:border-grey-300 focus-visible:ring-0 md:text-b2"
           />
@@ -71,6 +79,7 @@ export function RolesTable() {
           <Button
             type="button"
             className="h-11 cursor-pointer rounded-full bg-[image:var(--gradient-purple)] px-5 text-b3 font-semibold text-white hover:opacity-90 md:text-b2"
+            disabled={!can("roles.create")}
             onClick={() => setAddOpen(true)}
           >
             <Plus className="size-4" aria-hidden="true" />Add Role
@@ -79,6 +88,7 @@ export function RolesTable() {
             type="button"
             variant="outline"
             className="h-11 cursor-pointer rounded-full border-grey-300 px-5 text-b3 font-semibold text-grey-1000 hover:bg-grey-50 md:text-b2"
+            disabled={!rolesQuery.isSuccess || filtered.length === 0}
             onClick={() => downloadRolesCsv(filtered)}
           >
             <Download className="size-4" aria-hidden="true" />Export
@@ -86,10 +96,16 @@ export function RolesTable() {
         </div>
       </div>
 
+      {rolesQuery.isPending && <p role="status" className="p-6 text-sm text-muted-foreground">Loading roles…</p>}
+      {rolesQuery.isError && <div role="alert" className="flex flex-wrap items-center gap-3 p-6">
+        <p className="text-sm text-destructive">{rbacErrorMessage(rolesQuery.error, "Could not load roles.")}</p>
+        <Button type="button" variant="outline" onClick={() => void rolesQuery.refetch()}>Retry roles</Button>
+      </div>}
+
       {/* contain:paint stops the wide table's layout from leaking into the
           document's scrollWidth through the nested overflow-x-auto scroll
           container (see AdminsTable for the confirmed Chromium quirk). */}
-      <div className="max-w-full overflow-x-auto [contain:paint]">
+      {rolesQuery.data && <div className="max-w-full overflow-x-auto [contain:paint]">
         <table className="w-full min-w-[760px] text-left">
           <thead>
             <tr className="border-b border-grey-200 bg-grey-50/60 text-b3 font-semibold text-grey-500 md:text-b2">
@@ -116,12 +132,13 @@ export function RolesTable() {
                     <span className="truncate font-semibold text-grey-1000">{role.name}</span>
                   </div>
                 </td>
-                <td className="px-3 py-4 align-top text-grey-500">{role.description}</td>
+                <td className="px-3 py-4 align-top text-grey-500">{role.description || "—"}</td>
                 <td className="px-3 py-4 align-top">
                   <div className="flex flex-wrap gap-1.5">
+                    {role.permissions.length === 0 && <span className="text-grey-500">No permissions</span>}
                     {role.permissions.map((permission) => (
-                      <span key={permission} className="inline-flex items-center rounded-full bg-grey-100 px-2.5 py-1 text-b4 font-medium leading-none text-grey-600">
-                        {permission}
+                      <span key={permission.id} className="inline-flex items-center rounded-full bg-grey-100 px-2.5 py-1 text-b4 font-medium leading-none text-grey-600">
+                        {permission.key === "*" ? "All permissions" : permission.key}
                       </span>
                     ))}
                   </div>
@@ -138,9 +155,10 @@ export function RolesTable() {
             <p className="mt-1.5 max-w-sm text-sm leading-6 text-grey-500">Try a different name or description.</p>
           </div>
         )}
-      </div>
+      </div>}
 
-      <RoleFormDialog key={addOpen ? "add-open" : "add-closed"} mode="create" open={addOpen} onOpenChange={setAddOpen} />
+      <RoleFormDialog key={addOpen ? "add-open" : "add-closed"} mode="create" open={addOpen} onOpenChange={setAddOpen} onCreated={(role) => { if (can("roles.permissions.assign") && can("permissions.read")) setCreatedRole(role) }} />
+      {createdRole && <RolePermissionsDialog role={createdRole} open onOpenChange={(open) => { if (!open) setCreatedRole(null) }} />}
     </article>
   )
 }

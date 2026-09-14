@@ -1,12 +1,11 @@
 import { ShieldCheck, Users } from "lucide-react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAdminsStore } from "../store/admins-store"
-import { useRolesStore } from "../store/roles-store"
+import { useAdmins, useRoles } from "../hooks"
 import { AdminsTable } from "../components/AdminsTable"
 import { RolesTable } from "../components/RolesTable"
 
-function SummaryPill({ icon, tone, label, value }: { icon: React.ReactNode; tone: "purple" | "blue"; label: string; value: number }) {
+function SummaryPill({ icon, tone, label, value }: { icon: React.ReactNode; tone: "purple" | "blue"; label: string; value: number | string }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-2.5 shadow-adbox-small">
       <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${tone === "purple" ? "bg-purple/10 text-purple" : "bg-blue/10 text-blue"}`}>
@@ -21,8 +20,10 @@ function SummaryPill({ icon, tone, label, value }: { icon: React.ReactNode; tone
 }
 
 export function ManageAdminsPage() {
-  const adminsCount = useAdminsStore((state) => state.admins.length)
-  const rolesCount = useRolesStore((state) => state.roles.length)
+  const admins = useAdmins()
+  const adminsCount = admins.isSuccess ? admins.data.length : "—"
+  const roles = useRoles()
+  const rolesCount = roles.isSuccess ? roles.data.length : "—"
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-6 pb-10 pt-8 sm:pb-12">

@@ -10,7 +10,7 @@ describe("getCurrentAdmin", () => {
     const controller = new AbortController()
 
     await expect(getCurrentAdmin(controller.signal)).resolves.toEqual({
-      id: "admin-1", email: "admin@example.com", roles: ["SUPER_ADMIN"],
+      id: "admin-1", email: "admin@example.com", roles: ["SUPER_ADMIN"], permissions: ["*"],
     })
     expect(get).toHaveBeenCalledWith("/auth/me", { signal: controller.signal })
   })

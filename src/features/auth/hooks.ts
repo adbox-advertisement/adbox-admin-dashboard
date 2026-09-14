@@ -16,7 +16,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) => loginAdmin(email, password),
     onSuccess: () => {
-      queryClient.removeQueries({ queryKey: currentAdminQueryKey })
+      queryClient.removeQueries()
     },
   })
 }

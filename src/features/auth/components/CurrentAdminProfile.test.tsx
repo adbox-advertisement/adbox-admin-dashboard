@@ -7,7 +7,7 @@ import { CurrentAdminProfile } from "./CurrentAdminProfile"
 
 vi.mock("../api", () => ({ getCurrentAdmin: vi.fn(), loginAdmin: vi.fn() }))
 
-const admin = { id: "admin-1", email: "admin@example.com", roles: ["SUPER_ADMIN", "CONTENT_MANAGER"] }
+const admin = { id: "admin-1", email: "admin@example.com", roles: ["SUPER_ADMIN", "CONTENT_MANAGER"], permissions: ["*"] }
 
 describe("CurrentAdminProfile", () => {
   beforeEach(() => {

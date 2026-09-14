@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { RemoveRoleDialog } from "./RemoveRoleDialog"
 import { RoleFormDialog } from "./RoleFormDialog"
+import { RolePermissionsDialog } from "./RolePermissionsDialog"
+import { useRbacAccess } from "../hooks"
 import type { Role } from "../types"
 
 export function RoleRowMenu({ role }: { role: Role }) {
-  const [activeAction, setActiveAction] = useState<"edit" | "remove" | null>(null)
+  const [activeAction, setActiveAction] = useState<"edit" | "permissions" | "remove" | null>(null)
+  const can = useRbacAccess()
+
+  if (role.isSystem) return <span className="text-xs text-muted-foreground">System role</span>
+  if (!can("roles.update") && !can("roles.delete") && !can("roles.permissions.assign")) return null
 
   return (
     <>
@@ -25,15 +31,13 @@ export function RoleRowMenu({ role }: { role: Role }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {/* Both open the same form: Permissions is one field on the same
-              Edit Roles dialog as name/description, not a separate flow. */}
-          <DropdownMenuItem onSelect={() => setActiveAction("edit")} className="cursor-pointer">
-            <Pencil className="size-4" aria-hidden="true" />Edit Permission
+          <DropdownMenuItem disabled={!can("roles.permissions.assign")} onSelect={() => setActiveAction("permissions")} className="cursor-pointer">
+            <Pencil className="size-4" aria-hidden="true" />Edit permissions
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setActiveAction("edit")} className="cursor-pointer">
+          <DropdownMenuItem disabled={!can("roles.update")} onSelect={() => setActiveAction("edit")} className="cursor-pointer">
             <Pencil className="size-4" aria-hidden="true" />Edit role
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setActiveAction("remove")} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+          <DropdownMenuItem disabled={!can("roles.delete")} onSelect={() => setActiveAction("remove")} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
             <Trash2 className="size-4" aria-hidden="true" />Delete role
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -45,6 +49,7 @@ export function RoleRowMenu({ role }: { role: Role }) {
         open={activeAction === "edit"}
         onOpenChange={(open) => setActiveAction(open ? "edit" : null)}
       />
+      <RolePermissionsDialog key={activeAction === "permissions" ? role.id : "permissions-closed"} role={role} open={activeAction === "permissions"} onOpenChange={(open) => setActiveAction(open ? "permissions" : null)} />
       <RemoveRoleDialog
         key={activeAction === "remove" ? "remove-" + role.id : "remove-closed"}
         role={role}

@@ -14,8 +14,8 @@ function download(content: string, filename: string) {
 }
 
 export function adminsToCsv(admins: Admin[]) {
-  const header = ["First name", "Last name", "Role", "Email", "Telephone", "Last updated"]
-  const rows = admins.map((admin) => [admin.firstName, admin.lastName, admin.role, admin.email, admin.telephone, admin.updatedAt])
+  const header = ["First name", "Last name", "Roles", "Email", "Status", "Direct permissions", "Last updated"]
+  const rows = admins.map((admin) => [admin.firstName, admin.lastName, admin.roles.map((role) => role.name).join(", "), admin.email, admin.isActive ? "Active" : "Inactive", admin.permissions.map((permission) => permission.key).join(", "), admin.updatedAt])
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n")
 }
 
@@ -25,7 +25,7 @@ export function downloadAdminsCsv(admins: Admin[]) {
 
 export function rolesToCsv(roles: Role[]) {
   const header = ["Role", "Description", "Permissions", "Last updated"]
-  const rows = roles.map((role) => [role.name, role.description, role.permissions.join(", "), role.updatedAt])
+  const rows = roles.map((role) => [role.name, role.description, role.permissions.map((permission) => permission.key).join(", "), role.updatedAt])
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n")
 }
 
