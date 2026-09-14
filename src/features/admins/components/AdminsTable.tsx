@@ -8,16 +8,31 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { downloadAdminsCsv } from "../lib/export"
 import { useAdminsStore } from "../store/admins-store"
-import { adminDisplayName, adminRoles, type Admin } from "../types"
+import { adminDisplayName, adminRoles, type Admin, type AdminRole } from "../types"
 import { AdminFormDialog } from "./AdminFormDialog"
 import { AdminRowMenu } from "./AdminRowMenu"
 
+const roleBadgeTone: Record<AdminRole, string> = {
+  "Super Admin": "bg-purple/10 text-purple",
+  Administrator: "bg-blue/10 text-blue",
+  Accountant: "bg-cyan/10 text-blue",
+  Auditor: "bg-grey-100 text-grey-600",
+}
+
+function RoleBadge({ role }: { role: AdminRole }) {
+  return (
+    <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-b4 font-semibold leading-none ${roleBadgeTone[role]}`}>
+      {role}
+    </span>
+  )
+}
+
 function AdminAvatar({ admin }: { admin: Admin }) {
   if (admin.avatar) {
-    return <img src={admin.avatar} alt="" className="size-9 shrink-0 rounded-full object-cover" />
+    return <img src={admin.avatar} alt="" className="size-9 shrink-0 rounded-full object-cover ring-2 ring-white" />
   }
   return (
-    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-purple/10 text-sm font-semibold text-purple" aria-hidden="true">
+    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[image:var(--gradient-purple)] text-sm font-semibold text-white" aria-hidden="true">
       {admin.firstName.charAt(0).toUpperCase()}
     </span>
   )
@@ -60,7 +75,7 @@ export function AdminsTable() {
 
   return (
     <article className="overflow-hidden rounded-[20px] bg-white shadow-adbox-small">
-      <div className="flex flex-wrap items-center gap-3 p-4 sm:p-5">
+      <div className="flex flex-wrap items-center gap-3 border-b border-grey-200 p-4 sm:p-5">
         <div className="relative min-w-[220px] flex-1">
           <label htmlFor={searchId} className="sr-only">Search user by name/user name</label>
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-grey-400" />
@@ -77,7 +92,7 @@ export function AdminsTable() {
               type="button"
               aria-label="Clear search"
               onClick={() => setQuery("")}
-              className="absolute right-0 top-0 flex h-11 w-10 items-center justify-center text-grey-400 hover:text-grey-1000"
+              className="absolute right-0 top-0 flex h-11 w-10 cursor-pointer items-center justify-center text-grey-400 hover:text-grey-1000"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -85,7 +100,7 @@ export function AdminsTable() {
         </div>
 
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger aria-label="Filter by role" className="h-11 w-[160px] rounded-full border-grey-200 bg-grey-50 text-b3 md:text-b2">
+          <SelectTrigger aria-label="Filter by role" className="h-11 w-[160px] cursor-pointer rounded-full border-grey-200 bg-grey-50 text-b3 md:text-b2">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -98,14 +113,14 @@ export function AdminsTable() {
           <Button
             type="button"
             variant="outline"
-            className="h-11 rounded-full border-grey-300 px-5 text-b3 font-semibold text-grey-1000 hover:bg-grey-50 md:text-b2"
+            className="h-11 cursor-pointer rounded-full border-grey-300 px-5 text-b3 font-semibold text-grey-1000 hover:bg-grey-50 md:text-b2"
             onClick={() => downloadAdminsCsv(filtered)}
           >
             <Download className="size-4" aria-hidden="true" />Export
           </Button>
           <Button
             type="button"
-            className="h-11 rounded-full bg-[image:var(--gradient-purple)] px-5 text-b3 font-semibold text-white hover:opacity-90 md:text-b2"
+            className="h-11 cursor-pointer rounded-full bg-[image:var(--gradient-purple)] px-5 text-b3 font-semibold text-white hover:opacity-90 md:text-b2"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="size-4" aria-hidden="true" />Add Admin
@@ -121,10 +136,10 @@ export function AdminsTable() {
       <div className="max-w-full overflow-x-auto [contain:paint]">
         <table className="w-full min-w-[760px] text-left">
           <thead>
-            <tr className="border-b border-divider text-b3 font-semibold text-grey-500 md:text-b2">
+            <tr className="border-b border-grey-200 bg-grey-50/60 text-b3 font-semibold text-grey-500 md:text-b2">
               <th className="px-6 py-4 font-semibold sm:px-[26px]">
                 <div className="flex items-center gap-3">
-                  <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all admins" />
+                  <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all admins" className="cursor-pointer" />
                   <span className="text-grey-1000">User</span>
                 </div>
               </th>
@@ -136,15 +151,15 @@ export function AdminsTable() {
           </thead>
           <tbody>
             {filtered.map((admin) => (
-              <tr key={admin.id} className="border-b border-divider text-b3 last:border-b-0 md:text-b2">
+              <tr key={admin.id} className="border-b border-grey-200 text-b3 transition-colors last:border-b-0 hover:bg-grey-50/60 md:text-b2">
                 <td className="px-6 py-4 sm:px-[26px]">
                   <div className="flex items-center gap-3">
-                    <Checkbox checked={selected.has(admin.id)} onCheckedChange={() => toggleOne(admin.id)} aria-label={"Select " + adminDisplayName(admin)} />
+                    <Checkbox checked={selected.has(admin.id)} onCheckedChange={() => toggleOne(admin.id)} aria-label={"Select " + adminDisplayName(admin)} className="cursor-pointer" />
                     <AdminAvatar admin={admin} />
                     <span className="truncate font-semibold text-grey-1000">{adminDisplayName(admin)}</span>
                   </div>
                 </td>
-                <td className="px-3 py-4 text-grey-500">{admin.role}</td>
+                <td className="px-3 py-4"><RoleBadge role={admin.role} /></td>
                 <td className="px-3 py-4 text-grey-500">{admin.email}</td>
                 <td className="px-3 py-4 whitespace-nowrap text-grey-500">{format(new Date(admin.updatedAt), "MMM d '|' h:mm a")}</td>
                 <td className="px-6 py-4 text-right sm:px-[26px]"><AdminRowMenu admin={admin} /></td>
@@ -154,7 +169,7 @@ export function AdminsTable() {
         </table>
         {filtered.length === 0 && (
           <div className="flex flex-col items-center px-6 py-14 text-center">
-            <span className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-grey-50 text-grey-400"><SearchX className="size-6" aria-hidden="true" /></span>
+            <span className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-purple/10 text-purple"><SearchX className="size-6" aria-hidden="true" /></span>
             <h3 className="font-heading text-base font-semibold text-grey-1000">No admins found</h3>
             <p className="mt-1.5 max-w-sm text-sm leading-6 text-grey-500">Try a different name, username, or role filter.</p>
           </div>

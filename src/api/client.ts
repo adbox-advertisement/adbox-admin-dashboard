@@ -34,7 +34,9 @@ async function refreshSession(): Promise<AuthSession> {
 
 superAdminApi.interceptors.response.use(undefined, async (error: AxiosError) => {
   const request = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined
-  if (error.response?.status !== 401 || !request || request._retried || request.url?.startsWith("/auth/")) {
+  // The profile endpoint is protected and should refresh expired access tokens.
+  const isAuthAction = request?.url?.startsWith("/auth/") && request.url !== "/auth/me"
+  if (error.response?.status !== 401 || !request || request._retried || isAuthAction) {
     return Promise.reject(error)
   }
   request._retried = true

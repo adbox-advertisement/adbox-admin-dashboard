@@ -23,7 +23,7 @@ export function PermissionsPicker({ id, value, onChange }: { id: string; value: 
         id={id}
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        className="flex min-h-11 w-full flex-wrap items-center gap-2 rounded-xl border border-input bg-transparent px-3 py-2 text-left outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="flex min-h-11 w-full cursor-pointer flex-wrap items-center gap-2 rounded-xl border border-input bg-transparent px-3 py-2 text-left outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         {value.length === 0 ? (
           <span className="text-sm text-muted-foreground">Select permission</span>
@@ -37,7 +37,7 @@ export function PermissionsPicker({ id, value, onChange }: { id: string; value: 
                 aria-label={"Remove " + permission}
                 onClick={(event) => { event.stopPropagation(); remove(permission) }}
                 onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); remove(permission) } }}
-                className="flex size-4 items-center justify-center rounded-full text-secondary/70 outline-none hover:bg-secondary/20 hover:text-secondary"
+                className="flex size-4 cursor-pointer items-center justify-center rounded-full text-secondary/70 outline-none hover:bg-secondary/20 hover:text-secondary"
               >
                 <X className="size-3" aria-hidden="true" />
               </span>
@@ -54,7 +54,7 @@ export function PermissionsPicker({ id, value, onChange }: { id: string; value: 
               key={permission}
               type="button"
               onClick={() => add(permission)}
-              className="rounded-full bg-card px-3 py-1.5 text-xs font-medium text-secondary shadow-adbox-small transition-colors hover:bg-secondary/10"
+              className="cursor-pointer rounded-full bg-card px-3 py-1.5 text-xs font-medium text-secondary shadow-adbox-small transition-colors hover:bg-secondary/10"
             >
               {permission}
             </button>

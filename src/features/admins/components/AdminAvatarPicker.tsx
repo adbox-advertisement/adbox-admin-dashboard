@@ -40,7 +40,7 @@ export function AdminAvatarPicker({ value, onChange }: { value: string; onChange
           type="button"
           onClick={() => inputRef.current?.click()}
           aria-label={value ? "Change profile photo" : "Upload profile photo"}
-          className="flex size-20 items-center justify-center overflow-hidden rounded-full bg-grey-100 outline-none focus-visible:shadow-adbox-focus-secondary"
+          className="flex size-20 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-grey-100 outline-none focus-visible:shadow-adbox-focus-secondary"
         >
           {value ? <img src={value} alt="" className="size-full object-cover" /> : <UserRound className="size-8 text-grey-400" strokeWidth={1.5} aria-hidden="true" />}
         </button>

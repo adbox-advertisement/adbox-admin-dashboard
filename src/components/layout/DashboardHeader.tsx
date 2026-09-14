@@ -1,7 +1,6 @@
 import { Bell, Menu, Search } from "lucide-react"
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 
-import adminAvatar from "@/assets/dashboard/admin-avatar.jpg"
 import { DashboardSheetNavigation } from "@/components/layout/DashboardSidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,16 +13,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 
-export function DashboardHeader({ title = "Dashboard" }: { title?: string }) {
+export function DashboardHeader({ title = "Dashboard", account }: { title?: string; account: ReactNode }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
 
   return (
-    <header className="grid min-h-[101px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 bg-auth-background px-4 py-6 sm:px-6 md:grid-cols-[auto_minmax(0,415px)_auto] md:gap-6 lg:grid-cols-[minmax(0,1fr)_415px]">
+    <header className="grid min-h-[101px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 bg-auth-background px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-6">
       <h1 className="min-w-0 truncate py-1 font-heading text-h5 font-semibold leading-tight text-grey-1000 md:text-h4">
         {title}
       </h1>
 
-      <div className="justify-self-end md:col-start-3 lg:hidden">
+      <div className="justify-self-end lg:hidden">
         <Sheet open={isNavOpen} onOpenChange={setIsNavOpen}>
           <SheetTrigger asChild>
             <Button
@@ -48,8 +47,8 @@ export function DashboardHeader({ title = "Dashboard" }: { title?: string }) {
         </Sheet>
       </div>
 
-      <div className="col-span-2 row-start-2 flex h-[61px] w-full max-w-full shrink-0 items-center justify-end gap-3 rounded-[30px] bg-white py-2.5 pl-2.5 pr-[11px] shadow-[14px_17px_20px_rgba(112,144,176,0.08)] md:col-span-1 md:col-start-2 md:row-start-1 md:max-w-[415px] md:justify-self-center md:gap-5 lg:justify-self-end">
-        <label className="relative h-[41px] min-w-0 flex-1">
+      <div className="col-span-2 row-start-2 grid min-h-[61px] w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-3xl bg-white p-2.5 shadow-adbox-small sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:col-span-1 xl:col-start-2 xl:row-start-1">
+        <label className="relative h-[41px] min-w-0">
           <span className="sr-only">Search dashboard</span>
           <Search
             aria-hidden="true"
@@ -73,11 +72,9 @@ export function DashboardHeader({ title = "Dashboard" }: { title?: string }) {
           <Bell className="size-6" strokeWidth={1.7} />
         </Button>
 
-        <img
-          src={adminAvatar}
-          alt="Admin profile"
-          className="size-[41px] shrink-0 rounded-full object-cover"
-        />
+        <div className="col-span-2 min-w-0 border-t border-grey-100 px-1 pb-1 pt-3 sm:col-span-1 sm:border-l sm:border-t-0 sm:py-0 sm:pl-3 sm:pr-0">
+          {account}
+        </div>
       </div>
     </header>
   )

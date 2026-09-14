@@ -17,11 +17,11 @@ export function RemoveRoleDialog({ role, open, onOpenChange }: { role: Role; ope
           <DialogDescription className="mt-2">Admins assigned this role will need a new one. This can't be undone.</DialogDescription>
         </div>
         <div className="mt-2 flex justify-end gap-3">
-          <DialogClose asChild><Button type="button" variant="outline" className="h-11 rounded-xl px-4">Cancel</Button></DialogClose>
+          <DialogClose asChild><Button type="button" variant="outline" className="h-11 cursor-pointer rounded-xl px-4">Cancel</Button></DialogClose>
           <Button
             type="button"
             variant="destructive"
-            className="h-11 rounded-xl px-4"
+            className="h-11 cursor-pointer rounded-xl px-4"
             onClick={() => { removeRole(role.id); onOpenChange(false) }}
           >
             Remove role

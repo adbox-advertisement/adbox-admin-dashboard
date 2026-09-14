@@ -134,7 +134,7 @@ export function AdminFormDialog(props: Props) {
           <div>
             <label htmlFor={`${formId}-role`} className="mb-2 block text-sm font-medium">Assign Role</label>
             <Select value={values.role} onValueChange={(role) => { setValues((current) => ({ ...current, role: role as AdminInput["role"] })); setError("") }}>
-              <SelectTrigger id={`${formId}-role`} className="h-11 w-full"><SelectValue /></SelectTrigger>
+              <SelectTrigger id={`${formId}-role`} className="h-11 w-full cursor-pointer"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {adminRoles.map((role) => <SelectItem key={role} value={role}>{role}</SelectItem>)}
               </SelectContent>
@@ -142,8 +142,8 @@ export function AdminFormDialog(props: Props) {
           </div>
 
           {!isEdit && (
-            <label className="flex items-center gap-3 text-sm text-grey-1000">
-              <Checkbox checked={notify} onCheckedChange={(checked) => setNotify(checked === true)} />
+            <label className="flex cursor-pointer items-center gap-3 text-sm text-grey-1000">
+              <Checkbox checked={notify} onCheckedChange={(checked) => setNotify(checked === true)} className="cursor-pointer" />
               Send notification after adding admin
             </label>
           )}
@@ -151,8 +151,8 @@ export function AdminFormDialog(props: Props) {
           {error && <p role="alert" className="text-sm leading-6 text-destructive">{error}</p>}
 
           <div className="mt-1 flex justify-end gap-3">
-            <DialogClose asChild><Button type="button" variant="outline" className="h-11 rounded-full px-5">Cancel</Button></DialogClose>
-            <Button type="submit" className="h-11 rounded-full bg-[image:var(--gradient-purple)] px-5 text-white hover:opacity-90">{isEdit ? "Save changes" : "Add Admin"}</Button>
+            <DialogClose asChild><Button type="button" variant="outline" className="h-11 cursor-pointer rounded-full px-5">Cancel</Button></DialogClose>
+            <Button type="submit" className="h-11 cursor-pointer rounded-full bg-[image:var(--gradient-purple)] px-5 text-white hover:opacity-90">{isEdit ? "Save changes" : "Add Admin"}</Button>
           </div>
         </form>
       </DialogContent>

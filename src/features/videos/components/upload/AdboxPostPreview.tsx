@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from "react"
 import { BatteryFull, ChevronLeft, ChevronRight, GraduationCap, Signal, Tag, Wifi } from "lucide-react"
 
+import mainLogo from "@/assets/brand/mainlogo.svg"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { uploadSchools, type UploadSchoolId } from "../../data/schools"
@@ -16,7 +17,7 @@ function PhoneFrame({ schoolId, children }: { schoolId: UploadSchoolId | undefin
         <div className="absolute inset-0 flex flex-col overflow-y-auto">
           <div className="px-4 pb-3 pt-4">
             <div className="mb-4 flex items-center justify-between text-[10px] font-semibold"><span>9:41</span><span className="flex items-center gap-1.5"><Signal className="size-3" aria-hidden="true" /><Wifi className="size-3" aria-hidden="true" /><BatteryFull className="size-3.5" aria-hidden="true" /></span></div>
-            <div className="flex items-center justify-between gap-2"><span className="font-heading text-xl font-semibold text-secondary">AdBox<span className="text-primary">.</span></span><span className="rounded-full bg-secondary/5 px-2.5 py-1 text-[10px] font-semibold text-secondary">Campus stories</span></div>
+            <div className="flex items-center justify-between gap-2"><img src={mainLogo} alt="AdBox" className="h-5 w-auto" /><span className="rounded-full bg-secondary/5 px-2.5 py-1 text-[10px] font-semibold text-secondary">Campus stories</span></div>
           </div>
           <div className="flex-1 border-t border-border/60 p-3 pb-8">
             <div className="mb-3 flex items-center gap-2.5"><span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-secondary/5 text-secondary"><GraduationCap className="size-4" aria-hidden="true" /></span><span className="font-heading text-xs font-semibold leading-5">{school?.name}</span></div>

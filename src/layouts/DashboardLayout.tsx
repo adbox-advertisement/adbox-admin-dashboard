@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { Outlet, useMatches, useNavigation } from "react-router-dom"
 import { DashboardHeader } from "@/components/layout/DashboardHeader"
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
+import { CurrentAdminProfile } from "@/features/auth"
 import { cn } from "@/lib/utils"
 import type { AppRouteHandle } from "@/routes/types"
 
@@ -24,7 +25,7 @@ export function DashboardLayout() {
         </div>
       )}
       <div className="mx-auto w-full max-w-[1536px]">
-        {handle.layout !== "workspace" && <DashboardHeader title={title} />}
+        {handle.layout !== "workspace" && <DashboardHeader title={title} account={<CurrentAdminProfile />} />}
         <div id="page-content" tabIndex={-1} className="min-w-0 outline-none"><Outlet /></div>
       </div>
     </main>

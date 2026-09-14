@@ -5,6 +5,15 @@ export async function checkDashboardContent(page, baseUrl) {
   await page.goto(baseUrl + '/dashboard')
   await page.getByRole('heading', { name: 'Dashboard', exact: true }).waitFor()
 
+  const account = page.getByRole('group', { name: 'Signed-in account' })
+  await account.getByText('admin@example.com', { exact: true }).waitFor()
+  await account.getByText('Super Admin').waitFor()
+
+  // Profile identity survives a full page reload.
+  await page.reload()
+  await account.getByText('admin@example.com', { exact: true }).waitFor()
+  await account.getByText('Super Admin').waitFor()
+
   // KPI tiles and their trend badges.
   for (const label of ['Total Revenue', 'Total Users', 'Ad Payment', 'Reward Payment', 'Total Publishers', 'Total Viewers']) {
     await page.getByText(label, { exact: true }).waitFor()
@@ -52,6 +61,8 @@ export async function checkDashboardContent(page, baseUrl) {
 
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 })
+    assert.ok(await account.getByText('admin@example.com', { exact: true }).isVisible(), 'Account email must remain visible at ' + width)
+    assert.ok(await account.getByText('Super Admin').isVisible(), 'Account role must remain visible at ' + width)
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, '/dashboard overflows at ' + width)
   }
   await page.setViewportSize({ width: 1440, height: 1000 })

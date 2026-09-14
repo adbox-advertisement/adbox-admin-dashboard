@@ -24,12 +24,14 @@ describe("RolesTable", () => {
     resetStore()
   })
 
-  it("lists every seeded role with its description and joined permissions", () => {
+  it("lists every seeded role with its description and permissions", () => {
     render(<RolesTable />)
     for (const role of seedRoles) {
       const row = screen.getByText(role.name).closest("tr")!
       expect(within(row).getByText(role.description)).toBeInTheDocument()
-      expect(within(row).getByText(role.permissions.join(", "))).toBeInTheDocument()
+      for (const permission of role.permissions) {
+        expect(within(row).getByText(permission)).toBeInTheDocument()
+      }
     }
   })
 

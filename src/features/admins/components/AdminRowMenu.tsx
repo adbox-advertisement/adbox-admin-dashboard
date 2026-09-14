@@ -19,16 +19,16 @@ export function AdminRowMenu({ admin }: { admin: Admin }) {
             variant="ghost"
             size="icon"
             aria-label={"Open actions for " + adminDisplayName(admin)}
-            className="size-9 rounded-full text-muted-foreground hover:bg-secondary/8 hover:text-secondary"
+            className="size-9 cursor-pointer rounded-full text-muted-foreground hover:bg-secondary/8 hover:text-secondary"
           >
             <EllipsisVertical className="size-5" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => setActiveAction("edit")}>
+          <DropdownMenuItem onSelect={() => setActiveAction("edit")} className="cursor-pointer">
             <Pencil className="size-4" aria-hidden="true" />Edit profile
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setActiveAction("remove")} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+          <DropdownMenuItem onSelect={() => setActiveAction("remove")} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
             <Trash2 className="size-4" aria-hidden="true" />Remove
           </DropdownMenuItem>
         </DropdownMenuContent>

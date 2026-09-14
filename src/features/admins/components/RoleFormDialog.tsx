@@ -89,8 +89,8 @@ export function RoleFormDialog(props: Props) {
           {error && <p role="alert" className="text-sm leading-6 text-destructive">{error}</p>}
 
           <div className="mt-1 flex justify-end gap-3">
-            <DialogClose asChild><Button type="button" variant="outline" className="h-11 rounded-full px-5">Cancel</Button></DialogClose>
-            <Button type="submit" className="h-11 rounded-full bg-[image:var(--gradient-purple)] px-5 text-white hover:opacity-90">{isEdit ? "Save changes" : "Add role"}</Button>
+            <DialogClose asChild><Button type="button" variant="outline" className="h-11 cursor-pointer rounded-full px-5">Cancel</Button></DialogClose>
+            <Button type="submit" className="h-11 cursor-pointer rounded-full bg-[image:var(--gradient-purple)] px-5 text-white hover:opacity-90">{isEdit ? "Save changes" : "Add role"}</Button>
           </div>
         </form>
       </DialogContent>

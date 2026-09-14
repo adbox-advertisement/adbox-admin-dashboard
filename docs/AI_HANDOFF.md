@@ -1,75 +1,56 @@
 # Current handoff
 
-Update this file when handing work between Claude Code and Codex. Keep current facts and
-actionable next steps; replace stale task notes instead of appending a conversation log.
-Confirm the working tree before relying on this snapshot.
+Read this alongside `AGENTS.md` and confirm the working tree before continuing.
 
-## Current task
+## Current state — AdBox Studio removed
 
-Added a Vitest + React Testing Library unit/component test suite (the project previously had
-only the Playwright e2e smoke suite) and expanded the e2e suite to cover Dashboard and Video
-Management, which previously only got a route-existence check.
+The standalone AdBox Studio experiment has been **deleted by the user**. Do not recreate it
+without a new request.
 
-## Changes
+- `output/adbox-studio/` (the built HTML, `source/`, `build.mjs`, `verify.mjs`, README and
+  downloaded institution artwork) is gone. `output/` now holds only
+  `campus-creator-casting-call/`.
+- `/Users/pamelanutsukpo/Desktop/adbox-studio.html` and the dated build backup are gone.
+  Only the supplied original remains, untouched, at
+  `/Users/pamelanutsukpo/Desktop/adbox-studio-original-2026-09-12.html`.
+- Nothing in `src/`, `tests/` or the build config ever referenced the studio, so its removal
+  does not affect the dashboard. Confirmed by search: no `adbox-studio` references remain in
+  any source, test, config or HTML file.
 
-- `vitest.config.ts`, `src/test/setup.ts` (jsdom polyfills: matchMedia, ResizeObserver,
-  IntersectionObserver, URL.createObjectURL, crypto.randomUUID), `src/test/test-utils.tsx`
-  (`renderWithProviders` = QueryClientProvider + MemoryRouter).
-- `tsconfig.app.json` now excludes `*.test.ts(x)` and `src/test/`; `tsconfig.test.json` (new)
-  covers them separately via `npm run typecheck:test`, so test files never block or slow
-  `npm run build`'s `tsc -b` step, and don't trip the `check:architecture` script's "UI must
-  access server data through feature query/mutation hooks" rule when a test mocks an `api.ts`
-  module directly.
-- `package.json`: `test` (`vitest run`), `test:watch`, `typecheck:test`; `check` now runs
-  architecture → lint → typecheck:test → test → build.
-- `eslint.config.js`: `react-refresh/only-export-components` is off for `*.test.{ts,tsx}` and
-  `src/test/**` (test helpers legitimately export non-component utilities).
-- Unit/component tests added (119 tests, all passing): `src/lib/utils.test.ts`,
-  `src/lib/auth-session.test.ts`, `src/features/videos/store/folder-store.test.ts`,
-  `src/features/videos/data/schools.test.ts`, `src/features/rdi/cms/lib/document.test.ts`,
-  `src/features/rdi/cms/lib/media.test.ts`, `src/features/rdi/cms/store.test.ts`,
-  `src/features/dashboard/components/DashboardMetricCards.test.tsx`,
-  `src/features/videos/components/upload/MediaUpload.test.tsx`,
-  `src/features/videos/components/upload/AdboxPostPreview.test.tsx`,
-  `src/features/videos/components/upload/SchoolSelection.test.tsx`,
-  `src/features/videos/components/folders/UploadFolders.test.tsx`,
-  `src/features/auth/pages/LoginPage.test.tsx`.
-- e2e additions: `tests/smoke/dashboard.smoke.mjs` (KPI tiles/trend badges, chart, date-range
-  dropdown, geography region switching, top publishers, pending approvals, earning breakdown)
-  and `tests/smoke/video-management.smoke.mjs` (school search incl. GIS, tab order
-  Photos/Videos/Text, folder create/rename, text+hashtag+reference live preview, Posts page),
-  both wired into `tests/smoke/app.smoke.mjs`.
-- `AGENTS.md` and `README.md` updated: the "no unit-test runner configured" line is gone: new
-  commands documented, and `Validation Expectations` now includes `npm run test`.
+Everything the studio work touched lived under `output/` and on the Desktop. The dashboard,
+auth profile implementation and RDI were never modified by it.
 
-## Not covered by the new unit suite (scoping decisions, not oversights)
+## Checks actually run
 
-- `readImage()` in `src/features/rdi/cms/lib/media.ts` (needs `createImageBitmap`/`FileReader`
-  mocking) — the RDI e2e smoke suite already exercises real image upload end to end.
-- `useCmsStore`'s cross-tab `storage` event listener and `beforeunload` handler — browser-
-  integration-shaped, already covered by the e2e suite's draft-recovery checks.
-- Most RDI CMS UI components (`CollectionEditor`, `ContentField`, `AssetPicker`, etc.) — the
-  existing `tests/smoke/rdi-cms.smoke.mjs` already exercises these thoroughly end to end
-  (undo/redo, visibility, SEO, media replacement, collection edits, backup export/import,
-  corrupt-draft and storage-full recovery); adding a parallel unit layer for that surface would
-  be high effort for low incremental coverage.
+- `npm run check` passes end to end on the current tree:
+  - `check:architecture` — feature boundaries, API layering and runtime imports, 151 files.
+  - `lint` — ESLint clean, no warnings.
+  - `typecheck:test` — `tsc -p tsconfig.test.json` clean.
+  - `test` — Vitest: 25 files, 199 tests passed.
+  - `build` — `tsc -b && vite build` succeeded.
+- `index.html` now points the favicon at `src/assets/brand/mainlogo.svg` (a user change).
+  The asset exists and Vite emits it as `dist/assets/mainlogo-*.svg`; verified in
+  `dist/index.html`.
+- `tests/smoke/*.smoke.mjs` were not run this round — they need a running local server and an
+  installed Chrome. Run `npm run test:smoke` against `npm run dev` if you need that coverage.
+- No commits, pushes or deployments.
 
-## Existing application work to preserve
+## Work in progress to preserve
 
-RDI is a browser-only CMS and website UI: six editable pages, live previews, local images and
-uploads, shared settings, undo/redo, local draft persistence, and backup restore. There is no
-RDI API or publishing — do not add one without a new user request. See `README.md` and
-`docs/ARCHITECTURE.md` for feature details.
-
-## Validation and next steps
-
-- `npm run check` (architecture, lint, typecheck:test, test, build) passes.
-- `npm run test:smoke` passes end to end against a freshly started `npm run dev` server,
-  including the two new check files.
-- `npm install` added `vitest`, `@testing-library/react`, `@testing-library/jest-dom`,
-  `@testing-library/user-event`, `jsdom` as devDependencies (`npm audit` reports pre-existing
-  transitive vulnerabilities in dev tooling; not investigated as part of this task).
-- No commits, pushes, or deployments were made by this task.
-- Next step for whoever picks this up: keep adding `*.test.ts(x)` files alongside future logic
-  changes (see `AGENTS.md` → Validation Expectations) rather than letting unit coverage lag
-  behind the e2e suite again.
+- Dashboard header displays current email and readable roles from `GET /auth/me` through
+  Axios → auth API → TanStack Query → `CurrentAdminProfile`; no profile in Zustand/session
+  storage. It includes loading/retry/unassigned states, wraps long email/multiple roles,
+  clears previous profile cache at login, and supports token refresh on protected `/auth/me`.
+  Relevant files: `src/features/auth/`, `src/api/client.ts`, `DashboardLayout.tsx`,
+  `DashboardHeader.tsx`, associated tests, smoke scripts and `docs/ARCHITECTURE.md`.
+  Prior full `npm run check`, mocked browser smoke and responsive account checks passed.
+  Live authenticated `/auth/me` was not exercised.
+- The modified files under `src/features/admins/` predate these tasks. Preserve them.
+- Untracked and in progress: `src/features/auth/validation.ts`, `src/features/auth/components/`,
+  and the new `*.test.ts(x)` files for `src/api/client.ts` and the auth API/hooks.
+- RDI remains a browser-only CMS/website with local drafts, images, backups and previews.
+  Do not add APIs, publishing or contact delivery without a new request.
+- `output/campus-creator-casting-call/` holds the earlier editable DOCX, matching PDF and
+  editing notes: Arial Rounded headings, Trebuchet MS body, 30 placeholders. Original Desktop
+  PDF unchanged. PDF rendered locally because Word automation failed; native Word pagination
+  not verified. Confirm programme details and replace placeholders before release.

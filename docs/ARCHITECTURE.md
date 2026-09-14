@@ -44,7 +44,9 @@ API response → feature API service → TanStack Query hook → page / componen
 User input → component state or feature UI store
 ```
 
-`src/api/client.ts` owns the configured Axios instance, timeout, authorization header, and single-flight token refresh. `src/lib/auth-session.ts` validates session records and retains the existing session-storage key. Authentication endpoint errors do not trigger token refresh. Logout clears the session and Query cache, including when the server logout request fails.
+`src/api/client.ts` owns the configured Axios instance, timeout, authorization header, and single-flight token refresh. `src/lib/auth-session.ts` validates session records and retains the existing session-storage key. Authentication actions do not trigger token refresh; the protected `GET /auth/me` profile request does. Logout clears the session and Query cache, including when the server logout request fails.
+
+The authenticated dashboard header displays the current email and assigned roles from `GET /auth/me`. Auth validates this response and keeps it in TanStack Query, separately from session tokens. A successful sign-in removes any previous cached profile. `DashboardLayout` supplies the auth-owned profile component through the shared header's account slot, with loading and retry states; RDI workspace routes do not mount it or request profile data.
 
 Feature API services contain endpoints and transport mappings. Hooks own queries, mutations, invalidation, and loading state. RDI has no API services or Query hooks. Its Zustand store owns local authoring drafts, save state, and undo/redo history; this is browser content, not a duplicate of server state. The document is validated with Zod when read from storage, restored from a backup, or received by a preview. Storage errors remain visible and preserve the in-memory draft for export.
 
@@ -52,7 +54,7 @@ Video folders currently represent local authoring groups. The feature store pers
 
 ## Feature organization
 
-- **Auth:** the API validates returned sessions; mutation hooks drive the sign-in form.
+- **Auth:** the API validates returned sessions and the current-admin profile; mutation hooks drive sign-in, and a Query hook supplies the header's email and roles.
 - **Dashboard:** `components/` renders widgets; `data/` holds current display datasets. Keep dashboard-specific charts here until another feature needs them.
 - **Videos:** `components/upload/` handles school selection and media composition; `components/folders/` handles folder creation and selection; `components/posts/` renders collections and details; `components/shared/` holds media preview and header components. Filters live in `hooks/`, browser metadata in `store/`, models in `types/`, and fixture content in `data/`.
 - **RDI website:** `pages/` contains Home, About, Construction, Media, Solar, and Contact. `layouts/` supplies the shared website layout; `components/` groups division-specific UI and shared website controls. Static defaults live in `data/`, local images in `public/rdi-assets/`, and scoped styles in `styles/website.css`. Container queries respond to available width. Tabs, filters, project dialogs, and form feedback use component state. The contact form never transmits messages.

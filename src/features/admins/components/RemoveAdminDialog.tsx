@@ -17,11 +17,11 @@ export function RemoveAdminDialog({ admin, open, onOpenChange }: { admin: Admin;
           <DialogDescription className="mt-2">They will lose admin access to AdBox. This can't be undone.</DialogDescription>
         </div>
         <div className="mt-2 flex justify-end gap-3">
-          <DialogClose asChild><Button type="button" variant="outline" className="h-11 rounded-xl px-4">Cancel</Button></DialogClose>
+          <DialogClose asChild><Button type="button" variant="outline" className="h-11 cursor-pointer rounded-xl px-4">Cancel</Button></DialogClose>
           <Button
             type="button"
             variant="destructive"
-            className="h-11 rounded-xl px-4"
+            className="h-11 cursor-pointer rounded-xl px-4"
             onClick={() => { removeAdmin(admin.id); onOpenChange(false) }}
           >
             Remove admin

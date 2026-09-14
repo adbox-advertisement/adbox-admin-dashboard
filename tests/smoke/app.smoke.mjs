@@ -11,6 +11,7 @@ const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
+const currentAdmin = { id: 'smoke-admin', sessionId: 'smoke-session', email: 'admin@example.com', roles: ['SUPER_ADMIN'], permissions: ['*'] }
 let loginAllowed = false
 let refreshCount = 0
 const unexpectedRequests = []
@@ -25,6 +26,11 @@ try {
       const reply = (data, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(data) })
       if (url.pathname.endsWith('/auth/login')) return reply(loginAllowed ? session : { message: 'Invalid credentials' }, loginAllowed ? 200 : 401)
       if (url.pathname.endsWith('/auth/logout')) return reply({ message: 'Server unavailable' }, 503)
+      if (url.pathname.endsWith('/auth/me')) {
+        if (request.headers().authorization === 'Bearer smoke-access') return reply({ message: 'Token expired' }, 401)
+        assert.equal(request.headers().authorization, 'Bearer smoke-refreshed')
+        return reply(currentAdmin)
+      }
       if (url.pathname.endsWith('/auth/refresh')) {
         refreshCount++
         await new Promise(resolve => setTimeout(resolve, 100))
@@ -57,7 +63,11 @@ try {
   await page.waitForURL('**/dashboard')
   await page.getByRole('heading', { name: 'Dashboard', exact: true }).waitFor()
   assert.equal(await page.title(), 'Dashboard | AdBox')
-  console.log('Lazy startup, protected routes, failed sign-in, and successful sign-in passed')
+  const account = page.getByRole('group', { name: 'Signed-in account' })
+  await account.getByText(currentAdmin.email, { exact: true }).waitFor()
+  await account.getByText('Super Admin').waitFor()
+  assert.equal(refreshCount, 1, 'Loading the signed-in account must refresh an expired access token')
+  console.log('Lazy startup, protected routes, failed sign-in, successful sign-in, and account display after token refresh passed')
 
   for (const [path, title] of [
     ['/manage-users', 'Manage Users'], ['/ads-management', 'Ads Management'],

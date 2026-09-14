@@ -19,7 +19,7 @@ export function RoleRowMenu({ role }: { role: Role }) {
             variant="ghost"
             size="icon"
             aria-label={"Open actions for " + role.name}
-            className="size-9 rounded-full text-muted-foreground hover:bg-secondary/8 hover:text-secondary"
+            className="size-9 cursor-pointer rounded-full text-muted-foreground hover:bg-secondary/8 hover:text-secondary"
           >
             <EllipsisVertical className="size-5" aria-hidden="true" />
           </Button>
@@ -27,13 +27,13 @@ export function RoleRowMenu({ role }: { role: Role }) {
         <DropdownMenuContent align="end">
           {/* Both open the same form: Permissions is one field on the same
               Edit Roles dialog as name/description, not a separate flow. */}
-          <DropdownMenuItem onSelect={() => setActiveAction("edit")}>
+          <DropdownMenuItem onSelect={() => setActiveAction("edit")} className="cursor-pointer">
             <Pencil className="size-4" aria-hidden="true" />Edit Permission
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setActiveAction("edit")}>
+          <DropdownMenuItem onSelect={() => setActiveAction("edit")} className="cursor-pointer">
             <Pencil className="size-4" aria-hidden="true" />Edit role
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setActiveAction("remove")} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+          <DropdownMenuItem onSelect={() => setActiveAction("remove")} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
             <Trash2 className="size-4" aria-hidden="true" />Delete role
           </DropdownMenuItem>
         </DropdownMenuContent>

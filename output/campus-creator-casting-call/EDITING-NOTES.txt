@@ -1,0 +1,66 @@
+ADBOX CAMPUS CREATOR CASTING CALL — EDITING NOTES
+
+The DOCX is the editable master. The PDF uses the same content and styling.
+The PDF was rendered locally because Word’s automatic export was unavailable.
+All highlighted [BRACKETED FIELDS] are placeholders, not confirmed facts.
+Replace them with final copy, remove the placeholder shading, and remove the
+WORKING TEMPLATE line in the footer before distributing. Export a fresh PDF
+from Word after editing. Recheck pagination if replacement text is longer.
+Applicant-facing [YOUR NAME] and [INSTITUTION] in the submission label may
+remain as instructions, or be replaced with a concrete example.
+
+TYPOGRAPHY
+Arial Rounded MT Bold is used for major headings and benefit titles.
+Trebuchet MS is used for body copy, labels and highlighted placeholders.
+Both fonts are already available on this Mac; fonts are embedded in the PDF.
+The DOCX references the installed fonts, so use these same fonts when editing
+on another computer to preserve the layout.
+
+Before release, confirm:
+- The six institution names, campus scope and permission to describe them as
+  participating institutions. Original abbreviations and names are retained.
+- The source describes a tertiary-student platform but also lists Ghana
+  International School. Confirm that this is the intended GIS institution and
+  clarify age/consent eligibility; the rewrite uses broader student wording.
+- All dates, application route, contacts, weekly output and time commitment.
+- Stipend amount, commission measures, payout timing and kit ownership terms.
+- Premium access dates, completion criteria and event requirements.
+- Selection criteria/process, outcome notification, privacy notice and any
+  intended application-video publication. The rewrite does not assume that
+  an application video is automatically published as the applicant’s first post.
+- Content approval and usage terms before onboarding.
+
+The original PDF is unchanged. No deadlines, rates or legal terms were invented.
+The three-page layout fixes the original PDF’s overflow onto four physical pages.
+
+PLACEHOLDER INDEX
+- [ACCESS DATES]
+- [AMOUNT]
+- [APPLICATION FORM URL OR SUBMISSION EMAIL]
+- [CONTACT METHOD]
+- [CONTENT APPROVAL PROCESS / CONTENT USAGE TERMS]
+- [DATE]
+- [DEADLINE DATE]
+- [END DATE]
+- [EVENT COMMITMENT]
+- [FILE FORMATS]
+- [FREQUENCY]
+- [HOURS]
+- [INSTITUTION]
+- [KIT TERMS]
+- [MINIMUM AGE / CONSENT REQUIREMENTS]
+- [NOTIFICATION DATE]
+- [NUMBER]
+- [ONLINE / VENUE]
+- [PAYMENT TERMS]
+- [PRIVACY NOTICE URL]
+- [PROGRAM CONTACT EMAIL]
+- [PROGRAM LEAD / CHANNEL]
+- [RATE / TARGETS]
+- [REQUIREMENTS]
+- [REVIEW / PUBLICATION & CONSENT TERMS]
+- [SHORTLIST / INTERVIEW PROCESS]
+- [SIZE]
+- [START DATE]
+- [TIME]
+- [YOUR NAME]
