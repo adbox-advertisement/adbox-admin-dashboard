@@ -28,35 +28,35 @@ export const RdiContactPage = () => {
         </p>
       </div>
     </section></CmsSection>
-    <CmsSection id="contact.contact-details"><section className="bg-gradient-to-b from-slate-50 to-white px-4 py-16 @min-[640px]/rdi:py-24">
+    <CmsSection id="contact.contact-details"><section className="bg-gradient-to-b from-slate-50 dark:from-muted to-white dark:to-card px-4 py-16 @min-[640px]/rdi:py-24">
       <div className="rdi-container mx-auto grid max-w-7xl gap-8 @min-[1024px]/rdi:grid-cols-3 @min-[1024px]/rdi:gap-12">
         <div className="@min-[1024px]/rdi:col-span-2">
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-xl @min-[640px]/rdi:p-8 @min-[768px]/rdi:p-10">
-            <h2 className="rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+          <div className="rounded-2xl border border-slate-100 dark:border-border bg-white dark:bg-card p-6 shadow-xl @min-[640px]/rdi:p-8 @min-[768px]/rdi:p-10">
+            <h2 className="rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
               {content("contact.contact-details.1", "Tell us about your project")}
             </h2>
-            <p className="mb-8 mt-3 text-slate-600">
+            <p className="mb-8 mt-3 text-slate-600 dark:text-muted-foreground">
               {content("contact.contact-details.2", "Share a few details and select the division that best matches your needs.")}
             </p>
             <ContactForm />
           </div>
         </div>
         <aside className="space-y-6" aria-label="Contact information">
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg @min-[640px]/rdi:p-8">
-            <h2 className="rdi-heading text-2xl font-semibold text-slate-900">
+          <div className="rounded-2xl border border-slate-100 dark:border-border bg-white dark:bg-card p-6 shadow-lg @min-[640px]/rdi:p-8">
+            <h2 className="rdi-heading text-2xl font-semibold text-slate-900 dark:text-foreground">
               {content("contact.contact-details.3", "Contact information")}
             </h2>
             <address className="mt-6 not-italic">
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-amber-100 p-3 text-[#B45309]">
+                  <div className="rounded-xl bg-amber-100 dark:bg-muted p-3 text-[#B45309] dark:text-[#FBBF24]">
                     <MapPin className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-800">
+                    <p className="font-medium text-slate-800 dark:text-foreground">
                       {content("contact.contact-details.4", "Visit us")}
                     </p>
-                    <a href={officeMapUrl} target="_blank" rel="noreferrer" className="mt-1 block leading-relaxed text-slate-600 hover:text-slate-900">
+                    <a href={officeMapUrl} target="_blank" rel="noreferrer" className="mt-1 block leading-relaxed text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground">
                       {officeAddress.lines.map(s => <span className="block" key={s}>
                         {s}
                       </span>)}
@@ -64,40 +64,40 @@ export const RdiContactPage = () => {
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-purple-100 p-3 text-[#7E22CE]">
+                  <div className="rounded-xl bg-purple-100 dark:bg-muted p-3 text-[#7E22CE] dark:text-purple-300">
                     <Phone className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-800">
+                    <p className="font-medium text-slate-800 dark:text-foreground">
                       {content("contact.contact-details.5", "Call us")}
                     </p>
-                    <a href={phoneUrl} className="mt-1 block text-slate-600 hover:text-slate-900">
+                    <a href={phoneUrl} className="mt-1 block text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground">
                       {phone}
                     </a>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-emerald-100 p-3 text-[#047857]">
+                  <div className="rounded-xl bg-emerald-100 dark:bg-muted p-3 text-[#047857] dark:text-[#34D399]">
                     <Mail className="h-6 w-6" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-800">
+                    <p className="font-medium text-slate-800 dark:text-foreground">
                       {content("contact.contact-details.8", "Email us")}
                     </p>
-                    <a href={emailUrl} className="mt-1 block break-all text-slate-600 hover:text-slate-900">
+                    <a href={emailUrl} className="mt-1 block break-all text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground">
                       {email}
                     </a>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 p-3 text-slate-700">
+                  <div className="rounded-xl bg-slate-100 dark:bg-muted p-3 text-slate-700 dark:text-foreground">
                     <Clock className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-800">
+                    <p className="font-medium text-slate-800 dark:text-foreground">
                       {content("contact.contact-details.11", "Office hours")}
                     </p>
-                    <p className="mt-1 text-slate-600">
+                    <p className="mt-1 text-slate-600 dark:text-muted-foreground">
                       {content("contact.contact-details.12", "Monday–Friday: 8:00–17:00")}
                     </p>
                   </div>
@@ -105,71 +105,71 @@ export const RdiContactPage = () => {
               </ul>
             </address>
           </div>
-          <div className="rounded-2xl border border-[#FBBF24]/30 bg-gradient-to-br from-amber-50 to-emerald-50 p-6 @min-[640px]/rdi:p-8">
-            <Sun className="h-8 w-8 text-[#B45309]" />
-            <h2 className="mt-4 rdi-heading text-xl font-semibold text-slate-900">
+          <div className="rounded-2xl border border-[#FBBF24]/30 bg-gradient-to-br from-amber-50 dark:from-muted to-emerald-50 dark:to-muted p-6 @min-[640px]/rdi:p-8">
+            <Sun className="h-8 w-8 text-[#B45309] dark:text-[#FBBF24]" />
+            <h2 className="mt-4 rdi-heading text-xl font-semibold text-slate-900 dark:text-foreground">
               {content("contact.contact-details.13", "Planning a solar project?")}
             </h2>
-            <p className="mt-2 leading-relaxed text-slate-600">
+            <p className="mt-2 leading-relaxed text-slate-600 dark:text-muted-foreground">
               {content("contact.contact-details.14", "Include your location, typical power needs, and property type in the message so our solar team can prepare for the first conversation.")}
             </p>
           </div>
         </aside>
       </div>
     </section></CmsSection>
-    <CmsSection id="contact.our-teams"><section className="bg-[#F8FAFC] px-4 py-16 @min-[640px]/rdi:py-24">
+    <CmsSection id="contact.our-teams"><section className="bg-[#F8FAFC] dark:bg-background px-4 py-16 @min-[640px]/rdi:py-24">
       <div className="rdi-container mx-auto">
         <div className="mx-auto mb-12 max-w-3xl text-center">
-          <h2 className="rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+          <h2 className="rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
             {content("contact.our-teams.1", "Speak with the right team")}
           </h2>
-          <p className="mt-3 text-lg text-slate-600">
+          <p className="mt-3 text-lg text-slate-600 dark:text-muted-foreground">
             {content("contact.our-teams.2", "Each division has dedicated specialists ready to understand your project.")}
           </p>
         </div>
         <div className="grid gap-6 @min-[768px]/rdi:grid-cols-3">
-          {contactTeams.map(s => <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm @min-[640px]/rdi:p-8" key={s.cmsId}>
+          {contactTeams.map(s => <article className="rounded-2xl border border-slate-200 dark:border-border bg-white dark:bg-card p-6 shadow-sm @min-[640px]/rdi:p-8" key={s.cmsId}>
             <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${s.iconStyle}`}>
               <s.icon className="h-6 w-6" />
             </div>
-            <h3 className="mt-5 rdi-heading text-xl font-semibold text-slate-900">
+            <h3 className="mt-5 rdi-heading text-xl font-semibold text-slate-900 dark:text-foreground">
               {s.name}
             </h3>
-            <p className="mt-2 text-slate-600">
+            <p className="mt-2 text-slate-600 dark:text-muted-foreground">
               {s.description}
             </p>
-            <a href={`mailto:${s.email}`} className="mt-4 block break-all text-sm font-semibold text-slate-800 hover:underline">
+            <a href={`mailto:${s.email}`} className="mt-4 block break-all text-sm font-semibold text-slate-800 dark:text-foreground hover:underline">
               {s.email}
             </a>
           </article>)}
         </div>
       </div>
     </section></CmsSection>
-    <CmsSection id="contact.frequently-asked-questions"><section className="bg-white px-4 py-16 @min-[640px]/rdi:py-24">
+    <CmsSection id="contact.frequently-asked-questions"><section className="bg-white dark:bg-card px-4 py-16 @min-[640px]/rdi:py-24">
       <div className="rdi-container mx-auto">
         <div className="mx-auto mb-12 max-w-3xl text-center">
-          <h2 className="rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+          <h2 className="rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
             {content("contact.frequently-asked-questions.1", "Frequently asked questions")}
           </h2>
-          <p className="mt-3 text-lg text-slate-600">
+          <p className="mt-3 text-lg text-slate-600 dark:text-muted-foreground">
             {content("contact.frequently-asked-questions.2", "Helpful details before we begin.")}
           </p>
         </div>
         <div className="mx-auto max-w-4xl space-y-4">
           {contactFaqs.map((s, i) => {
             const a = openFaq === i, c = `faq-answer-${i}`
-            return <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" key={s.cmsId}>
+            return <article className="overflow-hidden rounded-2xl border border-slate-200 dark:border-border bg-white dark:bg-card shadow-sm" key={s.cmsId}>
               <h3>
-                <button type="button" onClick={() => setOpenFaq(a ? null : i)} className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-slate-50 @min-[640px]/rdi:px-7" aria-expanded={a} aria-controls={c}>
-                  <span className="rdi-heading text-lg font-semibold text-slate-900 @min-[640px]/rdi:text-xl">
+                <button type="button" onClick={() => setOpenFaq(a ? null : i)} className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-slate-50 dark:hover:bg-background @min-[640px]/rdi:px-7" aria-expanded={a} aria-controls={c}>
+                  <span className="rdi-heading text-lg font-semibold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-xl">
                     {s.question}
                   </span>
-                  <ChevronDown className={`h-5 w-5 shrink-0 text-slate-500 transition-transform ${a ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-5 w-5 shrink-0 text-slate-500 dark:text-muted-foreground transition-transform ${a ? "rotate-180" : ""}`} />
                 </button>
               </h3>
               <div id={c} className={`grid transition-[grid-template-rows] duration-300 ${a ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
                 <div className="overflow-hidden">
-                  <p className="px-5 pb-5 leading-relaxed text-slate-600 @min-[640px]/rdi:px-7 @min-[640px]/rdi:pb-6">
+                  <p className="px-5 pb-5 leading-relaxed text-slate-600 dark:text-muted-foreground @min-[640px]/rdi:px-7 @min-[640px]/rdi:pb-6">
                     {s.answer}
                   </p>
                 </div>

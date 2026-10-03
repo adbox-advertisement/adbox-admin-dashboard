@@ -58,14 +58,14 @@ export const RdiAboutPage = () => {
               <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-2xl ${activeDivision.iconStyle}`}>
                 <DivisionIcon className="h-8 w-8" />
               </div>
-              <p className="text-sm font-bold uppercase tracking-[0.15em] text-slate-500">
+              <p className="text-sm font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-muted-foreground">
                 {activeDivision.eyebrow}
               </p>
-              <h3 className="mt-3 rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+              <h3 className="mt-3 rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
                 {activeDivision.name}
                 {content("about.our-divisions.3", " Division")}
               </h3>
-              <p className="mt-5 text-lg leading-relaxed text-slate-600">
+              <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-muted-foreground">
                 {activeDivision.summary}
               </p>
               <WebsiteButton className={`w-full px-6 py-5 font-semibold @min-[640px]/rdi:w-auto ${activeDivision.linkStyle}`} asChild>
@@ -76,23 +76,23 @@ export const RdiAboutPage = () => {
                 </WebsiteLink>
               </WebsiteButton>
             </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 @min-[640px]/rdi:p-6">
-              <h4 className="rdi-heading text-xl font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-border/80 bg-white/80 dark:bg-card/80 p-5 @min-[640px]/rdi:p-6">
+              <h4 className="rdi-heading text-xl font-semibold text-slate-900 dark:text-foreground">
                 {content("about.our-divisions.5", "Core capabilities")}
               </h4>
               <ul className="mt-5 space-y-4">
-                {activeDivision.items.map(a => <li className="flex items-start gap-3 text-slate-700" key={a}>
-                  <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#059669]" />
+                {activeDivision.items.map(a => <li className="flex items-start gap-3 text-slate-700 dark:text-foreground" key={a}>
+                  <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#059669] dark:text-[#34D399]" />
                   <span>
                     {a}
                   </span>
                 </li>)}
               </ul>
-              <div className="mt-6 border-t border-slate-200 pt-6">
-                <h4 className="rdi-heading font-semibold text-slate-900">
+              <div className="mt-6 border-t border-slate-200 dark:border-border pt-6">
+                <h4 className="rdi-heading font-semibold text-slate-900 dark:text-foreground">
                   {content("about.our-divisions.6", "Our promise")}
                 </h4>
-                <p className="mt-2 leading-relaxed text-slate-600">
+                <p className="mt-2 leading-relaxed text-slate-600 dark:text-muted-foreground">
                   {activeDivision.promise}
                 </p>
               </div>
@@ -101,7 +101,7 @@ export const RdiAboutPage = () => {
         </article>
       </div>
     </section></CmsSection>
-    <CmsSection id="about.our-story"><section className="bg-white px-4 py-16 @min-[640px]/rdi:py-24">
+    <CmsSection id="about.our-story"><section className="bg-white dark:bg-card px-4 py-16 @min-[640px]/rdi:py-24">
       <div className="rdi-container mx-auto grid items-center gap-10 @min-[1024px]/rdi:grid-cols-2 @min-[1024px]/rdi:gap-16">
         <div className="relative">
           <img src={content("about.our-story.1", "/rdi-assets/36.jpg")} alt={content("about.our-story.2", "The RichDad Investments team collaborating")} className="relative z-10 aspect-[4/3] w-full rounded-2xl object-cover shadow-xl" loading="lazy" />
@@ -109,13 +109,13 @@ export const RdiAboutPage = () => {
           <div className="absolute -left-4 -top-4 hidden h-24 w-24 rounded-xl bg-[#FBBF24] @min-[768px]/rdi:block" />
         </div>
         <div>
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#B45309]">
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#B45309] dark:text-[#FBBF24]">
             {content("about.our-story.3", "Our story")}
           </p>
-          <h2 className="rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+          <h2 className="rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
             {content("about.our-story.4", "Expertise that grows with the needs of our clients")}
           </h2>
-          <div className="mt-6 space-y-5 leading-relaxed text-slate-600">
+          <div className="mt-6 space-y-5 leading-relaxed text-slate-600 dark:text-muted-foreground">
             <p>
               {content("about.our-story.5", "RichDad Investments began with a vision to combine physical construction expertise with the creative power of digital media. That connected approach gave clients fewer handoffs and a more consistent path from idea to delivery.")}
             </p>
@@ -168,7 +168,7 @@ export const RdiAboutPage = () => {
           </article>)}
         </div>
         <div className="mt-12 text-center">
-          <WebsiteButton className="w-full bg-white px-7 py-6 font-semibold text-[#0F172A] hover:bg-slate-100 @min-[640px]/rdi:w-auto" asChild>
+          <WebsiteButton className="w-full bg-white dark:bg-card px-7 py-6 font-semibold text-[#0F172A] dark:text-foreground hover:bg-slate-100 dark:hover:bg-muted @min-[640px]/rdi:w-auto" asChild>
             <WebsiteLink href={content("about.what-sets-us-apart.6", "/contact")} className="w-full @min-[640px]/rdi:w-auto">
               {content("about.what-sets-us-apart.7", "Talk to Our Team")}
               <ArrowRight className="ml-2 h-5 w-5" />

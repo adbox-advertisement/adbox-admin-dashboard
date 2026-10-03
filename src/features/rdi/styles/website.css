@@ -47,3 +47,6 @@
     scroll-behavior: auto !important;
   }
 }
+
+.dark .rdi-website { color: var(--foreground); }
+.dark .rdi-website .rdi-nav-link:hover { color: var(--adbox-warning-400); }

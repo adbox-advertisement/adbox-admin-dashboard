@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { Outlet, useMatches, useNavigation } from "react-router-dom"
 import { DashboardHeader } from "@/components/layout/DashboardHeader"
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
+import { WorkspaceHeader } from "@/components/layout/WorkspaceHeader"
 import { CurrentAdminProfile } from "@/features/auth"
 import { cn } from "@/lib/utils"
 import type { AppRouteHandle } from "@/routes/types"
@@ -15,7 +16,7 @@ export function DashboardLayout() {
   const title = handle.title ?? "AdBox"
   useEffect(() => { document.title = title + " | AdBox" }, [title])
   return (
-    <main className={cn("min-h-svh bg-auth-background font-sans text-grey-1000 lg:pl-[290px]", handle.layout === "workspace" && "h-svh overflow-x-clip overflow-y-auto", handle.className)}>
+    <main className={cn("min-h-svh bg-auth-background font-sans text-foreground dark:bg-background lg:pl-[290px]", handle.layout === "workspace" && "h-svh overflow-x-clip overflow-y-auto", handle.className)}>
       <a href="#page-content" className="sr-only z-50 rounded-lg bg-white px-4 py-3 text-purple focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
       <DashboardSidebar />
       {navigation.state !== "idle" && (
@@ -25,7 +26,7 @@ export function DashboardLayout() {
         </div>
       )}
       <div className="mx-auto w-full max-w-[1536px]">
-        {handle.layout !== "workspace" && <DashboardHeader title={title} account={<CurrentAdminProfile />} />}
+        {handle.compactHeader ? <WorkspaceHeader title={title} account={<CurrentAdminProfile />} /> : handle.layout !== "workspace" && <DashboardHeader title={title} account={<CurrentAdminProfile />} />}
         <div id="page-content" tabIndex={-1} className="min-w-0 outline-none"><Outlet /></div>
       </div>
     </main>

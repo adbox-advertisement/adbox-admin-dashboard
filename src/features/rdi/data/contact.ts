@@ -9,19 +9,19 @@ export const contactTeams = [{
   description: "Building, renovation, and project enquiries",
   email: "construction@richdadinvestments.com",
   icon: Building,
-  iconStyle: "bg-orange-100 text-[#C2410C]"
+  iconStyle: "bg-orange-100 text-[#C2410C] dark:bg-muted dark:text-[#FB923C]"
 }, {
   name: "Media",
   description: "Production, branding, and campaign enquiries",
   email: "media@richdadinvestments.com",
   icon: Film,
-  iconStyle: "bg-purple-100 text-[#7E22CE]"
+  iconStyle: "bg-purple-100 text-[#7E22CE] dark:bg-muted dark:text-purple-300"
 }, {
   name: "Solar Technology",
   description: "RDI × ALLOLLA solar systems, storage and support",
   email: "solar@richdadinvestments.com",
   icon: Sun,
-  iconStyle: "bg-gradient-to-br from-amber-100 to-emerald-100 text-[#047857]"
+  iconStyle: "bg-gradient-to-br from-amber-100 to-emerald-100 text-[#047857] dark:from-muted dark:to-card dark:text-[#34D399]"
 }]
 export const contactFaqs = [{
   question: "Which areas do you serve?",

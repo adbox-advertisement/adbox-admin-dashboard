@@ -23,10 +23,10 @@ export const RdiHomePage = () => {
               {content("home.welcome.2", "RichDad Investments")}
             </span>
           </h1>
-          <p className="text-[#94A3B8] text-xl @min-[768px]/rdi:text-2xl mb-4 max-w-3xl mx-auto">
+          <p className="text-[#94A3B8] dark:text-muted-foreground text-xl @min-[768px]/rdi:text-2xl mb-4 max-w-3xl mx-auto">
             {content("home.welcome.3", "Three Divisions. One Vision. Endless Possibilities.")}
           </p>
-          <p className="text-[#64748B] text-lg max-w-2xl mx-auto">
+          <p className="text-[#64748B] dark:text-muted-foreground text-lg max-w-2xl mx-auto">
             {content("home.welcome.4", "Choose your path to discover how we can transform your project")}
           </p>
         </div></CmsSection>
@@ -45,7 +45,7 @@ export const RdiHomePage = () => {
                   {content("home.construction-card.3", "Construction")}
                 </h2>
                 <div className="mb-6 h-1 w-20 bg-[#F97316] transition-all duration-300 group-hover:w-32" />
-                <p className="text-[#94A3B8] text-lg mb-8">
+                <p className="text-[#94A3B8] dark:text-muted-foreground text-lg mb-8">
                   {content("home.construction-card.4", "Building tomorrow's infrastructure today. Civil works, buildings and water systems, supported by the right equipment and engineering expertise.")}
                 </p>
                 <ul className="space-y-3 mb-8">
@@ -83,13 +83,13 @@ export const RdiHomePage = () => {
             <div className="relative flex h-full min-h-[480px] flex-col justify-between p-6 @min-[640px]/rdi:p-8 @min-[1280px]/rdi:p-8 @min-[1536px]/rdi:p-10">
               <div>
                 <div className="w-20 h-20 bg-[#9C27B0]/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#9C27B0]/30 transition-all duration-300">
-                  <Film className="h-10 w-10 text-[#9C27B0]" />
+                  <Film className="h-10 w-10 text-[#9C27B0] dark:text-purple-300" />
                 </div>
                 <h2 className="mb-4 rdi-heading text-3xl font-bold text-white @min-[640px]/rdi:text-4xl">
                   {content("home.media-card.3", "Media")}
                 </h2>
                 <div className="w-20 h-1 bg-[#9C27B0] mb-6 group-hover:w-32 transition-all duration-300" />
-                <p className="text-[#94A3B8] text-lg mb-8">
+                <p className="text-[#94A3B8] dark:text-muted-foreground text-lg mb-8">
                   {content("home.media-card.4", "Crafting compelling stories through digital innovation. From concept to creation, we bring your brand's vision to life.")}
                 </p>
                 <ul className="space-y-3 mb-8">
@@ -133,7 +133,7 @@ export const RdiHomePage = () => {
                   {content("home.solar-card.3", "Solar Technology")}
                 </h2>
                 <div className="mb-6 h-1 w-20 bg-gradient-to-r from-[#FBBF24] to-[#10B981] transition-all duration-300 group-hover:w-32" />
-                <p className="text-[#94A3B8] text-lg mb-8">
+                <p className="text-[#94A3B8] dark:text-muted-foreground text-lg mb-8">
                   {content("home.solar-card.4", "In partnership with ALLOLLA General Power, we connect homes and businesses with solar panels, inverters and intelligent energy storage.")}
                 </p>
                 <ul className="space-y-3 mb-8">
@@ -165,7 +165,7 @@ export const RdiHomePage = () => {
           </div></CmsSection>
         </div>
         <CmsSection id="home.contact-invitation"><div className="text-center mt-16">
-          <p className="text-[#64748B] mb-4">
+          <p className="text-[#64748B] dark:text-muted-foreground mb-4">
             {content("home.contact-invitation.1", "Not sure which division you need?")}
           </p>
           <WebsiteButton className="bg-[#334155] hover:bg-[#475569] text-white px-8 py-3 rounded-lg font-medium transition-all" asChild>

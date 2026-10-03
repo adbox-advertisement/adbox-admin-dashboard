@@ -7,7 +7,7 @@ import { type EarningBreakdownDatum, pendingApprovals, earningBreakdownData } fr
 function PendingPostThumbnail() {
   return (
     <div
-      className="flex size-[58px] shrink-0 items-center justify-center rounded-md bg-auth-background"
+      className="flex size-[58px] shrink-0 items-center justify-center rounded-md bg-auth-background dark:bg-background"
       aria-hidden="true"
     >
       <div className="relative h-[58px] w-11 overflow-hidden rounded-md bg-[linear-gradient(155deg,#0c5dff_0%,#1b86ff_46%,#0530d8_100%)] shadow-adbox-small">
@@ -39,9 +39,9 @@ function ApprovePill() {
 
 function PendingApprovalsTable() {
   return (
-    <article className="min-h-[615px] max-w-full overflow-hidden rounded-[20px] bg-white shadow-adbox-small">
+    <article className="min-h-[615px] max-w-full overflow-hidden rounded-[20px] bg-white dark:bg-card shadow-adbox-small">
       <header className="flex min-h-[76px] items-center justify-between gap-4 px-6 sm:px-[26px]">
-        <h2 className="font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
+        <h2 className="font-heading text-h6 font-semibold text-grey-1000 dark:text-foreground md:text-h5">
           Pending Approvals
         </h2>
         <Button
@@ -56,7 +56,7 @@ function PendingApprovalsTable() {
       <div className="relative z-0 max-w-full overflow-x-auto">
         <table className="w-full min-w-[720px] text-left">
           <thead>
-            <tr className="border-b border-divider text-b3 font-medium text-grey-500 md:text-b2">
+            <tr className="border-b border-divider dark:border-border text-b3 font-medium text-grey-500 dark:text-muted-foreground md:text-b2">
               <th className="w-[40%] px-6 py-[22px] font-medium sm:px-[26px]">
                 User
               </th>
@@ -86,25 +86,25 @@ function PendingApprovalsTable() {
             {pendingApprovals.map((approval, index) => (
               <tr
                 key={`${approval.title}-${index}`}
-                className="h-[91px] text-b3 transition-colors hover:bg-grey-50/70 md:text-b2"
+                className="h-[91px] text-b3 transition-colors hover:bg-grey-50/70 dark:hover:bg-background/70 md:text-b2"
               >
                 <td className="px-6 py-4 sm:px-[26px]">
                   <div className="flex min-w-0 items-center gap-3">
                     <PendingPostThumbnail />
                     <div className="min-w-0">
-                      <p className="truncate text-b3 font-semibold text-grey-1000 md:text-b2">
+                      <p className="truncate text-b3 font-semibold text-grey-1000 dark:text-foreground md:text-b2">
                         {approval.title}
                       </p>
-                      <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">
+                      <p className="truncate text-b3 text-secondary-grey-600 dark:text-muted-foreground md:text-b2">
                         {approval.category}
                       </p>
                     </div>
                   </div>
                 </td>
-                <td className="px-3 py-4 text-b3 font-semibold text-grey-500 md:text-b2">
+                <td className="px-3 py-4 text-b3 font-semibold text-grey-500 dark:text-muted-foreground md:text-b2">
                   {approval.budget}
                 </td>
-                <td className="px-3 py-4 text-b3 text-grey-500 md:text-b2">
+                <td className="px-3 py-4 text-b3 text-grey-500 dark:text-muted-foreground md:text-b2">
                   {approval.running}
                 </td>
                 <td className="px-3 py-4">
@@ -115,7 +115,7 @@ function PendingApprovalsTable() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="size-8 rounded-full text-blue hover:bg-auth-background hover:text-blue"
+                    className="size-8 rounded-full text-blue dark:text-cyan hover:bg-auth-background dark:hover:bg-background hover:text-blue dark:hover:text-cyan"
                     aria-label={`Open actions for ${approval.title}`}
                   >
                     <EllipsisVertical className="size-5" strokeWidth={1.8} />
@@ -136,15 +136,15 @@ function EarningBreakdownCard() {
   )
 
   return (
-    <article className="flex min-h-[425px] flex-col overflow-hidden rounded-[20px] bg-white px-6 py-9 shadow-adbox-small">
+    <article className="flex min-h-[425px] flex-col overflow-hidden rounded-[20px] bg-white dark:bg-card px-6 py-9 shadow-adbox-small">
       <header className="mb-6 flex items-start justify-between gap-4">
-        <h2 className="font-heading text-h6 font-semibold text-grey-1000 md:text-h5 md:leading-[27px] lg:text-h6 xl:text-h5">
+        <h2 className="font-heading text-h6 font-semibold text-grey-1000 dark:text-foreground md:text-h5 md:leading-[27px] lg:text-h6 xl:text-h5">
           Earning Breakdown
         </h2>
         <Button
           type="button"
           variant="ghost"
-          className="h-[27px] rounded-full px-0 text-b3 font-medium text-grey-300 hover:bg-transparent hover:text-grey-500 md:text-b2 lg:text-b3 xl:text-b2"
+          className="h-[27px] rounded-full px-0 text-b3 font-medium text-grey-300 hover:bg-transparent hover:text-grey-500 dark:hover:text-muted-foreground md:text-b2 lg:text-b3 xl:text-b2"
         >
           Monthly
           <ChevronDown aria-hidden="true" className="size-4" strokeWidth={1.7} />
@@ -167,7 +167,7 @@ function EarningBreakdownCard() {
                 outerRadius={74}
                 startAngle={90}
                 endAngle={-270}
-                stroke="var(--adbox-white)"
+                stroke="var(--card)"
                 strokeWidth={0}
                 isAnimationActive={false}
                 activeShape={false}
@@ -188,7 +188,7 @@ function EarningBreakdownCard() {
           </ResponsiveContainer>
           {selectedSlice ? (
             <div
-              className={`pointer-events-none absolute z-10 rounded-lg bg-white px-3 py-2 text-b3 shadow-adbox-large ${selectedSlice.labelPosition}`}
+              className={`pointer-events-none absolute z-10 rounded-lg bg-white dark:bg-card px-3 py-2 text-b3 shadow-adbox-large ${selectedSlice.labelPosition}`}
             >
               <div className="flex items-center gap-2">
                 <span
@@ -196,11 +196,11 @@ function EarningBreakdownCard() {
                   style={{ backgroundColor: selectedSlice.color }}
                   aria-hidden="true"
                 />
-                <span className="whitespace-nowrap font-semibold text-grey-1000">
+                <span className="whitespace-nowrap font-semibold text-grey-1000 dark:text-foreground">
                   {selectedSlice.name}
                 </span>
               </div>
-              <p className="mt-1 text-right font-semibold text-grey-1000">
+              <p className="mt-1 text-right font-semibold text-grey-1000 dark:text-foreground">
                 {selectedSlice.value}%
               </p>
             </div>
@@ -211,7 +211,7 @@ function EarningBreakdownCard() {
           {earningBreakdownData.map((entry) => (
             <div
               key={entry.name}
-              className="flex items-center gap-3 border-b border-grey-200 py-[7px] last:border-b-0"
+              className="flex items-center gap-3 border-b border-grey-200 dark:border-border py-[7px] last:border-b-0"
             >
               <span
                 className="size-2 shrink-0 rounded-full"
@@ -219,10 +219,10 @@ function EarningBreakdownCard() {
                 aria-hidden="true"
               />
               <div className="flex min-w-0 flex-1 items-center gap-4 text-b3 md:text-b2 lg:text-b3 xl:text-b2">
-                <span className="min-w-0 flex-1 truncate text-grey-500">
+                <span className="min-w-0 flex-1 truncate text-grey-500 dark:text-muted-foreground">
                   {entry.name}
                 </span>
-                <span className="w-[54px] shrink-0 text-left font-semibold text-grey-1000">
+                <span className="w-[54px] shrink-0 text-left font-semibold text-grey-1000 dark:text-foreground">
                   {entry.value}%
                 </span>
               </div>

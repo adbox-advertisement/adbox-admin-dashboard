@@ -17,11 +17,11 @@ export function WebsiteFooter() {
 
               {content("site.brand.name", "RDI")}</span>
           </WebsiteLink>
-          <p className="max-w-xs leading-relaxed text-slate-400">
+          <p className="max-w-xs leading-relaxed text-slate-400 dark:text-muted-foreground">
 
             {content("site.brand.description", "Building spaces, shaping stories, and powering progress through three specialized divisions.")}</p>
           <div className="mt-6 flex gap-3">
-            {(["Facebook", "Instagram", "LinkedIn"] as const).map(label => <span key={label} role="img" aria-label={label} className="flex size-10 items-center justify-center rounded-full bg-white/5 text-slate-400">
+            {(["Facebook", "Instagram", "LinkedIn"] as const).map(label => <span key={label} role="img" aria-label={label} className="flex size-10 items-center justify-center rounded-full bg-white/5 text-slate-400 dark:text-muted-foreground">
               <SocialIcon name={label} />
             </span>)}
           </div>
@@ -32,7 +32,7 @@ export function WebsiteFooter() {
           </h2>
           <ul className="space-y-3">
             {column.links.map(([label, href]) => <li key={label}>
-              <WebsiteLink href={href} className="text-slate-400 transition-colors hover:text-white">
+              <WebsiteLink href={href} className="text-slate-400 dark:text-muted-foreground transition-colors hover:text-white">
                 {label}
               </WebsiteLink>
             </li>)}
@@ -42,7 +42,7 @@ export function WebsiteFooter() {
           <h2 className="mb-5 rdi-heading text-lg font-semibold">
 
             {content("site.footer.8", "Contact")}</h2>
-          <ul className="space-y-4 text-slate-400">
+          <ul className="space-y-4 text-slate-400 dark:text-muted-foreground">
             <li>
               <WebsiteLink href={officeMapUrl} target="_blank" rel="noreferrer" className="flex items-start gap-3 hover:text-white">
                 <MapPin className="mt-1 size-5 shrink-0 text-amber-400" />
@@ -70,7 +70,7 @@ export function WebsiteFooter() {
           </ul>
         </div>
       </div>
-      <p className="border-t border-slate-700 pt-8 text-sm text-slate-400">
+      <p className="border-t border-slate-700 pt-8 text-sm text-slate-400 dark:text-muted-foreground">
 
         {content("site.footer.13", "© 2026 RichDad Investments. All rights reserved.")}</p>
     </div>

@@ -13,6 +13,8 @@ main.tsx
             ├── auth/            API, mutation hooks, login page
             ├── dashboard/       Widgets, charts, display datasets
             ├── admins/          Admin accounts, roles and permission assignments
+            ├── recruitment/     Applicant queue, full submissions, reviews and response drafts
+            ├── settings/        Workspace preferences, beginning with Appearance
             ├── videos/          Upload, folders, Posts
             └── rdi/             Website CMS, local drafts, website screens and previews
 
@@ -37,6 +39,20 @@ Small features use `api.ts`, `hooks.ts`, and `types.ts`. Split these into direct
 Protected routes share `DashboardLayout` and recheck the local session on navigation. Route metadata supplies the title and optional workspace layout. RDI provides lazy CMS pages at `/rdi`, a nested website layout at `/rdi/website`, and separately guarded standalone previews at `/rdi/preview/:pageId`. The previews render without `DashboardLayout` and also power the editor iframe. Video Management provides a nested Upload/Posts layout. The sidebar persists across page changes and uses `src/config/navigation.ts` for labels and groups.
 
 Initial navigation has a loading screen. Page changes have an accessible loading indicator. Route errors have a recovery screen; unknown URLs return a not-found screen. Backend authorization is required independently of browser route guards.
+
+`AppProviders` mounts the shared `WorkspaceTheme` above the router. One
+`next-themes` provider controls the root `.dark` class, color scheme, and Sonner
+notifications across authentication, dashboard features, RDI/CMS, standalone
+previews, loading/error screens, and Radix portals. The single `ThemeToggle` is
+mounted only in **Settings → Appearance** at `/settings`; headers, candidate
+profiles, sign-in, and RDI previews inherit the selected theme. The preference is
+stored as `adbox-theme` and synchronizes across browser tabs and preview iframes;
+an existing `adbox-recruitment-theme` preference is migrated on first use. The
+default is light. Theme changes do not modify CMS documents or other feature data.
+Shared semantic tokens and explicit dark variants cover surfaces, charts, forms,
+tables, borders, and labels; brand artwork and media retain their original colors.
+Recruitment's `compactHeader: true` route metadata selects its compact header
+layout and has no effect on theme scope.
 
 ## Server and client state
 
@@ -64,7 +80,9 @@ Video folders currently represent local authoring groups. The feature store pers
 ## Feature organization
 
 - **Auth:** the API validates returned sessions and the current-admin profile; mutation hooks drive sign-in, and a Query hook supplies the header's email and roles.
+- **Recruitment:** lazy `/recruitment` route with authenticated Axios services, Zod response/form schemas, and TanStack Query list/detail/stats/campaign queries. The queue uses server pagination/search/filtering, and queue/statistics poll every minute. Detail exposes all 14 applicant answers, on-demand private video, review notes/rating, allowed status transitions, actor-resolved history, and manual email drafts. Mutations invalidate recruitment data even on failure; permission gates come from the current admin profile. Detail/video data is discarded from its query/mutation cache when unobserved; filters and draft input remain local component state. No recruitment data is persisted in Zustand or browser storage. CSV comes from the audited backend export; unsupported text-search filtering is explained before download. See [RECRUITMENT.md](RECRUITMENT.md) for contracts, fields, retention behavior, and current limitations. Tracked applicant responses require the proposed backend extension in [RECRUITMENT_RESPONSES_BACKEND.md](RECRUITMENT_RESPONSES_BACKEND.md).
 - **Admins:** `api.ts`, `hooks.ts`, and `validation.ts` own backend account/RBAC integration. Components render account and role tables, profile/status/assignment dialogs, loading/retry states and CSV exports. Both old mock stores and catalogs have been removed; only form input, filters, selections and dialog visibility remain in component state.
+- **Settings:** lazy authenticated `/settings` route with an Appearance section and one theme button. The page shows the current mode and switches immediately through the shared provider, without an API or separate state store. Add future preferences as sections in this feature; keep theme switching centralized here. RDI `/rdi/settings` remains the separate website-content settings screen.
 - **Dashboard:** `components/` renders widgets; `data/` holds current display datasets. Keep dashboard-specific charts here until another feature needs them.
 - **Videos:** `components/upload/` handles school selection and media composition; `components/folders/` handles folder creation and selection; `components/posts/` renders collections and details; `components/shared/` holds media preview and header components. Filters live in `hooks/`, browser metadata in `store/`, models in `types/`, and fixture content in `data/`.
 - **RDI website:** `pages/` contains Home, About, Construction, Media, Solar, and Contact. `layouts/` supplies the shared website layout; `components/` groups division-specific UI and shared website controls. Static defaults live in `data/`, local images in `public/rdi-assets/`, and scoped styles in `styles/website.css`. Container queries respond to available width. Tabs, filters, project dialogs, and form feedback use component state. The contact form never transmits messages.

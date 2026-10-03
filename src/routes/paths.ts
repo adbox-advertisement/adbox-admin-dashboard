@@ -4,6 +4,7 @@ export const APP_ROUTES = {
   logout: "/logout",
   dashboard: "/dashboard",
   manageUsers: "/manage-users",
+  recruitment: "/recruitment",
   adsManagement: "/ads-management",
   adRequests: "/ads-management/ad-requests",
   reportedAds: "/ads-management/reported-ads",

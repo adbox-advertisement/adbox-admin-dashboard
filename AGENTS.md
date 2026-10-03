@@ -28,7 +28,7 @@ architecture source of truth. Before making layout decisions, read `docs/grid.md
 the responsive grid guidance.
 
 Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
-Auth, Dashboard, Video Management, and RDI own their lazy routes under `src/features/`.
+Auth, Dashboard, Manage Admins, Recruitment, Settings, Video Management, and RDI own their lazy routes under `src/features/`.
 Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
 
 RDI is a browser-only CMS and website UI. Preserve its local drafts, bundled images, backups,

@@ -47,9 +47,9 @@ export function WebsitePreviewRoute() {
   if (!page)
     throw new Response(null, { status: 404 })
   const Screen = screens[page.id]
-  return <main className="rdi-website min-h-svh bg-white">
+  return <main className="rdi-website min-h-svh bg-white dark:bg-card">
     <WebsiteHeader key={`preview-header:${page.id}`} scrolled={false} />
-    <Suspense fallback={<div className="p-12 text-center text-sm text-grey-500">Loading page…</div>}>
+    <Suspense fallback={<div className="p-12 text-center text-sm text-grey-500 dark:text-muted-foreground">Loading page…</div>}>
       <Screen key={page.id} />
     </Suspense>
     <WebsiteFooter />

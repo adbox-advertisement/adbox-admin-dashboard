@@ -48,7 +48,8 @@ implemented folder structure, module ownership, and current integration status.
 - Reusable UI components
 - Accessibility (WCAG)
 - Responsive layouts
-- Dark and light themes
+- Application-wide dark and light themes, with a shared persistent preference across
+  navigation, authentication, admin tools, and RDI previews
 - High performance
 - Scalability for enterprise applications
 - Clean, maintainable code
@@ -188,6 +189,31 @@ feature-based organization, barrel exports where appropriate, no duplicated busi
 reusable utilities, consistent naming, clear separation of concerns.
 
 ---
+
+## Settings
+
+`/settings` is the authenticated home for application preferences. Its initial
+Appearance section contains one button for switching between light and dark mode
+throughout the app. Show the current mode, apply changes immediately, and retain
+the browser preference across navigation and reloads. Other pages inherit the
+choice without extra theme controls. Future settings should be added as distinct
+sections within this feature as they are implemented.
+
+## Recruitment administration
+
+The implemented `/recruitment` workspace serves the campus representative
+programme. It must display every submitted answer and introduction video from
+the public recruitment form, preserve applicant answers as read-only, support
+permission-controlled vetting, and make institution/campaign coverage visible.
+The backend owns pagination, statistics, ratings, internal notes, permitted
+status changes, history, private video links, and CSV exports. Internal decisions
+and applicant communication remain separate actions. Current communication uses
+manual email drafts; tracked delivery is a documented backend extension.
+The workspace uses existing AdBox branding in light and dark appearances, with
+a persisted theme choice, actionable summaries, automatic search, visible active
+filters, 10/20/50-row pagination, and responsive candidate profiles.
+See [Recruitment administration](RECRUITMENT.md) for the implemented scope and
+[Response backend brief](RECRUITMENT_RESPONSES_BACKEND.md) for remaining work.
 
 ## Expected Outcome
 

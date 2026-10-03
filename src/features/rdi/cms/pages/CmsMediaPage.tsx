@@ -46,13 +46,13 @@ export function CmsMediaPage() {
   return <div className="px-4 py-7 sm:px-7 sm:py-9 xl:px-9">
     <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-blue">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-blue dark:text-cyan">
           Made to be seen
         </p>
         <h1 className="font-heading text-3xl font-semibold">
           Media library
         </h1>
-        <p className="mt-2 text-sm text-grey-500">
+        <p className="mt-2 text-sm text-grey-500 dark:text-muted-foreground">
           The images that bring your website to life, all together.
         </p>
       </div>
@@ -65,44 +65,44 @@ export function CmsMediaPage() {
     <div onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "copy" }} onDrop={event => {
       event.preventDefault(); if (!busy)
         void add(event.dataTransfer.files)
-    }} className="mb-7 flex flex-wrap items-center gap-4 rounded-2xl border border-dashed border-blue/25 bg-accent-background/40 p-5">
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue">
+    }} className="mb-7 flex flex-wrap items-center gap-4 rounded-2xl border border-dashed border-blue/25 dark:border-cyan/25 bg-accent-background/40 dark:bg-primary/15 p-5">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-card text-blue dark:text-cyan">
         <Image className="size-5" />
       </span>
       <div className="flex-1">
         <p className="text-sm font-semibold">
           A new look starts with a great image.
         </p>
-        <p className="mt-1 text-xs leading-5 text-grey-500">
+        <p className="mt-1 text-xs leading-5 text-grey-500 dark:text-muted-foreground">
           Drop images here, or use Add images. JPG, PNG, WebP, GIF · up to 2 MB each.
         </p>
       </div>
-      <span className="w-full text-xs text-grey-400 sm:w-auto">
+      <span className="w-full text-xs text-grey-400 dark:text-muted-foreground sm:w-auto">
         Stored in this browser
       </span>
     </div>
-    {error && <p role="alert" className="mb-5 rounded-xl bg-error-100 p-4 text-sm text-error-700">
+    {error && <p role="alert" className="mb-5 rounded-xl bg-error-100 dark:bg-error-400/10 p-4 text-sm text-error-700 dark:text-error-400">
       {error}
     </p>}
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div role="group" aria-label="Filter media library" className="flex flex-wrap gap-2">
-        {["All images", "Construction", "Media", "Solar", "Brand", "Uploads"].map(category => <button type="button" key={category} aria-pressed={filter === category} onClick={() => setFilter(category)} className={cn("rounded-full px-3.5 py-2 text-xs font-semibold transition-colors", filter === category ? "bg-grey-1000 text-white" : "bg-white text-grey-500 hover:bg-grey-100")}>
+        {["All images", "Construction", "Media", "Solar", "Brand", "Uploads"].map(category => <button type="button" key={category} aria-pressed={filter === category} onClick={() => setFilter(category)} className={cn("rounded-full px-3.5 py-2 text-xs font-semibold transition-colors", filter === category ? "bg-grey-1000 text-white" : "bg-white dark:bg-card text-grey-500 dark:text-muted-foreground hover:bg-grey-100 dark:hover:bg-muted")}>
           {category}
         </button>)}
       </div>
       <div className="relative w-full sm:w-56">
-        <Search className="absolute left-3.5 top-3 size-4 text-grey-400" />
-        <Input aria-label="Search media library" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search images…" className="rounded-xl border-grey-200 bg-white pl-10 shadow-none" />
+        <Search className="absolute left-3.5 top-3 size-4 text-grey-400 dark:text-muted-foreground" />
+        <Input aria-label="Search media library" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search images…" className="rounded-xl border-grey-200 dark:border-border bg-white dark:bg-card pl-10 shadow-none" />
       </div>
     </div>
-    <p role="status" className="mb-4 text-xs text-grey-400">
+    <p role="status" className="mb-4 text-xs text-grey-400 dark:text-muted-foreground">
       {filtered.length} {filtered.length === 1 ? "image" : "images"}
     </p>
     <div className="grid grid-cols-1 gap-4 @min-[375px]/cms:grid-cols-2 @min-[640px]/cms:grid-cols-3 @min-[1024px]/cms:grid-cols-4">
-      {filtered.map(asset => <button type="button" key={asset.id} aria-label={`Image details: ${asset.name}`} onClick={() => setSelected(asset)} className="group overflow-hidden rounded-2xl border border-grey-200 bg-white text-left transition-all hover:border-blue/30 hover:shadow-adbox-small">
-        <div className="relative overflow-hidden bg-grey-100">
+      {filtered.map(asset => <button type="button" key={asset.id} aria-label={`Image details: ${asset.name}`} onClick={() => setSelected(asset)} className="group overflow-hidden rounded-2xl border border-grey-200 dark:border-border bg-white dark:bg-card text-left transition-all hover:border-blue/30 dark:hover:border-cyan/30 hover:shadow-adbox-small">
+        <div className="relative overflow-hidden bg-grey-100 dark:bg-muted">
           <img src={asset.src} alt={asset.alt} loading="lazy" className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          <span className="absolute bottom-2.5 left-2.5 rounded-md bg-white/90 px-2 py-1 text-[10px] font-semibold text-grey-600">
+          <span className="absolute bottom-2.5 left-2.5 rounded-md bg-white/90 dark:bg-card/90 px-2 py-1 text-[10px] font-semibold text-grey-600 dark:text-muted-foreground">
             {asset.category}
           </span>
         </div>
@@ -110,18 +110,18 @@ export function CmsMediaPage() {
           <p className="truncate text-xs font-semibold">
             {asset.name}
           </p>
-          <p className="mt-1 text-[10px] text-grey-400">
+          <p className="mt-1 text-[10px] text-grey-400 dark:text-muted-foreground">
             {asset.addedAt ? "Added to your library" : "Website original"}
           </p>
         </div>
       </button>)}
     </div>
-    {filtered.length === 0 && <div className="rounded-2xl border border-dashed border-grey-300 bg-white p-12 text-center">
+    {filtered.length === 0 && <div className="rounded-2xl border border-dashed border-grey-300 dark:border-border bg-white dark:bg-card p-12 text-center">
       <Image className="mx-auto mb-4 size-8 text-grey-300" />
       <h2 className="font-heading text-xl font-semibold">
         Room for something new
       </h2>
-      <p className="mt-2 text-sm text-grey-500">
+      <p className="mt-2 text-sm text-grey-500 dark:text-muted-foreground">
         Add an image or try a different search.
       </p>
     </div>}
@@ -164,7 +164,7 @@ function AssetDetails({ asset, onClose, inUse, onRemove }: {
       <DialogDescription>
         Give this image a clear name so it’s easy to find.
       </DialogDescription>
-      <img src={asset.src} alt={alt} className="max-h-64 w-full rounded-xl bg-grey-50 object-contain" />
+      <img src={asset.src} alt={alt} className="max-h-64 w-full rounded-xl bg-grey-50 dark:bg-background object-contain" />
       <label className="text-sm font-semibold">
         Image name
         <Input className="mt-2 rounded-xl" value={name} maxLength={200} onChange={event => setName(event.target.value)} />
@@ -172,16 +172,16 @@ function AssetDetails({ asset, onClose, inUse, onRemove }: {
       <label className="text-sm font-semibold">
         Library description
         <Input className="mt-2 rounded-xl" value={alt} maxLength={500} onChange={event => setAlt(event.target.value)} />
-        <span className="mt-1.5 block text-xs font-normal leading-5 text-grey-400">
+        <span className="mt-1.5 block text-xs font-normal leading-5 text-grey-400 dark:text-muted-foreground">
           Describe what’s in this image to help you find it. Page editors have separate image descriptions for accessibility.
         </span>
       </label>
-      {error && <p role="alert" className="text-sm text-error-700">{error}</p>}
+      {error && <p role="alert" className="text-sm text-error-700 dark:text-error-400">{error}</p>}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {asset.addedAt ? <CmsButton disabled={inUse} title={inUse ? "Replace this image in your pages before removing it." : undefined} onClick={onRemove} className="text-error-700">
+        {asset.addedAt ? <CmsButton disabled={inUse} title={inUse ? "Replace this image in your pages before removing it." : undefined} onClick={onRemove} className="text-error-700 dark:text-error-400">
           <Trash2 className="size-4" />
           {inUse ? "Used in a page" : "Remove"}
-        </CmsButton> : <span className="text-xs text-grey-400">
+        </CmsButton> : <span className="text-xs text-grey-400 dark:text-muted-foreground">
           Website original
         </span>}
         <CmsButton variant="default" disabled={!name.trim()} onClick={saveDetails}>

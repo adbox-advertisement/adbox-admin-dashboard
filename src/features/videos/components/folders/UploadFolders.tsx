@@ -131,7 +131,7 @@ export function UploadFolders({ schoolId, selectedId, selectionCounts, onSelect 
                       className="peer sr-only"
                     />
                     <span className={cn("flex h-full min-h-20 items-center gap-3 rounded-xl border p-3 transition-colors peer-focus-visible:border-secondary peer-focus-visible:shadow-adbox-focus-secondary motion-reduce:transition-none", selected ? "border-secondary/40 bg-secondary/5" : "border-border bg-card hover:border-secondary/30 hover:bg-muted/40")}>
-                      <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", selected ? "bg-secondary/10 text-secondary" : "bg-warning-100 text-warning-700")}><Icon className="size-5" strokeWidth={1.6} aria-hidden="true" /></span>
+                      <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", selected ? "bg-secondary/10 text-secondary" : "bg-warning-100 dark:bg-warning-400/10 text-warning-700 dark:text-warning-400")}><Icon className="size-5" strokeWidth={1.6} aria-hidden="true" /></span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-heading text-sm font-semibold" title={folder.name}>{folder.name}</span>
                         <span id={browserId + "-count-" + folder.id} className="mt-1.5 block text-xs leading-5 text-muted-foreground">{describeSelection(selectionCounts[folder.id])}</span>

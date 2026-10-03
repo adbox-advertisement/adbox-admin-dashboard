@@ -11,30 +11,30 @@ export function CurrentAdminProfile() {
 
   return (
     <div role="group" aria-label="Signed-in account" className="flex min-w-0 items-center gap-3">
-      <span className="flex size-[41px] shrink-0 items-center justify-center rounded-full bg-blue/10 text-blue" aria-hidden="true">
+      <span className="flex size-[41px] shrink-0 items-center justify-center rounded-full bg-blue/10 text-blue dark:bg-cyan/10 dark:text-cyan" aria-hidden="true">
         <UserRound className="size-5" strokeWidth={1.8} />
       </span>
       <div className="min-w-0 flex-1 text-left">
         {admin ? (
           <>
-            <p className="text-sm font-semibold leading-5 text-grey-1000 [overflow-wrap:anywhere]">
+            <p className="text-sm font-semibold leading-5 text-foreground [overflow-wrap:anywhere]">
               {admin.email}
             </p>
-            <p className="mt-0.5 text-xs leading-4 text-grey-500 [overflow-wrap:anywhere]">
+            <p className="mt-0.5 text-xs leading-4 text-muted-foreground [overflow-wrap:anywhere]">
               <span className="sr-only">{admin.roles.length > 1 ? "Roles: " : "Role: "}</span>
               {roles || "No role assigned"}
             </p>
           </>
         ) : isPending ? (
-          <p role="status" className="text-xs leading-5 text-grey-500">Loading account…</p>
+          <p role="status" className="text-xs leading-5 text-grey-500 dark:text-muted-foreground">Loading account…</p>
         ) : (
           <>
-            <p role="status" className="text-xs leading-4 text-grey-500">Couldn’t load account</p>
+            <p role="status" className="text-xs leading-4 text-grey-500 dark:text-muted-foreground">Couldn’t load account</p>
             <Button
               type="button"
               variant="link"
               size="xs"
-              className="h-auto p-0 text-xs leading-5 text-blue"
+              className="h-auto p-0 text-xs leading-5 text-blue dark:text-cyan"
               disabled={isFetching}
               onClick={() => { void refetch() }}
             >

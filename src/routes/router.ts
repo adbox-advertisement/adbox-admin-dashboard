@@ -9,6 +9,8 @@ import { authRoutes, logoutAdmin } from "@/features/auth"
 import { dashboardRoutes } from "@/features/dashboard"
 import { rdiRoutes, rdiPreviewRoutes } from "@/features/rdi"
 import { videoRoutes } from "@/features/videos"
+import { recruitmentRoutes } from "@/features/recruitment"
+import { settingsRoutes } from "@/features/settings"
 import { DashboardLayout } from "@/layouts/DashboardLayout"
 import { requireAdminSession, redirectToWorkspace } from "./guards"
 import { APP_ROUTES } from "./paths"
@@ -37,7 +39,7 @@ export function createAppRouter(queryClient: QueryClient) {
         loader: requireAdminSession,
         shouldRevalidate: () => true,
         children: [
-          ...dashboardRoutes, ...videoRoutes, ...rdiRoutes, ...adminsRoutes,
+          ...dashboardRoutes, ...videoRoutes, ...rdiRoutes, ...adminsRoutes, ...recruitmentRoutes, ...settingsRoutes,
           ...pendingPages.map(({ path, ...page }) => ({
             path,
             handle: { title: page.title },

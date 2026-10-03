@@ -16,7 +16,7 @@ export function PostsFilters({ query, school, media, sort, setFilter, hasFilters
         <div className="flex gap-1 self-start rounded-xl bg-muted/80 p-1" role="group" aria-label="Filter by media type">
           {([{ value: "all", label: "All posts", icon: LayoutGrid }, { value: "video", label: "Videos", icon: Film }, { value: "photo", label: "Photos", icon: Images }] as const).map(({ value, label, icon: Icon }) => (
             <Button key={value} type="button" variant="ghost" aria-pressed={media === value} onClick={() => setFilter("type", value)} className={cn("h-10 gap-1.5 rounded-lg px-2.5 text-xs sm:px-3 sm:text-sm", media === value ? "bg-card text-secondary shadow-adbox-small hover:bg-card hover:text-secondary" : "text-muted-foreground")}>
-              <Icon className="hidden size-3.5 min-[380px]:block" aria-hidden="true" />{label}<span className={cn("hidden rounded-md px-1.5 py-0.5 text-[10px] tabular-nums min-[480px]:inline", media === value ? "bg-secondary/8 text-secondary" : "bg-grey-200/50 text-muted-foreground")}>{counts[value]}</span>
+              <Icon className="hidden size-3.5 min-[380px]:block" aria-hidden="true" />{label}<span className={cn("hidden rounded-md px-1.5 py-0.5 text-[10px] tabular-nums min-[480px]:inline", media === value ? "bg-secondary/8 text-secondary" : "bg-grey-200/50 dark:bg-muted/50 text-muted-foreground")}>{counts[value]}</span>
             </Button>
           ))}
         </div>

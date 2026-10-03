@@ -18,12 +18,12 @@ export function WebsiteHeader({ scrolled }: {
       setMenuOpen(false)
       menuButton.current?.focus()
     }
-  }} className={cn("sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md transition-all", scrolled ? "py-1 shadow-adbox-medium" : "py-2 shadow-adbox-small")}>
+  }} className={cn("sticky top-0 z-40 border-b border-slate-200/80 dark:border-border/80 bg-white/95 dark:bg-card/95 backdrop-blur-md transition-all", scrolled ? "py-1 shadow-adbox-medium" : "py-2 shadow-adbox-small")}>
     <div className="rdi-container mx-auto px-4">
-      <div className="flex items-center justify-between gap-6">
+      <div className="flex items-center justify-between gap-3">
         <WebsiteLink href={"/"} aria-label="RichDad Investments home" className="flex shrink-0 items-center gap-2">
           <img src={content("site.brand.logo", "/rdi-assets/logo.png")} alt={content("site.brand.name", "RichDad Investments")} className="size-14 rounded-lg object-cover @min-[640px]/rdi:size-16" />
-          <span className="relative rdi-heading text-xl font-semibold text-[#0F172A]">
+          <span className="relative rdi-heading text-xl font-semibold text-[#0F172A] dark:text-foreground">
 
             {content("site.brand.name", "RDI")}<span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-[#F97316] via-[#A855F7] to-[#10B981]" />
           </span>
@@ -33,13 +33,13 @@ export function WebsiteHeader({ scrolled }: {
             {content(`site.navigation.${page.id}`, page.label)}
           </WebsiteLink>)}
         </nav>
-        <button ref={menuButton} type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="rdi-mobile-navigation" aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"} className="rounded-lg p-2 text-[#0F172A] transition-colors hover:bg-slate-100 hover:text-[#B45309] @min-[1280px]/rdi:hidden">
+        <button ref={menuButton} type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="rdi-mobile-navigation" aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"} className="rounded-lg p-2 text-[#0F172A] dark:text-foreground transition-colors hover:bg-slate-100 dark:hover:bg-muted hover:text-[#B45309] dark:hover:text-[#FBBF24] @min-[1280px]/rdi:hidden">
           {menuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
         </button>
       </div>
       <nav id="rdi-mobile-navigation" aria-label="Mobile navigation" hidden={!menuOpen} className="@min-[1280px]/rdi:hidden">
-        <div className="grid gap-1 border-t border-slate-100 py-3">
-          {websitePages.map(page => <WebsiteLink key={page.id} href={page.href} onClick={() => setMenuOpen(false)} aria-current={currentPath === page.href ? "page" : undefined} className={cn("rounded-lg px-3 py-3 font-medium transition-colors hover:bg-slate-50", currentPath === page.href ? page.activeColor : "text-[#0F172A]")}>
+        <div className="grid gap-1 border-t border-slate-100 dark:border-border py-3">
+          {websitePages.map(page => <WebsiteLink key={page.id} href={page.href} onClick={() => setMenuOpen(false)} aria-current={currentPath === page.href ? "page" : undefined} className={cn("rounded-lg px-3 py-3 font-medium transition-colors hover:bg-slate-50 dark:hover:bg-background", currentPath === page.href ? page.activeColor : "text-[#0F172A] dark:text-foreground")}>
             {content(`site.navigation.${page.id}`, page.label)}
           </WebsiteLink>)}
         </div>

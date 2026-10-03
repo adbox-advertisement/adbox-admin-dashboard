@@ -36,7 +36,7 @@ export function AssetPicker({ open, onOpenChange, value, onSelect }: {
       </div>
       <div className="flex flex-wrap gap-3">
         <div className="relative min-w-0 flex-1">
-          <Search className="absolute left-3 top-3 size-4 text-grey-400" />
+          <Search className="absolute left-3 top-3 size-4 text-grey-400 dark:text-muted-foreground" />
           <Input aria-label="Search image library" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search images…" className="rounded-xl pl-9" />
         </div>
         <CmsButton disabled={busy} onClick={() => input.current?.click()}>
@@ -65,13 +65,13 @@ export function AssetPicker({ open, onOpenChange, value, onSelect }: {
           event.target.value = ""
         }
       }} />
-      {error && <p role="alert" className="text-sm text-error-700">
+      {error && <p role="alert" className="text-sm text-error-700 dark:text-error-400">
         {error}
       </p>}
       <div className="grid max-h-[48svh] grid-cols-2 gap-3 overflow-y-auto p-1 sm:grid-cols-3 lg:grid-cols-4">
-        {filtered.map(asset => <button type="button" key={asset.id} aria-label={`Select ${asset.name}`} aria-pressed={current?.id === asset.id} onClick={() => setSelected(assetValue(asset))} className={cn("relative overflow-hidden rounded-xl border-2 bg-grey-50 text-left outline-none transition-colors", current?.id === asset.id ? "border-blue" : "border-transparent hover:border-grey-300")}>
+        {filtered.map(asset => <button type="button" key={asset.id} aria-label={`Select ${asset.name}`} aria-pressed={current?.id === asset.id} onClick={() => setSelected(assetValue(asset))} className={cn("relative overflow-hidden rounded-xl border-2 bg-grey-50 dark:bg-background text-left outline-none transition-colors", current?.id === asset.id ? "border-blue dark:border-cyan" : "border-transparent hover:border-grey-300 dark:hover:border-border")}>
           <img src={asset.src} alt={asset.alt} loading="lazy" className="aspect-[4/3] w-full object-cover" />
-          <span className="block truncate bg-white px-2.5 py-2 text-xs text-grey-600">
+          <span className="block truncate bg-white dark:bg-card px-2.5 py-2 text-xs text-grey-600 dark:text-muted-foreground">
             {asset.name}
           </span>
           {current?.id === asset.id && <span className="absolute right-2 top-2 rounded-full bg-blue p-1 text-white">
@@ -79,12 +79,12 @@ export function AssetPicker({ open, onOpenChange, value, onSelect }: {
           </span>}
         </button>)}
       </div>
-      {filtered.length === 0 && <div className="py-10 text-center text-sm text-grey-500">
+      {filtered.length === 0 && <div className="py-10 text-center text-sm text-grey-500 dark:text-muted-foreground">
         <ImagePlus className="mx-auto mb-3 size-8 text-grey-300" />
         No images found. Try another search.
       </div>}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-grey-200 pt-4">
-        <p className="text-xs text-grey-500">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-grey-200 dark:border-border pt-4">
+        <p className="text-xs text-grey-500 dark:text-muted-foreground">
           JPG, PNG, WebP, GIF · up to 2 MB
         </p>
         <div className="flex gap-2">

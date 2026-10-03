@@ -19,7 +19,7 @@ export function PendingFeaturePage({
 }: PendingFeaturePageProps) {
   return (
     <div className="px-4 pb-10 sm:px-6 sm:pb-12">
-      <section className="relative flex min-h-[560px] overflow-hidden rounded-[20px] border border-grey-100 bg-white px-6 py-14 shadow-adbox-small sm:px-10 lg:min-h-[620px]">
+      <section className="relative flex min-h-[560px] overflow-hidden rounded-[20px] border border-grey-100 dark:border-border bg-white dark:bg-card px-6 py-14 shadow-adbox-small sm:px-10 lg:min-h-[620px]">
         <div className="pointer-events-none absolute -right-32 -top-28 size-[360px] rounded-full bg-purple/10 blur-[90px]" />
         <div className="pointer-events-none absolute -bottom-32 -left-24 size-[320px] rounded-full bg-cyan/10 blur-[90px]" />
 
@@ -29,29 +29,29 @@ export function PendingFeaturePage({
             <Icon aria-hidden="true" className="size-9 text-purple" strokeWidth={1.55} />
           </div>
 
-          <span className="mt-7 inline-flex items-center gap-2 rounded-full border border-warning-200 bg-warning-50 px-3.5 py-1.5 text-b3 font-semibold text-warning-700">
+          <span className="mt-7 inline-flex items-center gap-2 rounded-full border border-warning-200 bg-warning-50 dark:bg-warning-400/10 px-3.5 py-1.5 text-b3 font-semibold text-warning-700 dark:text-warning-400">
             <Clock3 aria-hidden="true" className="size-3.5" strokeWidth={1.8} />
             Pending
           </span>
 
-          <p className="mt-5 text-b3 font-semibold uppercase tracking-[0.16em] text-grey-400">
+          <p className="mt-5 text-b3 font-semibold uppercase tracking-[0.16em] text-grey-400 dark:text-muted-foreground">
             {section}
           </p>
-          <h2 className="mt-3 max-w-[620px] font-heading text-h5 font-semibold leading-tight text-grey-1000 sm:text-h4">
+          <h2 className="mt-3 max-w-[620px] font-heading text-h5 font-semibold leading-tight text-grey-1000 dark:text-foreground sm:text-h4">
             {title} is being prepared
           </h2>
-          <p className="mt-5 max-w-[560px] text-b2 leading-6 text-grey-500">
+          <p className="mt-5 max-w-[560px] text-b2 leading-6 text-grey-500 dark:text-muted-foreground">
             {description}
           </p>
 
           <div className="mt-8 grid w-full max-w-[520px] gap-3 text-left sm:grid-cols-2">
-            <div className="flex items-center gap-3 rounded-xl border border-success-100 bg-success-50/60 px-4 py-3 text-b3 text-grey-600">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success-100 text-success-700">
+            <div className="flex items-center gap-3 rounded-xl border border-success-100 bg-success-50/60 dark:bg-success-400/10 px-4 py-3 text-b3 text-grey-600 dark:text-muted-foreground">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success-100 dark:bg-success-400/10 text-success-700 dark:text-success-400">
                 <Check aria-hidden="true" className="size-3.5" strokeWidth={2} />
               </span>
               Navigation is ready
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-warning-100 bg-warning-50/60 px-4 py-3 text-b3 text-grey-600">
+            <div className="flex items-center gap-3 rounded-xl border border-warning-100 bg-warning-50/60 dark:bg-warning-400/10 px-4 py-3 text-b3 text-grey-600 dark:text-muted-foreground">
               <span className="size-2.5 shrink-0 rounded-full bg-warning-400" aria-hidden="true" />
               Feature work is pending
             </div>

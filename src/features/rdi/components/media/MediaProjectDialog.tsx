@@ -40,7 +40,7 @@ export function MediaProjectDialog({ project, onClose, returnFocus }: MediaProje
             <dl className="grid grid-cols-2 gap-6">
               {Object.entries(project.stats).map(([label, value]) => (
                 <div key={label}>
-                  <dt className="text-sm capitalize text-gray-400">{label}</dt>
+                  <dt className="text-sm capitalize text-gray-400 dark:text-muted-foreground">{label}</dt>
                   <dd className="mt-1 text-2xl font-bold text-white">{value}</dd>
                 </div>
               ))}

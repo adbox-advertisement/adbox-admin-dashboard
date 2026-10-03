@@ -102,7 +102,7 @@ function UploadPanel({ kind, schoolId, folderId, onCountChange }: Props & { kind
       ) : video ? (
         <section aria-label="Selected videos" className="video-reveal">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-sm font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-success-100 text-success-800"><Check className="size-3.5" aria-hidden="true" /></span>Video selected</div>
+            <div className="flex items-center gap-2 text-sm font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-success-100 dark:bg-success-400/10 text-success-800 dark:text-success-400"><Check className="size-3.5" aria-hidden="true" /></span>Video selected</div>
             <Button type="button" variant="outline" onClick={() => inputRef.current?.click()} className="h-11 rounded-xl px-4"><RefreshCw className="size-4" aria-hidden="true" />Replace video</Button>
           </div>
           <div className="overflow-hidden rounded-2xl border border-border bg-muted">

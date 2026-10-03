@@ -321,15 +321,15 @@
 .dark {
   --background: #060619;
   --foreground: var(--adbox-white);
-  --card: #160874;
+  --card: color-mix(in srgb, var(--adbox-grey-1000) 90%, var(--adbox-blue));
   --card-foreground: var(--adbox-white);
-  --popover: #160874;
+  --popover: var(--card);
   --popover-foreground: var(--adbox-white);
   --primary: var(--adbox-purple);
   --primary-foreground: var(--adbox-white);
   --secondary: var(--adbox-cyan);
   --secondary-foreground: #060619;
-  --muted: #24292e;
+  --muted: color-mix(in srgb, var(--adbox-grey-900) 92%, var(--adbox-blue));
   --muted-foreground: var(--adbox-grey-300);
   --accent: var(--adbox-blue);
   --accent-foreground: var(--adbox-white);
@@ -342,11 +342,11 @@
   --chart-3: var(--adbox-blue);
   --chart-4: var(--adbox-warning-400);
   --chart-5: var(--adbox-success-400);
-  --sidebar: #060619;
+  --sidebar: var(--card);
   --sidebar-foreground: var(--adbox-white);
   --sidebar-primary: var(--adbox-cyan);
   --sidebar-primary-foreground: #060619;
-  --sidebar-accent: #160874;
+  --sidebar-accent: var(--muted);
   --sidebar-accent-foreground: var(--adbox-white);
   --sidebar-border: rgb(255 255 255 / 12%);
   --sidebar-ring: var(--adbox-cyan);

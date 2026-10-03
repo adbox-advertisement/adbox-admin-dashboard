@@ -1,6 +1,6 @@
-import { ChevronDown, LogOut } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { useEffect, useId, useState } from "react"
-import { Form, Link, NavLink, useLocation, useNavigation } from "react-router-dom"
+import { Link, NavLink, useLocation } from "react-router-dom"
 
 import mainLogo from "@/assets/brand/mainlogo.svg"
 import { navItems } from "@/config/navigation"
@@ -13,9 +13,7 @@ function DashboardNavigationContent({
   onNavigate?: () => void
 }) {
   const { pathname } = useLocation()
-  const navigation = useNavigation()
   const navigationId = useId()
-  const isLoggingOut = navigation.state !== "idle" && navigation.formAction === APP_ROUTES.logout
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
     () =>
       new Set(
@@ -47,7 +45,7 @@ function DashboardNavigationContent({
   return (
     <>
       <div className="flex flex-col gap-5">
-        <div className="flex min-h-14 items-center border-b border-grey-100 px-2 pb-4">
+        <div className="flex min-h-14 items-center border-b border-sidebar-border px-2 pb-4">
           <Link
             to={APP_ROUTES.dashboard}
             onClick={onNavigate}
@@ -57,7 +55,7 @@ function DashboardNavigationContent({
             <img
               src={mainLogo}
               alt="AdBox"
-              className="h-[40.2px] w-[134px] object-contain"
+              className="h-[40.2px] w-[134px] object-contain dark:brightness-0 dark:invert"
             />
           </Link>
         </div>
@@ -76,15 +74,15 @@ function DashboardNavigationContent({
                     type="button"
                     onClick={() => toggleGroup(item.label)}
                     className={cn(
-                      "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                      "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
                       isGroupActive
-                        ? "bg-purple/10 text-purple"
-                        : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
+                        ? "bg-blue/10 text-blue dark:bg-cyan/10 dark:text-cyan"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     )}
                     aria-expanded={isExpanded}
                     aria-controls={groupId}
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-grey-50 transition-colors group-hover:bg-white">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/70 transition-colors group-hover:bg-card">
                       {item.icon ? (
                         <item.icon aria-hidden="true" className="size-5" strokeWidth={1.65} />
                       ) : null}
@@ -103,14 +101,14 @@ function DashboardNavigationContent({
                     end={item.to !== APP_ROUTES.rdi}
                     className={({ isActive }) =>
                       cn(
-                        "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                        "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
                         isActive
-                          ? "bg-purple/10 text-purple"
-                          : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
+                          ? "bg-blue/10 text-blue dark:bg-cyan/10 dark:text-cyan"
+                          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                       )
                     }
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-grey-50 transition-colors group-hover:bg-white group-aria-[current=page]:bg-white">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/70 transition-colors group-hover:bg-card group-aria-[current=page]:bg-card">
                       {item.imageSrc ? (
                         <img src={item.imageSrc} alt="" className="size-5 object-contain" />
                       ) : item.icon ? (
@@ -129,7 +127,7 @@ function DashboardNavigationContent({
                     )}
                   >
                     <div className="overflow-hidden" inert={!isExpanded}>
-                      <div id={groupId} className="ml-7 flex flex-col gap-0.5 border-l border-grey-200 py-1 pl-4">
+                      <div id={groupId} className="ml-7 flex flex-col gap-0.5 border-l border-sidebar-border py-1 pl-4">
                         {item.children.map((child) => (
                           <NavLink
                             key={child.to}
@@ -139,8 +137,8 @@ function DashboardNavigationContent({
                               cn(
                                 "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",
                                 isActive
-                                  ? "bg-auth-background font-semibold text-grey-1000"
-                                  : "text-grey-500 hover:bg-auth-background hover:text-grey-1000"
+                                  ? "bg-sidebar-accent font-semibold text-sidebar-foreground"
+                                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                               )
                             }
                           >
@@ -158,25 +156,13 @@ function DashboardNavigationContent({
         </nav>
       </div>
 
-      <Form method="post" action={APP_ROUTES.logout} onSubmit={onNavigate}>
-        <button
-          type="submit"
-          disabled={isLoggingOut}
-          className="flex h-11 w-full items-center gap-3 rounded-xl border border-transparent px-3 text-b2 text-error-500 outline-none transition-colors hover:border-error-100 hover:bg-error-50 focus-visible:ring-2 focus-visible:ring-error-300"
-        >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-error-50">
-            <LogOut aria-hidden="true" className="size-5" strokeWidth={1.65} />
-          </span>
-          <span>{isLoggingOut ? "Logging out…" : "Log Out"}</span>
-        </button>
-      </Form>
     </>
   )
 }
 
 export function DashboardSidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 flex w-[290px] shrink-0 flex-col justify-between overflow-y-auto border-r border-grey-100 bg-white px-4 pb-8 pt-4 font-sans max-lg:hidden">
+    <aside className="fixed inset-y-0 left-0 z-40 flex w-[290px] shrink-0 flex-col justify-between overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground px-4 pb-8 pt-4 font-sans max-lg:hidden">
       <DashboardNavigationContent />
     </aside>
   )

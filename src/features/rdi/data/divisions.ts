@@ -9,8 +9,8 @@ export const divisions = [{
   items: ["Commercial and residential construction", "Renovation and remodelling", "Design-build coordination", "Project management"],
   href: "/construction",
   buttonActive: "bg-[#F97316] text-white shadow-lg",
-  iconStyle: "bg-orange-100 text-[#C2410C]",
-  panelStyle: "border-orange-200 bg-gradient-to-br from-orange-50 to-white",
+  iconStyle: "bg-orange-100 text-[#C2410C] dark:bg-muted dark:text-[#FB923C]",
+  panelStyle: "border-orange-200 bg-gradient-to-br from-orange-50 to-white dark:border-border dark:from-muted dark:to-card",
   linkStyle: "bg-[#F97316] text-white hover:bg-[#FB923C]"
 }, {
   id: "media",
@@ -22,8 +22,8 @@ export const divisions = [{
   items: ["Video production and photography", "Brand strategy and identity", "Digital marketing content", "Animation and visual storytelling"],
   href: "/media",
   buttonActive: "bg-[#9333EA] text-white shadow-lg",
-  iconStyle: "bg-purple-100 text-[#7E22CE]",
-  panelStyle: "border-purple-200 bg-gradient-to-br from-purple-50 to-white",
+  iconStyle: "bg-purple-100 text-[#7E22CE] dark:bg-muted dark:text-purple-300",
+  panelStyle: "border-purple-200 bg-gradient-to-br from-purple-50 to-white dark:border-border dark:from-muted dark:to-card",
   linkStyle: "bg-[#9333EA] text-white hover:bg-[#A855F7]"
 }, {
   id: "solar",
@@ -35,7 +35,7 @@ export const divisions = [{
   items: ["ALLOLLA photovoltaic modules and inverters", "Home batteries and commercial energy storage", "Energy assessment and system design", "Monitoring, maintenance, and support"],
   href: "/solar",
   buttonActive: "bg-gradient-to-r from-[#FBBF24] to-[#10B981] text-[#0F172A] shadow-lg",
-  iconStyle: "bg-gradient-to-br from-amber-100 to-emerald-100 text-[#047857]",
-  panelStyle: "border-emerald-200 bg-gradient-to-br from-amber-50 via-white to-emerald-50",
+  iconStyle: "bg-gradient-to-br from-amber-100 to-emerald-100 text-[#047857] dark:from-muted dark:to-card dark:text-[#34D399]",
+  panelStyle: "border-emerald-200 bg-gradient-to-br from-amber-50 via-white to-emerald-50 dark:border-border dark:from-muted dark:via-card dark:to-muted",
   linkStyle: "bg-[#FBBF24] text-[#0F172A] hover:bg-[#FCD34D]"
 }]

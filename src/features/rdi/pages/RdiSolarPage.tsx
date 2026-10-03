@@ -43,11 +43,11 @@ export const RdiSolarPage = () => {
           </span>)}
         </div>
       </div>
-      <div className="overflow-hidden rounded-3xl border border-white/15 bg-white shadow-2xl">
-        <div className="flex items-center justify-center gap-5 border-b border-slate-100 px-5 py-6 @min-[640px]/rdi:gap-8">
+      <div className="overflow-hidden rounded-3xl border border-white/15 bg-white dark:bg-card shadow-2xl">
+        <div className="flex items-center justify-center gap-5 border-b border-slate-100 dark:border-border px-5 py-6 @min-[640px]/rdi:gap-8">
           <div className="flex items-center gap-2">
             <img src={content("solar.introduction.8", "/rdi-assets/logo.png")} alt={content("solar.introduction.9", "RichDad Investments")} width="52" height="52" className="h-12 w-12 object-contain" />
-            <span className="rdi-heading text-xl font-bold text-slate-900">
+            <span className="rdi-heading text-xl font-bold text-slate-900 dark:text-foreground">
               {content("solar.introduction.10", "RDI")}
             </span>
           </div>
@@ -57,7 +57,7 @@ export const RdiSolarPage = () => {
           <img src={solarPartner.logo} alt={content("solar.introduction.12", "ALLOLLA General Power")} width="370" height="120" className="h-auto w-32 object-contain @min-[640px]/rdi:w-40" />
         </div>
         <img src={content("solar.introduction.13", "/rdi-assets/solar/allolla/product-family.jpg")} alt={content("solar.introduction.14", "ALLOLLA solar panels, inverters, home batteries and commercial energy storage systems")} width="1630" height="860" className="w-full object-contain" fetchPriority="high" />
-        <div className="grid grid-cols-3 gap-3 border-t border-slate-100 px-5 py-6 text-center">
+        <div className="grid grid-cols-3 gap-3 border-t border-slate-100 dark:border-border px-5 py-6 text-center">
           {[{
             title: content("solar.introduction.15", "Generate"),
             description: content("solar.introduction.16", "Solar modules")
@@ -68,10 +68,10 @@ export const RdiSolarPage = () => {
             title: content("solar.introduction.19", "Manage"),
             description: content("solar.introduction.20", "Connected systems")
           }].map(t => <div key={t.title}>
-            <p className="rdi-heading font-semibold text-[#047857]">
+            <p className="rdi-heading font-semibold text-[#047857] dark:text-[#34D399]">
               {t.title}
             </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 dark:text-muted-foreground">
               {t.description}
             </p>
           </div>)}
@@ -79,27 +79,27 @@ export const RdiSolarPage = () => {
       </div>
     </div>
   </section></CmsSection>
-  <CmsSection id="solar.our-partnership"><section className="bg-white px-4 py-16 @min-[640px]/rdi:py-20">
+  <CmsSection id="solar.our-partnership"><section className="bg-white dark:bg-card px-4 py-16 @min-[640px]/rdi:py-20">
     <div className="rdi-container mx-auto">
       <div className="mb-12 grid gap-6 @min-[1024px]/rdi:grid-cols-2 @min-[1024px]/rdi:gap-16">
         <div>
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#047857]">
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#047857] dark:text-[#34D399]">
             {content("solar.our-partnership.1", "A partnership built around your energy needs")}
           </p>
-          <h2 className="rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+          <h2 className="rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
             {content("solar.our-partnership.2", "Local guidance.")}
             <br />
             {content("solar.our-partnership.3", "Connected energy solutions.")}
           </h2>
         </div>
-        <div className="text-lg leading-relaxed text-slate-600">
+        <div className="text-lg leading-relaxed text-slate-600 dark:text-muted-foreground">
           <p>
             {content("solar.our-partnership.4", "RDI is your local point of contact for planning and delivering your solar project. ALLOLLA General Power brings the technology range, from photovoltaic modules and inverters to intelligent battery storage.")}
           </p>
           <p className="mt-4">
             {content("solar.our-partnership.5", "Together, we help you explore a system that fits your property, power needs and plans for growth.")}
           </p>
-          <a href={solarPartner.website} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-base font-semibold text-[#047857] hover:text-[#065F46]">
+          <a href={solarPartner.website} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-base font-semibold text-[#047857] dark:text-[#34D399] hover:text-[#065F46] dark:hover:text-[#34D399]">
             {content("solar.our-partnership.6", "Meet ALLOLLA General Power ")}
             <ArrowRight className="h-4 w-4" />
           </a>
@@ -118,14 +118,14 @@ export const RdiSolarPage = () => {
           icon: ShieldCheck,
           title: content("solar.our-partnership.9", "Built for reliability"),
           text: "Thoughtful design, quality installation, and support protect long-term performance."
-        }].map(t => <article className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/60 p-6 shadow-sm @min-[640px]/rdi:p-8" key={t.title}>
-          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#FBBF24]/20 text-[#B45309]">
+        }].map(t => <article className="rounded-2xl border border-emerald-100 dark:border-border bg-gradient-to-br from-white dark:from-card to-emerald-50/60 dark:to-muted/60 p-6 shadow-sm @min-[640px]/rdi:p-8" key={t.title}>
+          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#FBBF24]/20 text-[#B45309] dark:text-[#FBBF24]">
             <t.icon className="h-6 w-6" />
           </div>
-          <h2 className="rdi-heading text-xl font-semibold text-slate-900">
+          <h2 className="rdi-heading text-xl font-semibold text-slate-900 dark:text-foreground">
             {t.title}
           </h2>
-          <p className="mt-2 leading-relaxed text-slate-600">
+          <p className="mt-2 leading-relaxed text-slate-600 dark:text-muted-foreground">
             {t.text}
           </p>
         </article>)}
@@ -146,9 +146,9 @@ export const RdiSolarPage = () => {
           {content("solar.energy-ecosystem.3", "ALLOLLA connects solar panels, inverters, battery storage and grid supply, with cloud, app and PC monitoring to help you understand your energy system.")}
         </p>
       </div>
-      <figure className="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-white p-3 shadow-2xl @min-[640px]/rdi:p-6">
+      <figure className="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-white dark:bg-card p-3 shadow-2xl @min-[640px]/rdi:p-6">
         <img src={content("solar.energy-ecosystem.4", "/rdi-assets/solar/allolla/energy-solutions.jpg")} alt={content("solar.energy-ecosystem.5", "ALLOLLA system diagram showing solar panels connected to an inverter, batteries, the grid and household loads, with cloud monitoring on an app or PC")} width="1500" height="1011" className="h-auto w-full" loading="lazy" />
-        <figcaption className="px-3 pb-3 pt-2 text-center text-sm text-slate-500">
+        <figcaption className="px-3 pb-3 pt-2 text-center text-sm text-slate-500 dark:text-muted-foreground">
           {content("solar.energy-ecosystem.6", "The ALLOLLA energy ecosystem, from generation to everyday use.")}
         </figcaption>
       </figure>
@@ -173,16 +173,16 @@ export const RdiSolarPage = () => {
       </div>
     </div>
   </section></CmsSection>
-  <CmsSection id="solar.our-process"><section className="bg-white px-4 py-16 @min-[640px]/rdi:py-24">
+  <CmsSection id="solar.our-process"><section className="bg-white dark:bg-card px-4 py-16 @min-[640px]/rdi:py-24">
     <div className="rdi-container mx-auto grid items-center gap-10 @min-[1024px]/rdi:grid-cols-2 @min-[1024px]/rdi:gap-16">
-      <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white p-6 shadow-xl @min-[640px]/rdi:p-8">
+      <div className="overflow-hidden rounded-3xl border border-emerald-100 dark:border-border bg-white dark:bg-card p-6 shadow-xl @min-[640px]/rdi:p-8">
         <div className="grid grid-cols-2 items-center gap-5">
           <img src={content("solar.our-process.1", "/rdi-assets/solar/allolla/inverter.jpg")} alt={content("solar.our-process.2", "ALLOLLA inverter with a digital control display")} className="h-64 w-full object-contain @min-[640px]/rdi:h-80" loading="lazy" />
           <img src={content("solar.our-process.3", "/rdi-assets/solar/allolla/geco-wall-battery.jpg")} alt={content("solar.our-process.4", "ALLOLLA GECO wall battery for home energy storage")} className="h-64 w-full object-contain @min-[640px]/rdi:h-80" loading="lazy" />
         </div>
-        <div className="mt-6 rounded-2xl bg-emerald-50 p-6">
-          <Sun className="mb-3 h-8 w-8 text-[#047857]" />
-          <p className="rdi-heading text-xl font-semibold text-slate-900">
+        <div className="mt-6 rounded-2xl bg-emerald-50 dark:bg-muted p-6">
+          <Sun className="mb-3 h-8 w-8 text-[#047857] dark:text-[#34D399]" />
+          <p className="rdi-heading text-xl font-semibold text-slate-900 dark:text-foreground">
             {content("solar.our-process.5", "ALLOLLA technology.")}
             <br />
             {content("solar.our-process.6", "Support from your RDI team.")}
@@ -190,10 +190,10 @@ export const RdiSolarPage = () => {
         </div>
       </div>
       <div>
-        <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#047857]">
+        <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#047857] dark:text-[#34D399]">
           {content("solar.our-process.7", "Our process")}
         </p>
-        <h2 className="rdi-heading text-3xl font-bold text-slate-900 @min-[640px]/rdi:text-4xl">
+        <h2 className="rdi-heading text-3xl font-bold text-slate-900 dark:text-foreground @min-[640px]/rdi:text-4xl">
           {content("solar.our-process.8", "A clear path from energy need to working system")}
         </h2>
         <div className="mt-8 space-y-6">
@@ -202,10 +202,10 @@ export const RdiSolarPage = () => {
               {t.number}
             </div>
             <div>
-              <h3 className="rdi-heading text-lg font-semibold text-slate-900">
+              <h3 className="rdi-heading text-lg font-semibold text-slate-900 dark:text-foreground">
                 {t.title}
               </h3>
-              <p className="mt-1 leading-relaxed text-slate-600">
+              <p className="mt-1 leading-relaxed text-slate-600 dark:text-muted-foreground">
                 {t.description}
               </p>
             </div>

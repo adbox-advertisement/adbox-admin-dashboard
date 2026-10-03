@@ -26,20 +26,20 @@ export function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-auth-background font-sans text-grey-1000">
+    <main className="relative min-h-svh overflow-hidden bg-auth-background dark:bg-background font-sans text-grey-1000 dark:text-foreground">
       <section className="flex min-h-svh items-center justify-center px-5 py-24 sm:px-8">
-        <div className="flex w-full max-w-[537px] flex-col items-center gap-10 rounded-[24px] bg-white px-6 py-10 sm:px-10 lg:-translate-y-5">
+        <div className="flex w-full max-w-[537px] flex-col items-center gap-10 rounded-[24px] bg-white dark:bg-card px-6 py-10 sm:px-10 lg:-translate-y-5">
           <img
             src={mainLogo}
             alt="AdBox"
-            className="h-[55.8px] w-[186px] object-contain"
+            className="h-[55.8px] w-[186px] object-contain dark:brightness-0 dark:invert"
           />
 
           <form className="flex w-full flex-col gap-[30px]" onSubmit={handleSignIn}>
             <div className="flex w-full flex-col px-0 py-5 sm:px-6">
               <div className="flex w-full flex-col gap-5">
                 <label className="flex w-full flex-col gap-2">
-                  <span className="text-b2 font-semibold text-grey-1000">
+                  <span className="text-b2 font-semibold text-grey-1000 dark:text-foreground">
                     Email
                   </span>
                   <Input
@@ -49,12 +49,12 @@ export function LoginPage() {
                     autoComplete="username"
                     required
                     placeholder="email@adbox.com"
-                    className="h-[52px] rounded-lg border-grey-300 bg-white px-3.5 py-4 text-b2 text-grey-1000 placeholder:text-grey-400 focus-visible:border-grey-400 focus-visible:ring-0"
+                    className="h-[52px] rounded-lg border-grey-300 dark:border-border bg-white dark:bg-card px-3.5 py-4 text-b2 text-grey-1000 dark:text-foreground placeholder:text-grey-400 dark:placeholder:text-muted-foreground focus-visible:border-grey-400 focus-visible:ring-0"
                   />
                 </label>
 
                 <label className="flex w-full flex-col gap-2">
-                  <span className="text-b2 font-semibold text-grey-1000">
+                  <span className="text-b2 font-semibold text-grey-1000 dark:text-foreground">
                     Password
                   </span>
                   <Input
@@ -65,14 +65,14 @@ export function LoginPage() {
                     minLength={5}
                     required
                     placeholder="Your Password"
-                    className="h-[52px] rounded-lg border-grey-300 bg-white px-3.5 py-4 text-b2 text-grey-1000 placeholder:text-grey-400 focus-visible:border-grey-400 focus-visible:ring-0"
+                    className="h-[52px] rounded-lg border-grey-300 dark:border-border bg-white dark:bg-card px-3.5 py-4 text-b2 text-grey-1000 dark:text-foreground placeholder:text-grey-400 dark:placeholder:text-muted-foreground focus-visible:border-grey-400 focus-visible:ring-0"
                   />
                 </label>
               </div>
             </div>
 
             {error ? (
-              <p role="alert" className="px-6 text-sm font-medium text-error-700">
+              <p role="alert" className="px-6 text-sm font-medium text-error-700 dark:text-error-400">
                 {error}
               </p>
             ) : null}
@@ -90,16 +90,16 @@ export function LoginPage() {
         </div>
       </section>
 
-      <footer className="absolute bottom-[69px] left-1/2 hidden w-[min(80.3vw,1156px)] -translate-x-1/2 items-center justify-between text-sm font-medium leading-6 tracking-[-0.28px] text-grey-400 lg:flex">
+      <footer className="absolute bottom-[69px] left-1/2 hidden w-[min(80.3vw,1156px)] -translate-x-1/2 items-center justify-between text-sm font-medium leading-6 tracking-[-0.28px] text-grey-400 dark:text-muted-foreground lg:flex">
         <p>© 2022 AdBox. All Rights Reserved.</p>
         <nav aria-label="Footer navigation" className="flex items-center gap-[42px]">
-          <a href="#" className="transition-colors hover:text-grey-1000">
+          <a href="#" className="transition-colors hover:text-grey-1000 dark:hover:text-foreground">
             Website
           </a>
-          <a href="#" className="transition-colors hover:text-grey-1000">
+          <a href="#" className="transition-colors hover:text-grey-1000 dark:hover:text-foreground">
             Terms of Use
           </a>
-          <a href="#" className="transition-colors hover:text-grey-1000">
+          <a href="#" className="transition-colors hover:text-grey-1000 dark:hover:text-foreground">
             Blog
           </a>
         </nav>

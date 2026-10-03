@@ -74,27 +74,27 @@ function GhanaMap({
         aria-live="polite"
       >{`${selectedRegion.name}: ${selectedRegion.users} of users`}</div>
 
-      <div className="pointer-events-none absolute left-[37px] top-[120px] z-30 w-[130px] rounded-lg bg-white p-4 shadow-adbox-large">
+      <div className="pointer-events-none absolute left-[37px] top-[120px] z-30 w-[130px] rounded-lg bg-white dark:bg-card p-4 shadow-adbox-large">
         <p className="sr-only">{selectedRegion.name}</p>
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full bg-cyan" aria-hidden="true" />
           <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-            <span className="text-[10px] leading-[15px] text-paragraph-text">
+            <span className="text-[10px] leading-[15px] text-paragraph-text dark:text-muted-foreground">
               Viewers
             </span>
-            <span className="text-b3 font-semibold text-grey-1000">
+            <span className="text-b3 font-semibold text-grey-1000 dark:text-foreground">
               {selectedRegion.viewers}
             </span>
           </div>
         </div>
-        <div className="my-2 h-px bg-grey-200" />
+        <div className="my-2 h-px bg-grey-200 dark:bg-muted" />
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full bg-purple" aria-hidden="true" />
           <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-            <span className="text-[10px] leading-[15px] text-paragraph-text">
+            <span className="text-[10px] leading-[15px] text-paragraph-text dark:text-muted-foreground">
               Publisher
             </span>
-            <span className="text-b3 font-semibold text-grey-1000">
+            <span className="text-b3 font-semibold text-grey-1000 dark:text-foreground">
               {selectedRegion.publishers}
             </span>
           </div>
@@ -113,11 +113,11 @@ function TopRegionsTable({
 }) {
   return (
     <div className="w-full md:max-w-[270px] md:justify-self-end">
-      <h3 className="pb-2 pt-0 text-b2 font-semibold text-black md:pt-[52px] md:text-b1 md:leading-[19px]">
+      <h3 className="pb-2 pt-0 text-b2 font-semibold text-black dark:text-foreground md:pt-[52px] md:text-b1 md:leading-[19px]">
         Top Regions
       </h3>
-      <div className="border-b border-divider pb-2 pt-2">
-        <div className="grid grid-cols-[1fr_72px] gap-2 text-b3 font-semibold text-grey-1000 md:text-b2">
+      <div className="border-b border-divider dark:border-border pb-2 pt-2">
+        <div className="grid grid-cols-[1fr_72px] gap-2 text-b3 font-semibold text-grey-1000 dark:text-foreground md:text-b2">
           <span>Region</span>
           <span className="text-right">Users</span>
         </div>
@@ -128,20 +128,20 @@ function TopRegionsTable({
             key={region.name}
             type="button"
             className={cn(
-              "grid w-full grid-cols-[1fr_72px] gap-x-2 rounded-lg px-2 py-2 text-left text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white md:text-b2",
+              "grid w-full grid-cols-[1fr_72px] gap-x-2 rounded-lg px-2 py-2 text-left text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-card md:text-b2",
               region.id === selectedRegion.id
-                ? "bg-auth-background text-grey-1000"
-                : "text-grey-500 hover:bg-grey-50 hover:text-grey-1000",
+                ? "bg-auth-background dark:bg-background text-grey-1000 dark:text-foreground"
+                : "text-grey-500 dark:text-muted-foreground hover:bg-grey-50 dark:hover:bg-background hover:text-grey-1000 dark:hover:text-foreground",
             )}
             aria-pressed={region.id === selectedRegion.id}
             onClick={() => onSelectRegion(region)}
           >
             <span className="truncate">{region.name}</span>
-            <span className="text-right font-semibold text-grey-1000">
+            <span className="text-right font-semibold text-grey-1000 dark:text-foreground">
               {region.users}
             </span>
             <span
-              className="col-span-2 mt-1 h-1 overflow-hidden rounded-full bg-auth-background"
+              className="col-span-2 mt-1 h-1 overflow-hidden rounded-full bg-auth-background dark:bg-background"
               aria-hidden="true"
             >
               <span
@@ -158,16 +158,16 @@ function TopRegionsTable({
 
 function TopPublishersTable() {
   return (
-    <article className="flex min-h-[326px] flex-col overflow-hidden rounded-[14px] bg-white shadow-adbox-small">
+    <article className="flex min-h-[326px] flex-col overflow-hidden rounded-[14px] bg-white dark:bg-card shadow-adbox-small">
       <div className="px-4 pb-2 pt-6 sm:px-5">
-        <h2 className="font-heading text-h6 font-semibold text-black md:text-h5">
+        <h2 className="font-heading text-h6 font-semibold text-black dark:text-foreground md:text-h5">
           Top Publishers
         </h2>
       </div>
       <div className="min-h-0 flex-1 overflow-x-auto pb-6">
         <table className="w-full min-w-[288px] text-left">
           <thead>
-            <tr className="border-b border-divider text-b3 font-semibold text-grey-500 md:text-b2">
+            <tr className="border-b border-divider dark:border-border text-b3 font-semibold text-grey-500 dark:text-muted-foreground md:text-b2">
               <th className="px-4 pb-[14px] pt-[9px] font-semibold sm:px-5">
                 User
               </th>
@@ -183,7 +183,7 @@ function TopPublishersTable() {
             {publishers.map((publisher) => (
               <tr
                 key={publisher.name}
-                className="text-b3 text-grey-500 transition-colors hover:bg-grey-50/70 md:text-b2"
+                className="text-b3 text-grey-500 dark:text-muted-foreground transition-colors hover:bg-grey-50/70 dark:hover:bg-background/70 md:text-b2"
               >
                 <td className="px-4 py-2 sm:px-5">
                   <div className="flex items-center gap-[10px]">
@@ -197,7 +197,7 @@ function TopPublishersTable() {
                     </span>
                   </div>
                 </td>
-                <td className="px-2 py-2 font-semibold text-grey-500">
+                <td className="px-2 py-2 font-semibold text-grey-500 dark:text-muted-foreground">
                   {publisher.spending}
                 </td>
                 <td className="w-[74px] px-2 py-2">{publisher.views}</td>
@@ -218,14 +218,14 @@ export function DashboardGeographySection() {
   return (
     <section className="px-4 sm:px-6">
       <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-12">
-        <article className="overflow-hidden rounded-[20px] bg-white px-5 pb-[30px] pt-7 shadow-adbox-small sm:px-8 lg:col-span-8">
+        <article className="overflow-hidden rounded-[20px] bg-white dark:bg-card px-5 pb-[30px] pt-7 shadow-adbox-small sm:px-8 lg:col-span-8">
           <div className="mb-[21px] flex items-start gap-6">
-            <h2 className="min-w-0 flex-1 font-heading text-h6 font-semibold text-black md:text-h5">
+            <h2 className="min-w-0 flex-1 font-heading text-h6 font-semibold text-black dark:text-foreground md:text-h5">
               Geographical Performance
             </h2>
             <button
               type="button"
-              className="flex size-[33px] shrink-0 items-center justify-center rounded-[18px] bg-auth-background"
+              className="flex size-[33px] shrink-0 items-center justify-center rounded-[18px] bg-auth-background dark:bg-background"
               aria-label="View geography chart"
             >
               <img

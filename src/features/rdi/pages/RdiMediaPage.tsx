@@ -57,7 +57,7 @@ export const RdiMediaPage = () => {
             <div className="text-3xl font-bold text-white mb-1">
               {m.value}
             </div>
-            <div className="text-gray-400 text-sm">
+            <div className="text-gray-400 dark:text-muted-foreground text-sm">
               {m.label}
             </div>
           </div>)}
@@ -70,7 +70,7 @@ export const RdiMediaPage = () => {
           <h2 className="mb-4 text-3xl font-bold text-white @min-[640px]/rdi:text-4xl @min-[768px]/rdi:text-5xl">
             {content("media.featured-work.1", "Featured Work")}
           </h2>
-          <p className="text-xl text-gray-400">
+          <p className="text-xl text-gray-400 dark:text-muted-foreground">
             {content("media.featured-work.2", "Explore our latest creative projects")}
           </p>
         </div>

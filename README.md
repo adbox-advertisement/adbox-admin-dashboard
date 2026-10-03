@@ -13,6 +13,8 @@ npm run dev
 
 The app opens at `http://127.0.0.1:5173`. API requests use `/api/v1` by default; Vite proxies `/api` to the separate backend at `http://localhost:3005`. To use a different backend, copy `.env.example` to `.env.local` and set `VITE_SUPER_ADMIN_API_URL`. Restart Vite after changing environment variables.
 
+If port 5173 is occupied, run `npm run dev -- --port 5174` and use `http://127.0.0.1:5174`.
+
 All `VITE_*` values are public browser configuration. Keep credentials out of environment files committed to the repository. Sign-in requires an available backend and a valid administrator account.
 
 ## Project structure
@@ -25,6 +27,7 @@ All `VITE_*` values are public browser configuration. Keep credentials out of en
 | `src/config/` | Navigation, environment values, planned page definitions |
 | `src/features/auth/` | Sign-in and session API operations |
 | `src/features/dashboard/` | Dashboard widgets and display datasets |
+| `src/features/recruitment/` | Recruitment queue, full applicant submissions, private videos, reviews, and response drafts |
 | `src/features/videos/` | School selection, upload folders, media composers, post collections |
 | `src/features/rdi/` | Website CMS, local drafts and media, six website screens, and live previews |
 | `src/components/` | Shared UI primitives, navigation, feedback screens |
@@ -61,14 +64,25 @@ Vitest and React Testing Library cover logic-heavy code (Zustand stores, validat
 
 With the dev server running and Google Chrome installed, run `npm run test:smoke` for browser checks of authentication, protected routes, mobile navigation, the Dashboard, Video Management (school selection incl. search, folder create/rename, the Photos/Videos/Text upload tabs, and Posts), the six RDI screens, and CMS editing, previews, images, backups, and storage recovery. API calls are mocked and never change live content. Set `ADBOX_TEST_URL=http://127.0.0.1:4173` to check a running production preview, or `ADBOX_BROWSER_CHANNEL` to use another installed Playwright browser channel.
 
+For focused browser checks, set `ADBOX_SMOKE_FEATURE=recruitment` or
+`ADBOX_SMOKE_FEATURE=appearance` alongside `ADBOX_TEST_URL` when running
+`npm run test:smoke`. Appearance checks cover both themes throughout the app,
+including dialogs, RDI preview synchronization, and 320–1440px layouts. Shared
+authentication, shell, navigation, and logout checks still run.
+
 ## Current integrations
 
 - Authentication uses the configured API. The backend remains responsible for authorization.
+- **Recruitment** at `/recruitment` uses the existing Super Admin recruitment API for all submitted answers, private introduction videos, campaign/stage/campus filters, counts, paginated search, ratings, notes, decisions, history, and CSV. It refreshes queue/statistics every minute. Access follows recruitment permissions; no mock applicants appear in the production interface. Contact offers editable email drafts. The backend currently sends submission receipts only; decisions do not automatically notify applicants. See [Recruitment administration](docs/RECRUITMENT.md) and [Response backend brief](docs/RECRUITMENT_RESPONSES_BACKEND.md).
+- **Light mode / Dark mode** applies throughout the application: dashboard, admin management, recruitment, videos, RDI/CMS and previews, sign-in, and loading/error screens. Use the single button under **Settings → Appearance** to switch themes. It saves the `adbox-theme` preference through navigation and sign-out and synchronizes across tabs. Existing recruitment theme preferences migrate automatically. AdBox branding and media retain their colors.
+- **Log Out** lives under **Settings → Account**; the sidebar no longer has a logout button.
+- Recruitment search updates as you type; summary cards/stage tabs filter the queue, and page sizes are 10/20/50.
 - Both **Manage Admins** tabs use that same Super Admin API. Admins can be created with a password and multiple roles; profile names, role assignments, direct permissions and active status persist to the backend. Deactivation revokes sessions; reactivation restores sign-in. Role creation, editing, deletion and permission replacement are also connected. Create a role using an identifier such as `CONTENT_MANAGER`, then save its permissions in the next dialog. System roles are read-only. Admin email is read-only after creation; photo/telephone/notification fields and permission-definition CRUD are not supported by this UI.
 - RDI has a browser-only CMS for Home, About, Construction, Media, Solar, and Contact. Page editing, section visibility, collections, shared settings, image selection, local image uploads, and backups work without APIs. The website uses bundled images in `public/rdi-assets/`; source URLs are recorded in `docs/references/rdi-assets.json`. The screens use the existing shared heading font; the reference site’s Poppins font has not been added. There is no remote publishing or contact submission.
 - Dashboard widgets and Posts currently use local display data.
 - Upload folder names and the selected folder persist in this browser. Selected files and composer drafts stay in memory and reset when the upload page is unmounted or reloaded. Upload publishing is not connected to a backend.
-- Other sidebar modules show their existing pending pages. Header search and notifications await integration.
+- **Settings** at `/settings` currently provides Appearance; its section layout can accommodate future preferences.
+- Other unfinished sidebar modules show their existing pending pages. Header search and notifications await integration.
 
 ## RDI website manager
 

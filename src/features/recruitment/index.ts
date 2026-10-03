@@ -1,0 +1,1 @@
+export { recruitmentRoutes } from "./routes"

@@ -1,4 +1,4 @@
-import { Banknote, CircleHelp, CirclePlay, ClipboardList, Flag, Settings, UserRound, WalletCards } from "lucide-react"
+import { Banknote, CircleHelp, CirclePlay, ClipboardList, Flag, UserRound, WalletCards } from "lucide-react"
 import type { PendingFeaturePageProps } from "@/components/feedback/PendingFeaturePage"
 import { APP_ROUTES } from "@/routes/paths"
 
@@ -54,11 +54,5 @@ export const pendingPages: Array<PendingFeaturePageProps & { path: string }> = [
     title: "Support",
     description: "Support conversations, issue tracking, and resolution tools are being prepared.",
     icon: CircleHelp,
-  },
-  {
-    path: APP_ROUTES.settings,
-    title: "Settings",
-    description: "Workspace preferences, security controls, and configuration options are currently pending.",
-    icon: Settings,
   },
 ]

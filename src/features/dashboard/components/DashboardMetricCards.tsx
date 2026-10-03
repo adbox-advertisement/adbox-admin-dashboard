@@ -65,8 +65,8 @@ export function TrendBadge({
         tone === "inverse"
           ? "bg-white/15 text-white"
           : isUp
-            ? "bg-success-100 text-success-700"
-            : "bg-error-100 text-error-700",
+            ? "bg-success-100 dark:bg-success-400/10 text-success-700 dark:text-success-400"
+            : "bg-error-100 dark:bg-error-400/10 text-error-700 dark:text-error-400",
       )}
     >
       <Icon className="size-3" strokeWidth={2.5} aria-hidden="true" />
@@ -84,7 +84,7 @@ function MiniBarChart() {
       {paymentBars.map((height, index) => (
         <div
           key={`${height}-${index}`}
-          className="relative h-full w-[5.33px] overflow-hidden rounded-full bg-accent-background"
+          className="relative h-full w-[5.33px] overflow-hidden rounded-full bg-accent-background dark:bg-primary/15"
         >
           <div
             className="absolute bottom-0 left-0 w-full rounded-full bg-purple"
@@ -126,13 +126,13 @@ export function DashboardMetricCards() {
         <article
           className={cn(
             cardBase,
-            "col-span-1 flex items-center gap-4 bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+            "col-span-1 flex items-center gap-4 bg-white dark:bg-card px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
           )}
         >
           <UsersGlyph />
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">Total Users</p>
-            <p className="truncate font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
+            <p className="truncate text-b3 text-secondary-grey-600 dark:text-muted-foreground md:text-b2">Total Users</p>
+            <p className="truncate font-heading text-h6 font-semibold text-grey-1000 dark:text-foreground md:text-h5">
               321
             </p>
             <TrendBadge direction="up" value="8.1%" />
@@ -142,12 +142,12 @@ export function DashboardMetricCards() {
         <article
           className={cn(
             cardBase,
-            "col-span-1 flex items-center gap-4 bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+            "col-span-1 flex items-center gap-4 bg-white dark:bg-card px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
           )}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">Ad Payment</p>
-            <p className="truncate font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
+            <p className="truncate text-b3 text-secondary-grey-600 dark:text-muted-foreground md:text-b2">Ad Payment</p>
+            <p className="truncate font-heading text-h6 font-semibold text-grey-1000 dark:text-foreground md:text-h5">
               $9,2421,682
             </p>
             <TrendBadge direction="up" value="4.6%" />
@@ -158,14 +158,14 @@ export function DashboardMetricCards() {
         <article
           className={cn(
             cardBase,
-            "col-span-1 flex items-center gap-4 bg-white px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
+            "col-span-1 flex items-center gap-4 bg-white dark:bg-card px-6 py-4 sm:col-span-4 md:col-span-3 xl:col-span-3",
           )}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <p className="truncate text-b3 text-secondary-grey-600 md:text-b2">
+            <p className="truncate text-b3 text-secondary-grey-600 dark:text-muted-foreground md:text-b2">
               Reward Payment
             </p>
-            <p className="truncate font-heading text-h6 font-semibold text-grey-1000 md:text-h5">
+            <p className="truncate font-heading text-h6 font-semibold text-grey-1000 dark:text-foreground md:text-h5">
               $9,2421
             </p>
             <TrendBadge direction="down" value="2.3%" />

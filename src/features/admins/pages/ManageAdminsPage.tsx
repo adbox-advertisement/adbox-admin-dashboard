@@ -7,13 +7,13 @@ import { RolesTable } from "../components/RolesTable"
 
 function SummaryPill({ icon, tone, label, value }: { icon: React.ReactNode; tone: "purple" | "blue"; label: string; value: number | string }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-2.5 shadow-adbox-small">
-      <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${tone === "purple" ? "bg-purple/10 text-purple" : "bg-blue/10 text-blue"}`}>
+    <div className="flex items-center gap-3 rounded-2xl bg-white dark:bg-card px-4 py-2.5 shadow-adbox-small">
+      <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${tone === "purple" ? "bg-purple/10 text-purple" : "bg-blue/10 text-blue dark:text-cyan"}`}>
         {icon}
       </span>
       <div>
-        <p className="text-b4 leading-none text-grey-500">{label}</p>
-        <p className="text-b2 font-semibold leading-tight text-grey-1000">{value}</p>
+        <p className="text-b4 leading-none text-grey-500 dark:text-muted-foreground">{label}</p>
+        <p className="text-b2 font-semibold leading-tight text-grey-1000 dark:text-foreground">{value}</p>
       </div>
     </div>
   )
@@ -30,11 +30,11 @@ export function ManageAdminsPage() {
       <section className="min-w-0 px-4 sm:px-6">
         <Tabs defaultValue="admin">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <TabsList className="w-fit gap-1 rounded-xl border-0 bg-white p-1 shadow-adbox-small">
-              <TabsTrigger value="admin" className="cursor-pointer rounded-lg border-0 px-4 py-2.5 text-b3 text-grey-500 data-[state=active]:bg-purple/10 data-[state=active]:text-purple md:text-b2">
+            <TabsList className="w-fit gap-1 rounded-xl border-0 bg-white dark:bg-card p-1 shadow-adbox-small">
+              <TabsTrigger value="admin" className="cursor-pointer rounded-lg border-0 px-4 py-2.5 text-b3 text-grey-500 dark:text-muted-foreground data-[state=active]:bg-purple/10 data-[state=active]:text-purple md:text-b2">
                 <Users className="size-4" aria-hidden="true" />Admin
               </TabsTrigger>
-              <TabsTrigger value="roles" className="cursor-pointer rounded-lg border-0 px-4 py-2.5 text-b3 text-grey-500 data-[state=active]:bg-purple/10 data-[state=active]:text-purple md:text-b2">
+              <TabsTrigger value="roles" className="cursor-pointer rounded-lg border-0 px-4 py-2.5 text-b3 text-grey-500 dark:text-muted-foreground data-[state=active]:bg-purple/10 data-[state=active]:text-purple md:text-b2">
                 <ShieldCheck className="size-4" aria-hidden="true" />Manage Roles and permissions
               </TabsTrigger>
             </TabsList>

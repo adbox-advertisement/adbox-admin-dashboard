@@ -36,7 +36,7 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 motion-reduce:animate-none!",
         className,
       )}
       {...props}
@@ -60,7 +60,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-white shadow-adbox-large transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "fixed z-50 flex flex-col gap-4 bg-card text-foreground shadow-adbox-large transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out motion-reduce:animate-none!",
           side === "right" &&
             "inset-y-0 right-0 h-full w-[min(22rem,calc(100vw-2rem))] border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
           side === "left" &&
@@ -74,7 +74,7 @@ function SheetContent({
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-full p-2 text-grey-400 opacity-80 transition-opacity hover:bg-grey-100 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
+        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground opacity-80 transition-opacity hover:bg-muted hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
           <X className="size-5" />
           <span className="sr-only">{closeLabel}</span>
         </SheetPrimitive.Close>
@@ -100,7 +100,7 @@ function SheetTitle({
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("font-heading text-h5 font-semibold text-grey-1000", className)}
+      className={cn("font-heading text-h5 font-semibold text-foreground", className)}
       {...props}
     />
   )
@@ -113,7 +113,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-b2 text-grey-500", className)}
+      className={cn("text-b2 text-muted-foreground", className)}
       {...props}
     />
   )

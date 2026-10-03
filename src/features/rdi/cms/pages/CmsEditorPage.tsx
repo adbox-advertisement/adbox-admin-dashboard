@@ -46,7 +46,7 @@ function PageEditor({ page }: {
   return <div className="px-4 py-6 sm:px-7 xl:px-9">
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div>
-        <Link to="/rdi" className="mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-grey-500 hover:text-blue">
+        <Link to="/rdi" className="mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-grey-500 dark:text-muted-foreground hover:text-blue dark:hover:text-cyan">
           <ArrowLeft className="size-3.5" />
           All pages
         </Link>
@@ -54,7 +54,7 @@ function PageEditor({ page }: {
           <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
             {page.name}
           </h1>
-          <span className="rounded-lg bg-grey-100 px-2.5 py-1 font-mono text-xs text-grey-500">
+          <span className="rounded-lg bg-grey-100 dark:bg-muted px-2.5 py-1 font-mono text-xs text-grey-500 dark:text-muted-foreground">
             {page.path}
           </span>
         </div>
@@ -84,8 +84,8 @@ function PageEditor({ page }: {
       </div>
     </div>
     <div className="cms-editor-grid items-start">
-      <aside className="min-w-0 rounded-2xl border border-grey-200 bg-white p-3 @min-[880px]/cms:sticky @min-[880px]/cms:top-5">
-        <p className="px-2 pb-3 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-grey-400">
+      <aside className="min-w-0 rounded-2xl border border-grey-200 dark:border-border bg-white dark:bg-card p-3 @min-[880px]/cms:sticky @min-[880px]/cms:top-5">
+        <p className="px-2 pb-3 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-grey-400 dark:text-muted-foreground">
           On this page
         </p>
         <div className="@min-[880px]/cms:hidden">
@@ -101,7 +101,7 @@ function PageEditor({ page }: {
           </Select>
         </div>
         <nav aria-label="Page sections" className="hidden space-y-1 @min-[880px]/cms:block">
-          {sections.map((item, index) => <button type="button" key={item.id} onClick={() => setSectionId(item.id)} aria-current={section.id === item.id ? "true" : undefined} className={cn("flex w-full items-center gap-2 rounded-xl px-2.5 py-3 text-left text-xs font-medium transition-colors", section.id === item.id ? "bg-blue/8 text-blue" : "text-grey-500 hover:bg-grey-50 hover:text-grey-900")}>
+          {sections.map((item, index) => <button type="button" key={item.id} onClick={() => setSectionId(item.id)} aria-current={section.id === item.id ? "true" : undefined} className={cn("flex w-full items-center gap-2 rounded-xl px-2.5 py-3 text-left text-xs font-medium transition-colors", section.id === item.id ? "bg-blue/8 text-blue dark:text-cyan" : "text-grey-500 dark:text-muted-foreground hover:bg-grey-50 dark:hover:bg-background hover:text-grey-900 dark:hover:text-foreground")}>
             <span className="text-[10px] opacity-50">
               {String(index + 1).padStart(2, "0")}
             </span>
@@ -111,12 +111,12 @@ function PageEditor({ page }: {
             {draft.hiddenSections.includes(item.id) ? <EyeOff className="size-3 shrink-0" /> : section.id === item.id ? <span className="size-1.5 rounded-full bg-blue" /> : null}
           </button>)}
         </nav>
-        <div className="mt-4 hidden rounded-xl bg-grey-50 p-3 text-xs leading-5 text-grey-500 @min-[880px]/cms:block">
-          <LayoutTemplate className="mb-2 size-4 text-blue" />
+        <div className="mt-4 hidden rounded-xl bg-grey-50 dark:bg-background p-3 text-xs leading-5 text-grey-500 dark:text-muted-foreground @min-[880px]/cms:block">
+          <LayoutTemplate className="mb-2 size-4 text-blue dark:text-cyan" />
           Your layout stays consistent while you focus on the words and images.
         </div>
       </aside>
-      <section className="min-w-0 overflow-hidden rounded-2xl border border-grey-200 bg-white">
+      <section className="min-w-0 overflow-hidden rounded-2xl border border-grey-200 dark:border-border bg-white dark:bg-card">
         <Tabs defaultValue="content">
           <TabsList className="gap-5 px-5">
             <TabsTrigger value="content">
@@ -129,32 +129,32 @@ function PageEditor({ page }: {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="content">
-            <div className="border-b border-grey-100 p-5">
+            <div className="border-b border-grey-100 dark:border-border p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-grey-400">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-grey-400 dark:text-muted-foreground">
                     Page section
                   </p>
                   <h2 className="mt-1 font-heading text-xl font-semibold">
                     {section.label}
                   </h2>
                 </div>
-                <button type="button" role="switch" aria-checked={visible} aria-label={`Show ${section.label} section`} onClick={() => useCmsStore.getState().change(current => ({ ...current, hiddenSections: visible ? [...current.hiddenSections, section.id] : current.hiddenSections.filter(id => id !== section.id) }))} className={cn("relative mt-1 h-6 w-10 shrink-0 rounded-full transition-colors", visible ? "bg-blue" : "bg-grey-300")}>
-                  <span className={cn("absolute top-0.5 size-5 rounded-full bg-white transition-transform", visible ? "left-0.5 translate-x-4" : "left-0.5")} />
+                <button type="button" role="switch" aria-checked={visible} aria-label={`Show ${section.label} section`} onClick={() => useCmsStore.getState().change(current => ({ ...current, hiddenSections: visible ? [...current.hiddenSections, section.id] : current.hiddenSections.filter(id => id !== section.id) }))} className={cn("relative mt-1 h-6 w-10 shrink-0 rounded-full transition-colors", visible ? "bg-blue" : "bg-grey-300 dark:bg-muted")}>
+                  <span className={cn("absolute top-0.5 size-5 rounded-full bg-white dark:bg-card transition-transform", visible ? "left-0.5 translate-x-4" : "left-0.5")} />
                 </button>
               </div>
-              <p className="mt-2 text-xs leading-5 text-grey-500">
+              <p className="mt-2 text-xs leading-5 text-grey-500 dark:text-muted-foreground">
                 {visible ? "Update this section. Your preview will follow along." : "This section is hidden from the website preview."}
               </p>
             </div>
             <div key={section.id} className="space-y-6 p-5">
               {section.fields.map(field => <ContentField key={field.id} field={field} value={draft.values[field.id] ?? field.value} onChange={value => changeField(field.id, value)} />)}
-              {collections.map(collection => <div key={collection.id} className="border-t border-grey-100 pt-6">
+              {collections.map(collection => <div key={collection.id} className="border-t border-grey-100 dark:border-border pt-6">
                 <CollectionEditor definition={collection} />
               </div>)}
             </div>
-            <div className="border-t border-grey-100 p-4">
-              <button type="button" className="inline-flex items-center gap-1.5 text-xs text-grey-400 hover:text-grey-800" onClick={() => setReset(true)}>
+            <div className="border-t border-grey-100 dark:border-border p-4">
+              <button type="button" className="inline-flex items-center gap-1.5 text-xs text-grey-400 dark:text-muted-foreground hover:text-grey-800 dark:hover:text-foreground" onClick={() => setReset(true)}>
                 <RotateCcw className="size-3.5" />
                 Restore original section
               </button>
@@ -165,28 +165,28 @@ function PageEditor({ page }: {
               <h2 className="font-heading text-xl font-semibold">
                 Help people find this page
               </h2>
-              <p className="mt-2 text-xs leading-5 text-grey-500">
+              <p className="mt-2 text-xs leading-5 text-grey-500 dark:text-muted-foreground">
                 Set the title and description used in your page preview and content backup.
               </p>
             </div>
             <ContentField field={{ id: "seo-title", label: "Page title", kind: "text", value: "" }} value={seo.title} onChange={title => useCmsStore.getState().change(current => ({ ...current, seo: { ...current.seo, [page.id]: { ...seo, title: title.slice(0, 150) } } }))} />
             <ContentField field={{ id: "seo-description", label: "Page description", kind: "textarea", value: "" }} value={seo.description} onChange={description => useCmsStore.getState().change(current => ({ ...current, seo: { ...current.seo, [page.id]: { ...seo, description: description.slice(0, 500) } } }))} />
-            <div className="rounded-xl border border-grey-200 bg-grey-50 p-4">
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-grey-400">
+            <div className="rounded-xl border border-grey-200 dark:border-border bg-grey-50 dark:bg-background p-4">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-grey-400 dark:text-muted-foreground">
                 Search preview
               </p>
-              <p className="truncate text-xs text-grey-500">
+              <p className="truncate text-xs text-grey-500 dark:text-muted-foreground">
                 richdadinvestments.org
                 {page.path === "/" ? "" : page.path}
               </p>
-              <p className="mt-1 break-words text-lg text-blue">
+              <p className="mt-1 break-words text-lg text-blue dark:text-cyan">
                 {seo.title}
               </p>
-              <p className="mt-1 break-words text-xs leading-5 text-grey-600">
+              <p className="mt-1 break-words text-xs leading-5 text-grey-600 dark:text-muted-foreground">
                 {seo.description}
               </p>
             </div>
-            <p className="inline-flex items-start gap-2 text-xs leading-5 text-grey-400">
+            <p className="inline-flex items-start gap-2 text-xs leading-5 text-grey-400 dark:text-muted-foreground">
               <Check className="mt-0.5 size-3.5 shrink-0" />
               These settings are part of your local draft. Nothing is published online.
             </p>
@@ -195,7 +195,7 @@ function PageEditor({ page }: {
       </section>
       <aside className="cms-preview-column sticky top-5 min-w-0">
         <PreviewPane pageId={page.id} section={section.id} />
-        <Link to={`/rdi/preview/${page.id}`} target="_blank" rel="noreferrer" className="mt-4 flex items-center justify-center gap-1.5 text-xs text-grey-500 hover:text-blue">
+        <Link to={`/rdi/preview/${page.id}`} target="_blank" rel="noreferrer" className="mt-4 flex items-center justify-center gap-1.5 text-xs text-grey-500 dark:text-muted-foreground hover:text-blue dark:hover:text-cyan">
           Open a larger preview
           <ArrowUpRight className="size-3.5" />
         </Link>

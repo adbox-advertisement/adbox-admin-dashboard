@@ -24,9 +24,9 @@ export function RdiWebsiteLayout() {
     else
       marker.current?.closest("main")?.scrollTo({ top: 0, behavior: "instant" })
   }, [pathname, hash])
-  return (<div ref={marker} className="rdi-website min-w-0 bg-white">
-    <div className="border-b border-slate-100 bg-white px-4 py-2 lg:hidden">
-      <Link to={APP_ROUTES.rdi} className="inline-flex min-h-9 items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900">
+  return (<div ref={marker} className="rdi-website min-w-0 bg-white dark:bg-card">
+    <div className="border-b border-slate-100 dark:border-border bg-white dark:bg-card px-4 py-2 lg:hidden">
+      <Link to={APP_ROUTES.rdi} className="inline-flex min-h-9 items-center gap-2 text-sm font-medium text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground">
         <ArrowLeft className="size-4" />
 
         Website manager

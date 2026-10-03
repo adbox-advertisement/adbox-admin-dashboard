@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { Banknote, CircleHelp, CirclePlay, LayoutDashboard, Settings, UserRound, UsersRound, Video } from "lucide-react"
+import { Banknote, CircleHelp, CirclePlay, GraduationCap, LayoutDashboard, Settings, UserRound, UsersRound, Video } from "lucide-react"
 import rdiMark from "@/assets/brand/rdi-mark.svg"
 import { APP_ROUTES } from "@/routes/paths"
 
@@ -24,6 +24,11 @@ export const navItems: DashboardNavItem[] = [
     label: "Manage Users",
     icon: UserRound,
     to: APP_ROUTES.manageUsers,
+  },
+  {
+    label: "Recruitment",
+    icon: GraduationCap,
+    to: APP_ROUTES.recruitment,
   },
   {
     label: "Ads Management",

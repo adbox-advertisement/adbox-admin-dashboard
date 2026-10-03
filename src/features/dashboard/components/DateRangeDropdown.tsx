@@ -113,38 +113,38 @@ const baseCalendarClassNames = {
   month: "flex w-full flex-col gap-0",
   nav: "absolute right-0 top-0 flex items-center justify-end gap-0",
   button_previous:
-    "size-9 rounded-full bg-transparent p-0 text-grey-900 hover:bg-transparent hover:text-date-accent",
+    "size-9 rounded-full bg-transparent p-0 text-grey-900 dark:text-foreground hover:bg-transparent hover:text-date-accent dark:hover:text-cyan",
   button_next:
-    "size-9 rounded-full bg-transparent p-0 text-grey-900 hover:bg-transparent hover:text-date-accent",
+    "size-9 rounded-full bg-transparent p-0 text-grey-900 dark:text-foreground hover:bg-transparent hover:text-date-accent dark:hover:text-cyan",
   month_caption: "mb-3 flex h-9 w-full items-center justify-start px-2",
   caption_label:
-    "font-caption text-sm font-semibold leading-5 text-grey-1000 md:text-base",
+    "font-caption text-sm font-semibold leading-5 text-grey-1000 dark:text-foreground md:text-base",
   month_grid: "w-full border-collapse",
   weekdays: "grid grid-cols-7",
   weekday:
-    "p-2 text-center font-caption text-sm font-normal leading-[1.4] text-grey-400 md:text-base",
+    "p-2 text-center font-caption text-sm font-normal leading-[1.4] text-grey-400 dark:text-muted-foreground md:text-base",
   week: "mt-0 grid grid-cols-7",
-  selected: "text-grey-1000",
-  outside: "text-date-muted aria-selected:text-date-muted",
-  disabled: "text-date-muted opacity-50",
-  today: "text-grey-1000",
+  selected: "text-grey-1000 dark:text-foreground",
+  outside: "text-date-muted dark:text-muted-foreground aria-selected:text-date-muted dark:aria-selected:text-muted-foreground",
+  disabled: "text-date-muted dark:text-muted-foreground opacity-50",
+  today: "text-grey-1000 dark:text-foreground",
 }
 
 const rangeCalendarClassNames = {
   ...baseCalendarClassNames,
-  day: "relative flex min-w-0 justify-center rounded-none p-1 data-[range-middle=true]:bg-date-range data-[range-start=true]:rounded-l-[18px] data-[range-start=true]:bg-date-range data-[range-end=true]:rounded-r-[18px] data-[range-end=true]:bg-date-range",
+  day: "relative flex min-w-0 justify-center rounded-none p-1 data-[range-middle=true]:bg-date-range dark:data-[range-middle=true]:bg-primary/20 data-[range-start=true]:rounded-l-[18px] data-[range-start=true]:bg-date-range dark:data-[range-start=true]:bg-primary/20 data-[range-end=true]:rounded-r-[18px] data-[range-end=true]:bg-date-range dark:data-[range-end=true]:bg-primary/20",
   day_button:
-    "flex size-7 min-w-7 items-center justify-center rounded-[14px] font-caption text-sm font-normal leading-5 text-grey-1000 transition-colors hover:bg-date-range md:text-base data-[range-middle=true]:bg-transparent data-[range-middle=true]:text-grey-1000 data-[range-start=true]:bg-date-accent data-[range-start=true]:font-semibold data-[range-start=true]:text-white data-[range-end=true]:bg-date-accent data-[range-end=true]:font-semibold data-[range-end=true]:text-white",
-  range_start: "rounded-l-[18px] bg-date-range",
-  range_middle: "rounded-none bg-date-range",
-  range_end: "rounded-r-[18px] bg-date-range",
+    "flex size-7 min-w-7 items-center justify-center rounded-[14px] font-caption text-sm font-normal leading-5 text-grey-1000 dark:text-foreground transition-colors hover:bg-date-range dark:hover:bg-primary/20 md:text-base data-[range-middle=true]:bg-transparent data-[range-middle=true]:text-grey-1000 dark:data-[range-middle=true]:text-foreground data-[range-start=true]:bg-date-accent data-[range-start=true]:font-semibold data-[range-start=true]:text-white data-[range-end=true]:bg-date-accent data-[range-end=true]:font-semibold data-[range-end=true]:text-white",
+  range_start: "rounded-l-[18px] bg-date-range dark:bg-primary/20",
+  range_middle: "rounded-none bg-date-range dark:bg-primary/20",
+  range_end: "rounded-r-[18px] bg-date-range dark:bg-primary/20",
 }
 
 const singleCalendarClassNames = {
   ...baseCalendarClassNames,
   day: "relative flex min-w-0 justify-center rounded-none p-1",
   day_button:
-    "flex size-7 min-w-7 items-center justify-center rounded-[14px] font-caption text-sm font-normal leading-5 text-grey-1000 transition-colors hover:bg-date-range md:text-base data-[selected-single=true]:bg-date-accent data-[selected-single=true]:font-semibold data-[selected-single=true]:text-white",
+    "flex size-7 min-w-7 items-center justify-center rounded-[14px] font-caption text-sm font-normal leading-5 text-grey-1000 dark:text-foreground transition-colors hover:bg-date-range dark:hover:bg-primary/20 md:text-base data-[selected-single=true]:bg-date-accent data-[selected-single=true]:font-semibold data-[selected-single=true]:text-white",
 }
 
 export function DateRangeDropdown() {
@@ -195,7 +195,7 @@ export function DateRangeDropdown() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="flex h-10 min-w-[199px] items-center justify-center gap-1 rounded-[40px] bg-auth-background py-2 pl-4 pr-2 text-b3 text-grey-500 transition-colors hover:text-grey-1000 data-[state=open]:text-grey-1000 md:text-b2"
+          className="flex h-10 min-w-[199px] items-center justify-center gap-1 rounded-[40px] bg-auth-background dark:bg-background py-2 pl-4 pr-2 text-b3 text-grey-500 dark:text-muted-foreground transition-colors hover:text-grey-1000 dark:hover:text-foreground data-[state=open]:text-grey-1000 dark:data-[state=open]:text-foreground md:text-b2"
         >
           <span className="truncate">
             {pickerMode === "single"
@@ -204,7 +204,7 @@ export function DateRangeDropdown() {
           </span>
           <ChevronDown
             aria-hidden="true"
-            className="size-6 shrink-0 text-grey-400"
+            className="size-6 shrink-0 text-grey-400 dark:text-muted-foreground"
             strokeWidth={1.7}
           />
         </button>
@@ -214,7 +214,7 @@ export function DateRangeDropdown() {
         align="start"
         className="w-[calc(100vw-2rem)] max-w-[437px] overflow-hidden p-0"
       >
-        <div className="flex flex-col bg-white sm:flex-row">
+        <div className="flex flex-col bg-white dark:bg-card sm:flex-row">
           <div className="flex shrink-0 flex-col justify-between gap-4 px-6 py-4 sm:w-[153px] sm:pl-6 sm:pr-3">
             <div className="flex flex-wrap gap-x-4 gap-y-1 sm:flex-col sm:flex-nowrap">
               {quickRanges.map((range) => {
@@ -229,8 +229,8 @@ export function DateRangeDropdown() {
                     aria-pressed={isActive}
                     onClick={() => selectQuickRange(rangeValue)}
                     className={cn(
-                      "rounded-lg px-0 py-2 text-left font-caption text-sm leading-[1.4] text-grey-1000 transition-colors hover:text-date-accent md:text-base",
-                      isActive && "font-semibold text-date-accent",
+                      "rounded-lg px-0 py-2 text-left font-caption text-sm leading-[1.4] text-grey-1000 dark:text-foreground transition-colors hover:text-date-accent dark:hover:text-cyan md:text-base",
+                      isActive && "font-semibold text-date-accent dark:text-cyan",
                     )}
                   >
                     {range.label}
@@ -242,8 +242,8 @@ export function DateRangeDropdown() {
                 aria-pressed={pickerMode === "single"}
                 onClick={selectDaysOnly}
                 className={cn(
-                  "rounded-lg px-0 py-2 text-left font-caption text-sm leading-[1.4] text-grey-1000 transition-colors hover:text-date-accent md:text-base",
-                  pickerMode === "single" && "font-semibold text-date-accent",
+                  "rounded-lg px-0 py-2 text-left font-caption text-sm leading-[1.4] text-grey-1000 dark:text-foreground transition-colors hover:text-date-accent dark:hover:text-cyan md:text-base",
+                  pickerMode === "single" && "font-semibold text-date-accent dark:text-cyan",
                 )}
               >
                 Days only
@@ -254,7 +254,7 @@ export function DateRangeDropdown() {
               type="button"
               variant="ghost"
               onClick={() => selectQuickRange(getThisWeekRange())}
-              className="h-auto w-fit rounded-lg px-0 py-2 font-caption text-sm font-semibold text-date-accent hover:bg-transparent hover:text-date-accent/80 md:text-base"
+              className="h-auto w-fit rounded-lg px-0 py-2 font-caption text-sm font-semibold text-date-accent dark:text-cyan hover:bg-transparent hover:text-date-accent/80 dark:hover:text-cyan/80 md:text-base"
             >
               Reset
             </Button>
@@ -279,7 +279,7 @@ export function DateRangeDropdown() {
                 showOutsideDays
                 weekStartsOn={1}
                 numberOfMonths={1}
-                className="w-full bg-white p-0 [--cell-radius:18px] [--cell-size:2.25rem]"
+                className="w-full bg-white dark:bg-card p-0 [--cell-radius:18px] [--cell-size:2.25rem]"
                 classNames={singleCalendarClassNames}
               />
             ) : (
@@ -293,7 +293,7 @@ export function DateRangeDropdown() {
                 showOutsideDays
                 weekStartsOn={1}
                 numberOfMonths={1}
-                className="w-full bg-white p-0 [--cell-radius:18px] [--cell-size:2.25rem]"
+                className="w-full bg-white dark:bg-card p-0 [--cell-radius:18px] [--cell-size:2.25rem]"
                 classNames={rangeCalendarClassNames}
               />
             )}

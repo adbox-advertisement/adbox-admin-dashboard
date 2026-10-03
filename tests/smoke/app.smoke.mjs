@@ -5,9 +5,13 @@ import { checkRdiCms } from './rdi-cms.smoke.mjs'
 import { checkVideoManagement } from './video-management.smoke.mjs'
 import { checkDashboardContent } from './dashboard.smoke.mjs'
 import { checkManageAdmins } from './manage-admins.smoke.mjs'
+import { checkRecruitment } from './recruitment.smoke.mjs'
+import { checkAppearance } from './appearance.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
+const smokeFeature = process.env.ADBOX_SMOKE_FEATURE
+if (smokeFeature && !['recruitment', 'appearance'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance or unset')
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
@@ -27,6 +31,9 @@ try {
       if (url.pathname.endsWith('/auth/login')) return reply(loginAllowed ? session : { message: 'Invalid credentials' }, loginAllowed ? 200 : 401)
       if (url.pathname.endsWith('/auth/logout')) return reply({ message: 'Server unavailable' }, 503)
       if (url.pathname.endsWith('/auth/me')) {
+        // Query observers may refetch briefly as logout clears the shared cache.
+        // Match the real API's unauthenticated response during that transition.
+        if (!request.headers().authorization) return reply({ message: 'Authentication required' }, 401)
         if (request.headers().authorization === 'Bearer smoke-access') return reply({ message: 'Token expired' }, 401)
         assert.equal(request.headers().authorization, 'Bearer smoke-refreshed')
         return reply(currentAdmin)
@@ -94,16 +101,32 @@ try {
   await page.getByRole('heading', { name: 'Dashboard', exact: true }).waitFor()
   console.log('All planned routes, shared page shell, mobile navigation, and responsive layouts passed')
 
-  await checkDashboardContent(page, baseUrl)
-  await checkVideoManagement(page, baseUrl)
-  await checkManageAdmins(page, baseUrl)
-  await checkRdiScreens(page, baseUrl)
-  await checkRdiTouchScreens(browser, baseUrl, sessionKey, session)
-  await checkRdiCms(page, baseUrl)
+  if (smokeFeature !== 'recruitment') await checkAppearance(page, baseUrl)
+  if (smokeFeature !== 'appearance') await checkRecruitment(page, baseUrl)
+  if (!smokeFeature) {
+    await checkDashboardContent(page, baseUrl)
+    await checkVideoManagement(page, baseUrl)
+    await checkManageAdmins(page, baseUrl)
+    await checkRdiScreens(page, baseUrl)
+    await checkRdiTouchScreens(browser, baseUrl, sessionKey, session)
+    await checkRdiCms(page, baseUrl)
+  }
 
   await page.setViewportSize({ width: 1440, height: 1000 })
-  await page.getByRole('button', { name: 'Log Out', exact: true }).click()
+  await page.goto(baseUrl + '/dashboard')
+  await page.getByRole('navigation', { name: 'Dashboard navigation' }).waitFor()
+  assert.equal(await page.getByRole('button', { name: 'Log Out', exact: true }).count(), 0)
+  await page.goto(baseUrl + '/settings')
+  await page.getByRole('button', { name: 'Switch to dark mode', exact: true }).click()
+  await page.getByRole('region', { name: 'Account' }).getByRole('button', { name: 'Log Out', exact: true }).click()
   await page.waitForURL('**/login')
+  await page.getByRole('button', { name: 'Sign in', exact: true }).waitFor()
+  assert.equal(await page.getByRole('button', { name: /^Switch to (light|dark) mode$/ }).count(), 0)
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains('dark')), true)
+  await page.screenshot({ path: '/tmp/adbox-dark-login.png', animations: 'disabled' })
+  await page.reload()
+  await page.getByRole('button', { name: 'Sign in', exact: true }).waitFor()
+  assert.equal(await page.evaluate(() => localStorage.getItem('adbox-theme')), 'dark')
   assert.equal(await page.evaluate(key => sessionStorage.getItem(key), sessionKey), null)
   await page.goto(baseUrl + '/dashboard')
   await page.waitForURL('**/login')

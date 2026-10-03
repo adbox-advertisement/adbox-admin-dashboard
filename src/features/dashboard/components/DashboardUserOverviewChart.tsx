@@ -44,12 +44,12 @@ function UserOverviewBar({ x = 0, y = 0, width = 0, height = 0, payload }: BarSh
 export function DashboardUserOverviewChart() {
   return (
     <section className="px-4 sm:px-6">
-      <article className="min-h-[364px] max-w-full overflow-hidden rounded-[20px] bg-white pb-[30px] pl-6 pr-2 pt-7 shadow-adbox-small sm:pl-8">
+      <article className="min-h-[364px] max-w-full overflow-hidden rounded-[20px] bg-white dark:bg-card pb-[30px] pl-6 pr-2 pt-7 shadow-adbox-small sm:pl-8">
         <div className="mb-[21px]">
-          <p className="text-b2 font-semibold text-secondary-grey-600 md:text-b1 md:leading-[19px]">
+          <p className="text-b2 font-semibold text-secondary-grey-600 dark:text-muted-foreground md:text-b1 md:leading-[19px]">
             User Overview
           </p>
-          <p className="font-chart text-[28px] font-bold leading-9 text-chart-ink md:text-[34px] md:leading-[42px]">
+          <p className="font-chart text-[28px] font-bold leading-9 text-chart-ink dark:text-foreground md:text-[34px] md:leading-[42px]">
             682k
           </p>
         </div>
@@ -77,7 +77,7 @@ export function DashboardUserOverviewChart() {
                   tickMargin={17}
                   height={39}
                   tick={{
-                    fill: "var(--adbox-secondary-grey-600)",
+                    fill: "var(--muted-foreground)",
                     fontFamily: "var(--adbox-font-chart)",
                     fontSize: 12,
                     fontWeight: 500,
@@ -91,7 +91,7 @@ export function DashboardUserOverviewChart() {
                   label={{
                     value: "179",
                     position: "right",
-                    fill: "var(--adbox-date-accent)",
+                    fill: "var(--chart-1)",
                     fontSize: 12,
                     fontWeight: 500,
                     fontFamily: "var(--adbox-font-chart)",
