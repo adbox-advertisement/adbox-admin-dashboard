@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { Banknote, CircleHelp, CirclePlay, GraduationCap, LayoutDashboard, Settings, UserRound, UsersRound, Video } from "lucide-react"
+import { Banknote, CircleHelp, CirclePlay, GraduationCap, LayoutDashboard, LibraryBig, Settings, UserRound, UsersRound, Video } from "lucide-react"
 import rdiMark from "@/assets/brand/rdi-mark.svg"
 import { APP_ROUTES } from "@/routes/paths"
 
@@ -24,6 +24,26 @@ export const navItems: DashboardNavItem[] = [
     label: "Manage Users",
     icon: UserRound,
     to: APP_ROUTES.manageUsers,
+    children: [
+      { label: "Overview", to: APP_ROUTES.manageUsers },
+      { label: "People", to: APP_ROUTES.manageUsersPeople },
+      { label: "Institutions", to: APP_ROUTES.manageUsersInstitutions },
+      { label: "Publishers & Companies", to: APP_ROUTES.manageUsersCompanies },
+      { label: "Verification", to: APP_ROUTES.manageUsersVerification },
+      { label: "Honours", to: APP_ROUTES.manageUsersHonours },
+    ],
+  },
+  {
+    label: "User Content",
+    icon: LibraryBig,
+    to: APP_ROUTES.userContent,
+    children: [
+      { label: "Overview", to: APP_ROUTES.userContent },
+      { label: "Posts", to: APP_ROUTES.userContentPosts },
+      { label: "Ads", to: APP_ROUTES.userContentAds },
+      { label: "Surveys", to: APP_ROUTES.userContentSurveys },
+      { label: "Reports", to: APP_ROUTES.userContentReports },
+    ],
   },
   {
     label: "Recruitment",

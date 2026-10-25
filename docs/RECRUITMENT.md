@@ -191,3 +191,10 @@ Run `npm run check`, then `ADBOX_TEST_URL=http://127.0.0.1:5174 npm run test:smo
 with the dev server running on 5174. Live verification additionally requires an
 authenticated admin with the listed permissions and the recruitment-enabled
 backend pointed at the same database used by the live public recruitment form.
+
+## Recruitment advert
+
+The director's script for the campus rep recruitment video (any-gender lead,
+scenes, locations, dialogue, and right/wrong checks) is in
+[RECRUITMENT_ADVERT_SCRIPT.md](RECRUITMENT_ADVERT_SCRIPT.md), with a styled,
+printable version at [recruitment-advert/index.html](recruitment-advert/index.html).

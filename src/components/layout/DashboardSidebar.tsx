@@ -3,9 +3,19 @@ import { useEffect, useId, useState } from "react"
 import { Link, NavLink, useLocation } from "react-router-dom"
 
 import mainLogo from "@/assets/brand/mainlogo.svg"
-import { navItems } from "@/config/navigation"
+import { navItems, type DashboardNavItem } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
+
+// A child owns its nested pages (/manage-users/people/:id belongs to People),
+// except one that shares its group's path, which would otherwise match them all.
+function childMatches(pathname: string, item: DashboardNavItem, to: string) {
+  return pathname === to || (to !== item.to && pathname.startsWith(to + "/"))
+}
+
+function groupMatches(pathname: string, item: DashboardNavItem) {
+  return pathname === item.to || Boolean(item.children?.some((child) => childMatches(pathname, item, child.to)))
+}
 
 function DashboardNavigationContent({
   onNavigate,
@@ -18,17 +28,14 @@ function DashboardNavigationContent({
     () =>
       new Set(
         navItems
-          .filter(
-            (item) =>
-              item.children?.some((child) => pathname === child.to) || pathname === item.to
-          )
+          .filter((item) => groupMatches(pathname, item))
           .map((item) => item.label)
       )
   )
 
   useEffect(() => {
     setExpandedGroups((current) => {
-      const active = navItems.find((item) => item.to === pathname || item.children?.some((child) => child.to === pathname))
+      const active = navItems.find((item) => groupMatches(pathname, item))
       return active?.children && !current.has(active.label) ? new Set([...current, active.label]) : current
     })
   }, [pathname])
@@ -64,8 +71,7 @@ function DashboardNavigationContent({
           {navItems.map((item) => {
             const isExpanded = expandedGroups.has(item.label)
             const groupId = `${navigationId}-${item.label.toLowerCase().replace(/\s+/g, "-")}-subnavigation`
-            const isGroupActive =
-              pathname === item.to || item.children?.some((child) => pathname === child.to)
+            const isGroupActive = groupMatches(pathname, item)
 
             return (
               <div key={item.label} className="w-full">
@@ -133,6 +139,7 @@ function DashboardNavigationContent({
                             key={child.to}
                             to={child.to}
                             onClick={onNavigate}
+                            end={child.to === item.to}
                             className={({ isActive }) =>
                               cn(
                                 "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",

@@ -27,6 +27,8 @@ All `VITE_*` values are public browser configuration. Keep credentials out of en
 | `src/config/` | Navigation, environment values, planned page definitions |
 | `src/features/auth/` | Sign-in and session API operations |
 | `src/features/dashboard/` | Dashboard widgets and display datasets |
+| `src/features/users/` | Manage Users: overview, people directory and full profiles, institutions, publishers & companies, verification, Gye Nyame honours |
+| `src/features/content/` | User Content: videos, pictures, text posts, ads and surveys by uploader; post removal/restore and survey deactivation |
 | `src/features/recruitment/` | Recruitment queue, full applicant submissions, private videos, reviews, and response drafts |
 | `src/features/videos/` | School selection, upload folders, media composers, post collections |
 | `src/features/rdi/` | Website CMS, local drafts and media, six website screens, and live previews |
@@ -64,8 +66,8 @@ Vitest and React Testing Library cover logic-heavy code (Zustand stores, validat
 
 With the dev server running and Google Chrome installed, run `npm run test:smoke` for browser checks of authentication, protected routes, mobile navigation, the Dashboard, Video Management (school selection incl. search, folder create/rename, the Photos/Videos/Text upload tabs, and Posts), the six RDI screens, and CMS editing, previews, images, backups, and storage recovery. API calls are mocked and never change live content. Set `ADBOX_TEST_URL=http://127.0.0.1:4173` to check a running production preview, or `ADBOX_BROWSER_CHANNEL` to use another installed Playwright browser channel.
 
-For focused browser checks, set `ADBOX_SMOKE_FEATURE=recruitment` or
-`ADBOX_SMOKE_FEATURE=appearance` alongside `ADBOX_TEST_URL` when running
+For focused browser checks, set `ADBOX_SMOKE_FEATURE=recruitment`,
+`ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users` (Manage Users) or `ADBOX_SMOKE_FEATURE=content` (User Content) alongside `ADBOX_TEST_URL` when running
 `npm run test:smoke`. Appearance checks cover both themes throughout the app,
 including dialogs, RDI preview synchronization, and 320–1440px layouts. Shared
 authentication, shell, navigation, and logout checks still run.
@@ -77,6 +79,8 @@ authentication, shell, navigation, and logout checks still run.
 - **Light mode / Dark mode** applies throughout the application: dashboard, admin management, recruitment, videos, RDI/CMS and previews, sign-in, and loading/error screens. Use the single button under **Settings → Appearance** to switch themes. It saves the `adbox-theme` preference through navigation and sign-out and synchronizes across tabs. Existing recruitment theme preferences migrate automatically. AdBox branding and media retain their colors.
 - **Log Out** lives under **Settings → Account**; the sidebar no longer has a logout button.
 - Recruitment search updates as you type; summary cards/stage tabs filter the queue, and page sizes are 10/20/50.
+- **Manage Users** (`/manage-users`, with sidebar sub-pages) covers everything about platform accounts. **Overview** breaks people down by account role (viewer, creator, publisher), campus affiliation (student, alumni, faculty & staff), verification, badges and account status, and every figure links to a filtered list. **People** is a server-filtered directory (role, affiliation, verification, badge, status, institution; filters live in the URL) that opens a full **profile page** with Profile, Connections (followers, following, blocks), Publishing (companies), Badges & honours, and Account & sign-in tabs, plus edit, badge management and suspend/reactivate. **Institutions** lists members per institution and opens campus breakdowns and member lists. **Publishers & Companies** lists advertiser companies with owners and publishers, with approve/reject. **Verification** is the student-ID review queue and **Honours** the Gye Nyame nomination review. Needs the super-admin `platform-users` stats/relationships/connections endpoints from the backend. There is no create- or delete-user endpoint.
+- **User Content** (sidebar, `/user-content`) lists videos, pictures, text posts, ads and surveys with their uploaders: totals, top uploaders, a per-uploader filter (also reachable from a Manage Users profile), media previews and engagement. Admins with `user.content.moderate` can remove or restore posts and deactivate or reactivate surveys. Ads are view-only. Needs the `user-content` super-admin endpoints from the backend.
 - Both **Manage Admins** tabs use that same Super Admin API. Admins can be created with a password and multiple roles; profile names, role assignments, direct permissions and active status persist to the backend. Deactivation revokes sessions; reactivation restores sign-in. Role creation, editing, deletion and permission replacement are also connected. Create a role using an identifier such as `CONTENT_MANAGER`, then save its permissions in the next dialog. System roles are read-only. Admin email is read-only after creation; photo/telephone/notification fields and permission-definition CRUD are not supported by this UI.
 - RDI has a browser-only CMS for Home, About, Construction, Media, Solar, and Contact. Page editing, section visibility, collections, shared settings, image selection, local image uploads, and backups work without APIs. The website uses bundled images in `public/rdi-assets/`; source URLs are recorded in `docs/references/rdi-assets.json`. The screens use the existing shared heading font; the reference site’s Poppins font has not been added. There is no remote publishing or contact submission.
 - Dashboard widgets and Posts currently use local display data.

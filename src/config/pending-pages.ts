@@ -1,14 +1,8 @@
-import { Banknote, CircleHelp, CirclePlay, ClipboardList, Flag, UserRound, WalletCards } from "lucide-react"
+import { Banknote, CircleHelp, CirclePlay, ClipboardList, Flag, WalletCards } from "lucide-react"
 import type { PendingFeaturePageProps } from "@/components/feedback/PendingFeaturePage"
 import { APP_ROUTES } from "@/routes/paths"
 
 export const pendingPages: Array<PendingFeaturePageProps & { path: string }> = [
-  {
-    path: APP_ROUTES.manageUsers,
-    title: "Manage Users",
-    description: "User accounts, roles, and account-management tools will be available here once this module is complete.",
-    icon: UserRound,
-  },
   {
     path: APP_ROUTES.adsManagement,
     title: "Ads Management",

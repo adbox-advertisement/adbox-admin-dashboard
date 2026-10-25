@@ -1,4 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap");
+/* Manrope is the AdBox type family, matching the mobile app (adbox-mobile-mvp AppTypography).
+   DM Sans, Inter and Outfit stay loaded for RDI, which keeps its original type (see .rdi-* below). */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -164,11 +166,11 @@
 }
 
 :root {
-  --adbox-font-heading: "Outfit", "Manrope", sans-serif;
-  --adbox-font-sans: "Manrope", "Inter", sans-serif;
-  --adbox-font-body: "Manrope", "Inter", sans-serif;
-  --adbox-font-caption: "Inter", "Manrope", sans-serif;
-  --adbox-font-chart: "DM Sans", "Inter", sans-serif;
+  --adbox-font-heading: "Manrope", sans-serif;
+  --adbox-font-sans: "Manrope", sans-serif;
+  --adbox-font-body: "Manrope", sans-serif;
+  --adbox-font-caption: "Manrope", sans-serif;
+  --adbox-font-chart: "Manrope", sans-serif;
 
   --adbox-white: #ffffff;
   --adbox-purple: #d132fb;
@@ -384,4 +386,16 @@
     @apply font-heading;
     letter-spacing: 0;
   }
+}
+
+/* RDI (CMS, its dialogs, and the website and previews) keeps the type it was designed with;
+   only the AdBox dashboard moved to Manrope. */
+.rdi-cms,
+.rdi-cms-dialog,
+.rdi-website {
+  --adbox-font-heading: "Outfit", "Manrope", sans-serif;
+  --adbox-font-sans: "Manrope", "Inter", sans-serif;
+  --adbox-font-body: "Manrope", "Inter", sans-serif;
+  --adbox-font-caption: "Inter", "Manrope", sans-serif;
+  --adbox-font-chart: "DM Sans", "Inter", sans-serif;
 }

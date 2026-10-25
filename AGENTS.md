@@ -28,13 +28,65 @@ architecture source of truth. Before making layout decisions, read `docs/grid.md
 the responsive grid guidance.
 
 Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
-Auth, Dashboard, Manage Admins, Recruitment, Settings, Video Management, and RDI own their lazy routes under `src/features/`.
+Auth, Dashboard, Manage Users, User Content, Manage Admins, Recruitment, Settings, Video Management, and RDI own their lazy routes under `src/features/`.
 Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
 
-RDI is a browser-only CMS and website UI. Preserve its local drafts, bundled images, backups,
-and previews. Do not add RDI APIs, remote uploads, publishing, or contact delivery without a new
-user request. Authentication uses the existing API independently. Historical database scripts
-under `database/rdi-cms/` are disconnected from the frontend; do not run them during setup.
+Key wiring that spans several files:
+
+- `src/routes/paths.ts` defines stable URLs; each feature's `routes.ts` owns its lazy pages;
+  `src/routes/router.ts` composes public, protected, pending, and not-found routes. Protected
+  routes share `DashboardLayout`. Sidebar labels/groups come from `src/config/navigation.ts`;
+  unbuilt modules live in `src/config/pending-pages.ts` until they get a feature directory.
+- Each feature's `index.ts` is its public API (route definitions, no eager page imports). Use
+  relative imports inside a feature and `@/features/<name>` outside it. Shared code must not
+  import features or the app shell, and UI must not import API services directly;
+  `npm run check:architecture` enforces this.
+- Theme is app-wide: one `next-themes` provider (`WorkspaceTheme` in `AppProviders`), stored as
+  `adbox-theme`, toggled only from Settings → Appearance.
+- Dev API: requests go to `/api/v1`; Vite proxies `/api` to `http://localhost:3005`. Override with
+  `VITE_SUPER_ADMIN_API_URL` in `.env.local` (see `.env.example`). Sign-in needs that backend.
+
+RDI is a browser-only CMS and website UI. Its authentication uses the existing API independently.
+It is protected by the RDI rule below.
+
+## RDI Is Off-Limits Unless Explicitly Requested
+
+This rule applies to every agent and every task in this repository, and it overrides any broader
+instruction. **Do not change any part of RDI unless the user's current request explicitly names
+RDI and asks for that change.** Work on any other part of the dashboard must leave RDI exactly as
+it was: its code, appearance, behaviour, data and tests.
+
+- A request counts as explicit only when it names RDI (for example "change the RDI home page").
+  General requests do not count, even when they could seem to include RDI: "redesign the app",
+  "update every page", "clean up", "fix lint", "rename X everywhere", "upgrade dependencies",
+  "apply the new font/colours" and similar.
+- Permission covers only the RDI change that was asked for, in that request. It does not carry
+  over to later tasks or sessions, and it does not allow other RDI edits along the way.
+- Without that permission, do not create, edit, move, rename, delete, reformat or refactor these:
+  - `src/features/rdi/` (all of it: `cms/`, `components/`, `config/`, `data/`, `layouts/`, `lib/`,
+    `pages/`, `styles/`, `routes.ts`, `types.ts`, `index.ts`)
+  - `public/rdi-assets/`, `src/assets/rdi-logo.svg`, `src/assets/brand/rdi-mark.svg`,
+    `docs/references/rdi-assets.json`
+  - `tests/smoke/rdi.smoke.mjs`, `tests/smoke/rdi-cms.smoke.mjs`
+  - `database/rdi-cms/` (also never run these scripts; they are disconnected from the frontend)
+- These shared files contain RDI wiring. You may edit them for other work, but keep their RDI parts
+  exactly as they are:
+  - `src/routes/router.ts`: the `rdiRoutes` / `rdiPreviewRoutes` import and their use
+  - `src/routes/paths.ts`: the `rdi` path
+  - `src/config/navigation.ts`: the `rdiMark` import and the RDI sidebar entry
+  - `src/styles/index.css`: the `.rdi-cms`, `.rdi-cms-dialog` and `.rdi-website` rules and the fonts
+    loaded for them (DM Sans, Inter, Outfit)
+  - `tests/smoke/app.smoke.mjs`: the RDI imports, checks and bundle assertions
+- RDI renders through shared code: `src/styles/index.css` tokens, `src/components/ui/`, `src/lib/`,
+  the theme provider, the router, the build config and dependencies. Before changing any of these, make sure RDI's look and
+  behaviour stay the same, for example by scoping the change away from `.rdi-*`. If you can't,
+  stop and ask the user first.
+- Never clear, migrate or rewrite RDI's browser data (local drafts, backups, bundled images,
+  previews). Do not add RDI APIs, remote uploads, publishing or contact delivery.
+- If a check (lint, types, tests, smoke, build) fails only in RDI, report it and leave it unfixed.
+  Exclude RDI from bulk edits, such as search-and-replace, codemods or `eslint --fix`, by
+  narrowing their paths.
+- When in doubt whether something touches RDI, treat it as RDI and ask.
 
 ## Architecture Rules
 
@@ -124,8 +176,13 @@ Axios client -> services -> TanStack Query hooks -> components
 - `npm run ai:claude` starts Claude Code in the project.
 - `npm run ai:check` checks shared guidance and local CLI availability without contacting models.
 
+- Single test file: `npx vitest run src/features/settings/pages/SettingsPage.test.tsx`
+  (filter by name with `-t "<test name>"`).
+
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
-local server and an installed Chrome browser. It mocks all API calls. See README for overrides.
+local server and an installed Chrome browser. It mocks all API calls. Point it at another server
+with `ADBOX_TEST_URL=http://127.0.0.1:5174`, and narrow it with
+`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users` or `ADBOX_SMOKE_FEATURE=content`. See README for overrides.
 
 Unit and component tests live beside the code they cover as `*.test.ts`/`*.test.tsx` (Vitest +
 React Testing Library, jsdom environment). Shared test setup and render helpers live in
