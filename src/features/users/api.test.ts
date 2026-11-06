@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from "vitest"
 import { superAdminApi } from "@/api/client"
 import {
-  approveCompany, getCompany, getHonourNominee, getPlatformUsers, getUserConnections, getUserRelationships, getUserStats, getVerificationRequests,
+  approveBusinessRequest, approveCompany, approvePageRequest, declineBusinessRequest, declinePageRequest, getBusinessRequest, getBusinessRequests,
+  getCompany, getPageRequest, getPageRequests, getHonourNominee, getPlatformUsers, getUserConnections, getUserRelationships, getUserStats, getVerificationRequests,
   grantHonour, reactivatePlatformUser, rejectCompany, rejectVerificationRequest, suspendPlatformUser, updatePlatformUser, updateUserBadges,
 } from "./api"
 import {
-  companyDetailFixture, companyFixture, connectionsFixture, honourCandidateFixture, institutionFixtures, page, platformUserFixtures,
+  businessDetail, businessRequestFixtures, companyDetailFixture, pageDetail, pageRequestFixtures, companyFixture, connectionsFixture, honourCandidateFixture, institutionFixtures, page, platformUserFixtures,
   relationshipsFixture, statsFixture, verificationFixtures,
 } from "@/test/users-fixtures"
 
@@ -95,5 +96,44 @@ describe("Manage Users API contracts", () => {
     const post = vi.spyOn(superAdminApi, "post").mockResolvedValue({ data: detail })
     await grantHonour({ userId, input: { override: true, note: "Led the clean-up drive" } })
     expect(post).toHaveBeenCalledWith(`/honour-review/${userId}/grant`, { override: true, note: "Led the clean-up drive" })
+  })
+
+  it("asks for business requests with only the filters that are set", async () => {
+    const get = vi.spyOn(superAdminApi, "get").mockResolvedValue({ data: page(businessRequestFixtures) })
+    const result = await getBusinessRequests({ status: "open", search: " BN1 " })
+    expect(get).toHaveBeenCalledWith("/business-requests", { params: { status: "open", search: "BN1", page: 1, limit: 20 }, signal: undefined })
+    expect(result.items[1].proof).toBeNull()
+  })
+
+  it("reads a business request with its proof link and history", async () => {
+    vi.spyOn(superAdminApi, "get").mockResolvedValue({ data: businessDetail(businessRequestFixtures[0]) })
+    const request = await getBusinessRequest(businessRequestFixtures[0].id)
+    expect(request.proofUrl).toBe("https://s3.example.com/proof?signed")
+    expect(request.history).toHaveLength(1)
+  })
+
+  it("approves with a cleaned username and declines without an empty note", async () => {
+    const id = businessRequestFixtures[0].id
+    const post = vi.spyOn(superAdminApi, "post").mockResolvedValue({ data: businessDetail(businessRequestFixtures[0]) })
+    await approveBusinessRequest({ id, input: { username: " @Akos.Legon ", name: " Akos " } })
+    expect(post).toHaveBeenCalledWith(`/business-requests/${id}/approve`, { username: "akos.legon", name: "Akos" })
+    await declineBusinessRequest({ id, input: { reason: "IMPERSONATION", note: "  " } })
+    expect(post).toHaveBeenLastCalledWith(`/business-requests/${id}/decline`, { reason: "IMPERSONATION" })
+  })
+
+  it("reads page requests and decides them on super-admin's routes", async () => {
+    const get = vi.spyOn(superAdminApi, "get").mockResolvedValue({ data: page(pageRequestFixtures) })
+    const list = await getPageRequests({ status: "NEW", search: " ug " })
+    expect(get).toHaveBeenCalledWith("/page-requests", { params: { status: "NEW", search: "ug", page: 1, limit: 20 }, signal: undefined })
+    expect(list.items[1].letter).toBeNull()
+    get.mockResolvedValue({ data: pageDetail(pageRequestFixtures[0]) })
+    expect((await getPageRequest(pageRequestFixtures[0].id)).letterUrl).toBe("https://s3.example.com/letter?signed")
+
+    const id = pageRequestFixtures[0].id
+    const post = vi.spyOn(superAdminApi, "post").mockResolvedValue({ data: pageDetail(pageRequestFixtures[0]) })
+    await approvePageRequest({ id, input: { username: " @UG.CSU ", name: " CSU " } })
+    expect(post).toHaveBeenCalledWith(`/page-requests/${id}/approve`, { username: "ug.csu", name: "CSU" })
+    await declinePageRequest({ id, input: { reason: "ALREADY_HAS_PAGE", note: "" } })
+    expect(post).toHaveBeenLastCalledWith(`/page-requests/${id}/decline`, { reason: "ALREADY_HAS_PAGE" })
   })
 })

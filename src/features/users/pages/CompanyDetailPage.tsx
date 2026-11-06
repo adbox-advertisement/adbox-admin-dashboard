@@ -1,20 +1,21 @@
 import { useState } from "react"
 import { useParams } from "react-router-dom"
-import { Building2, CalendarDays, ExternalLink, Globe, Hash, Mail, Megaphone, Phone, ShieldCheck, ShieldX, UsersRound } from "lucide-react"
+import { Building2, CalendarDays, ExternalLink, Globe, Hash, Mail, Megaphone, Phone, ShieldCheck, ShieldX, UserCog, UsersRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
 import { useCompany, useUserAccess } from "../hooks"
 import { usersErrorMessage } from "../lib/errors"
+import { companySizeLabels } from "../lib/business-requests"
 import { formatDate, formatRelative, safeImageUrl } from "../lib/format"
 import { USER_PERMISSIONS } from "../types"
 import { CompanyStatusBadge, UserAvatar, pill } from "../components/UserBadges"
 import { BackLink, EmptyState, ErrorState, NoAccess, ink, muted, surface } from "../components/Surface"
 import { Callout, MiniStat, Row, Rows, Section } from "../components/ProfileParts"
 import { PersonRow } from "../components/ConnectionsList"
+import { RunByList } from "../components/RunAccounts"
 import { CompanyDecisionDialog } from "../components/CompanyDecisionDialog"
 
-const sizeLabels: Record<string, string> = { SOLO: "Just one person", SMALL: "2–10 people", MEDIUM: "11–50 people", LARGE: "51–200 people", ENTERPRISE: "More than 200 people" }
 const businessLabels: Record<string, string> = { PRODUCTS: "Products", SERVICES: "Services", BOTH: "Products and services" }
 
 export function CompanyDetailPage() {
@@ -53,13 +54,14 @@ export function CompanyDetailPage() {
         </div>}
       </header>
 
-      {data.status === "SUSPENDED" && data.rejectionNote && <Callout tone="danger" icon={<ShieldX className="size-4" aria-hidden="true" />}>Rejected: “{data.rejectionNote}”</Callout>}
+      {(data.status === "REJECTED" || data.status === "SUSPENDED") && data.rejectionNote && <Callout tone="danger" icon={<ShieldX className="size-4" aria-hidden="true" />}>{data.status === "SUSPENDED" ? "Suspended" : "Rejected"}: “{data.rejectionNote}”</Callout>}
+      {data.status === "NEEDS_CHANGES" && <Callout tone="warning" icon={<ShieldCheck className="size-4" aria-hidden="true" />}>Changes asked{data.rejectionNote ? `: “${data.rejectionNote}”` : ""}. It comes back for review once the owner changes it.</Callout>}
       {data.status === "PENDING_VERIFICATION" && <Callout tone="warning" icon={<ShieldCheck className="size-4" aria-hidden="true" />}>Waiting for review. Its campaigns stay in draft until the company is approved.</Callout>}
 
       <section aria-label="At a glance" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <MiniStat label="Publishers" value={data.publishers.length} />
         <MiniStat label="Campaigns" value={data._count?.campaigns ?? "—"} />
-        <MiniStat label="Size" value={data.size ? sizeLabels[data.size] ?? data.size : "Not given"} />
+        <MiniStat label="Size" value={data.size ? companySizeLabels[data.size] ?? data.size : "Not given"} />
         <MiniStat label="Approved" value={data.verifiedAt ? formatDate(data.verifiedAt) ?? "—" : "Not yet"} />
       </section>
 
@@ -86,6 +88,11 @@ export function CompanyDetailPage() {
           </Rows>
         </Section>
       </div>
+
+      {data.runBy.length > 0 && <Section icon={<UserCog className="size-4" aria-hidden="true" />} title="Who runs its account">
+        <p className={cn("px-4 pt-3 text-b3", muted)}>Asked for from someone's own account: nobody signs in to it. These people switch to it from theirs.</p>
+        <RunByList members={data.runBy.map(({ user, ...member }) => ({ ...member, person: user }))} label="People who run this company's account" />
+      </Section>}
 
       {decision && <CompanyDecisionDialog companyId={data.id} companyName={data.name} decision={decision} onClose={() => setDecision(null)} />}
     </>}

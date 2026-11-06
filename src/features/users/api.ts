@@ -1,7 +1,15 @@
 import { z } from "zod"
 import { superAdminApi } from "@/api/client"
 import {
+  approveBusinessRequestSchema,
+  businessRequestChangesSchema,
+  businessRequestCountsSchema,
+  businessRequestDetailSchema,
+  businessRequestPageSchema,
+  businessRequestQuerySchema,
   companyDetailSchema,
+  declineBusinessRequestSchema,
+  declineRequestSchema,
   companyPageSchema,
   companyQuerySchema,
   companySchema,
@@ -27,7 +35,22 @@ import {
   verificationPageSchema,
   verificationQuerySchema,
   verificationRequestSchema,
+  type ApproveBusinessRequestInput,
+  type BusinessRequestChangesInput,
+  type BusinessRequestQuery,
   type CompanyQuery,
+  type DeclineBusinessRequestInput,
+  type DeclineRequestInput,
+  type ApprovePageRequestInput,
+  type PageRequestChangesInput,
+  type PageRequestQuery,
+  approvePageRequestSchema,
+  pageRequestChangesSchema,
+  pageRequestDetailSchema,
+  pageRequestPageSchema,
+  pageRequestQuerySchema,
+  requestCountsSchema,
+  usernameCheckSchema,
   type ConnectionsQuery,
   type DeclineHonourInput,
   type GrantHonourInput,
@@ -50,6 +73,8 @@ const userPath = (id: string) => `/platform-users/${encodeURIComponent(id)}`
 const verificationPath = (id: string) => `/verification-requests/${encodeURIComponent(id)}`
 const companyPath = (id: string) => `/companies/${encodeURIComponent(id)}`
 const honourPath = (userId: string) => `/honour-review/${encodeURIComponent(userId)}`
+const businessRequestPath = (id: string) => `/business-requests/${encodeURIComponent(id)}`
+const pageRequestPath = (id: string) => `/page-requests/${encodeURIComponent(id)}`
 
 // ── People ────────────────────────────────────────────────────────────────
 
@@ -172,4 +197,92 @@ export async function approveVerificationRequest(id: string) {
 export async function rejectVerificationRequest({ id, input }: { id: string; input: RejectVerificationInput }) {
   const { data } = await superAdminApi.post<unknown>(`${verificationPath(id)}/reject`, rejectVerificationSchema.parse(input))
   return verificationRequestSchema.omit({ reviewedBy: true }).parse(data)
+}
+
+// ── Business requests ─────────────────────────────────────────────────────
+
+export async function getBusinessRequests(query: BusinessRequestQuery, signal?: AbortSignal) {
+  const params = compactParams(businessRequestQuerySchema.parse(compactParams(query)))
+  const { data } = await superAdminApi.get<unknown>("/business-requests", { params, signal })
+  return businessRequestPageSchema.parse(data)
+}
+
+export async function getBusinessRequestCounts(signal?: AbortSignal) {
+  const { data } = await superAdminApi.get<unknown>("/business-requests/counts", { signal })
+  return businessRequestCountsSchema.parse(data)
+}
+
+export async function getBusinessRequest(id: string, signal?: AbortSignal) {
+  const { data } = await superAdminApi.get<unknown>(businessRequestPath(id), { signal })
+  return businessRequestDetailSchema.parse(data)
+}
+
+export async function checkBusinessUsername({ id, username }: { id: string; username: string }, signal?: AbortSignal) {
+  const { data } = await superAdminApi.get<unknown>(`${businessRequestPath(id)}/username-available`, { params: { username }, signal })
+  return usernameCheckSchema.parse(data)
+}
+
+/** Opening a NEW request claims it, so two admins don't review the same one. */
+export async function claimBusinessRequest(id: string) {
+  const { data } = await superAdminApi.post<unknown>(`${businessRequestPath(id)}/claim`)
+  return businessRequestDetailSchema.parse(data)
+}
+
+export async function approveBusinessRequest({ id, input }: { id: string; input: ApproveBusinessRequestInput }) {
+  const { data } = await superAdminApi.post<unknown>(`${businessRequestPath(id)}/approve`, approveBusinessRequestSchema.parse(input))
+  return businessRequestDetailSchema.parse(data)
+}
+
+export async function askForBusinessRequestChanges({ id, input }: { id: string; input: BusinessRequestChangesInput }) {
+  const { data } = await superAdminApi.post<unknown>(`${businessRequestPath(id)}/request-changes`, businessRequestChangesSchema.parse(input))
+  return businessRequestDetailSchema.parse(data)
+}
+
+export async function declineBusinessRequest({ id, input }: { id: string; input: DeclineBusinessRequestInput }) {
+  const { data } = await superAdminApi.post<unknown>(`${businessRequestPath(id)}/decline`, declineBusinessRequestSchema.parse(input))
+  return businessRequestDetailSchema.parse(data)
+}
+
+// ── Page requests ─────────────────────────────────────────────────────────
+
+export async function getPageRequests(query: PageRequestQuery, signal?: AbortSignal) {
+  const params = compactParams(pageRequestQuerySchema.parse(compactParams(query)))
+  const { data } = await superAdminApi.get<unknown>("/page-requests", { params, signal })
+  return pageRequestPageSchema.parse(data)
+}
+
+export async function getPageRequestCounts(signal?: AbortSignal) {
+  const { data } = await superAdminApi.get<unknown>("/page-requests/counts", { signal })
+  return requestCountsSchema.parse(data)
+}
+
+export async function getPageRequest(id: string, signal?: AbortSignal) {
+  const { data } = await superAdminApi.get<unknown>(pageRequestPath(id), { signal })
+  return pageRequestDetailSchema.parse(data)
+}
+
+export async function checkPageUsername({ id, username }: { id: string; username: string }, signal?: AbortSignal) {
+  const { data } = await superAdminApi.get<unknown>(`${pageRequestPath(id)}/username-available`, { params: { username }, signal })
+  return usernameCheckSchema.parse(data)
+}
+
+/** Opening a NEW request claims it, so two admins don't review the same one. */
+export async function claimPageRequest(id: string) {
+  const { data } = await superAdminApi.post<unknown>(`${pageRequestPath(id)}/claim`)
+  return pageRequestDetailSchema.parse(data)
+}
+
+export async function approvePageRequest({ id, input }: { id: string; input: ApprovePageRequestInput }) {
+  const { data } = await superAdminApi.post<unknown>(`${pageRequestPath(id)}/approve`, approvePageRequestSchema.parse(input))
+  return pageRequestDetailSchema.parse(data)
+}
+
+export async function askForPageRequestChanges({ id, input }: { id: string; input: PageRequestChangesInput }) {
+  const { data } = await superAdminApi.post<unknown>(`${pageRequestPath(id)}/request-changes`, pageRequestChangesSchema.parse(input))
+  return pageRequestDetailSchema.parse(data)
+}
+
+export async function declinePageRequest({ id, input }: { id: string; input: DeclineRequestInput }) {
+  const { data } = await superAdminApi.post<unknown>(`${pageRequestPath(id)}/decline`, declineRequestSchema.parse(input))
+  return pageRequestDetailSchema.parse(data)
 }

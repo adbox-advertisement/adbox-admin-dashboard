@@ -3,6 +3,8 @@ import { APP_ROUTES } from "@/routes/paths"
 export const userProfilePath = (id: string) => `${APP_ROUTES.manageUsersPeople}/${encodeURIComponent(id)}`
 export const institutionPath = (id: string) => `${APP_ROUTES.manageUsersInstitutions}/${encodeURIComponent(id)}`
 export const companyPath = (id: string) => `${APP_ROUTES.manageUsersCompanies}/${encodeURIComponent(id)}`
+export const pageRequestPath = (id: string) => `${APP_ROUTES.manageUsersPageRequests}/${encodeURIComponent(id)}`
+export const businessRequestPath = (id: string) => `${APP_ROUTES.manageUsersBusinessRequests}/${encodeURIComponent(id)}`
 
 /** A People link with filters already applied, e.g. from an Overview figure. */
 export function peoplePath(filters: Record<string, string | undefined>) {

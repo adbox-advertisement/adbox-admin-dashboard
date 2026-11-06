@@ -86,7 +86,7 @@ export function RequestStatusBadge({ status }: { status: VerificationRequestStat
   return <span className={cn(pill, tones[requestTone[status]])}>{status.charAt(0) + status.slice(1).toLowerCase()}</span>
 }
 
-const companyTone: Record<CompanyStatus, keyof typeof tones> = { PENDING_VERIFICATION: "warning", ACTIVE: "success", SUSPENDED: "danger", INACTIVE: "neutral" }
+const companyTone: Record<CompanyStatus, keyof typeof tones> = { PENDING_VERIFICATION: "warning", NEEDS_CHANGES: "warning", ACTIVE: "success", REJECTED: "danger", SUSPENDED: "danger", INACTIVE: "neutral" }
 
 export function CompanyStatusBadge({ status }: { status: CompanyStatus | null }) {
   const value = status ?? "INACTIVE"

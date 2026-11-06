@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 
-const usersApi = /\/api\/v1\/(platform-users|verification-requests|institutions|companies|honour-review)(\/|$|\?)/
+const usersApi = /\/api\/v1\/(platform-users|verification-requests|institutions|companies|honour-review|business-requests|page-requests)(\/|$|\?)/
 
 const members = (total, student, alumni, staff, verified) => ({ total, STUDENT: student, ALUMNI: alumni, STAFF: staff, NONE: total - student - alumni - staff, verified, pending: 1 })
 
@@ -29,6 +29,27 @@ export async function checkManageUsers(page, baseUrl) {
     status: 'PENDING_VERIFICATION', registrationNumber: 'CS123456789', verifiedAt: null, verifiedByAdminId: null, rejectionNote: null, size: 'SMALL', businessType: 'PRODUCTS',
     createdAt: '2026-09-10T10:00:00.000Z', updatedAt: '2026-09-10T10:00:00.000Z', _count: { publishers: 1, campaigns: 2 },
   }
+  const business = {
+    id: '90000000-0000-4000-8000-000000000001', reference: 'BR-0001', name: "Auntie Akos' Waakye", username: 'akos.waakye', category: 'FOOD', categoryLabel: 'Food & drinks',
+    about: 'Waakye by the Legon gate, from 6am.', location: 'East Legon, Accra', serves: { institution: institution.name, school: 'UG', campus: 'Legon' },
+    email: 'ama@example.com', phone: '+233241234567', showPhone: true, website: null, size: 'SOLO', registrationNumber: 'BN123456789',
+    hasLogo: false, hasCover: false, logoUrl: null, proof: { name: 'certificate.pdf', sizeKb: 412 },
+    requester: { id: users[0].id, name: 'Ama Mensah', username: 'student1', role: 'Owner', joinedAt: '2025-01-10T10:00:00.000Z', emailVerified: true, upheldReports: 0 },
+    sentAt: '2026-11-02T10:00:00.000Z', status: 'NEW', reviewer: null, reviewerId: null,
+    checks: [{ tone: 'ok', text: 'Registered: BN123456789. Check it against the certificate.' }, { tone: 'ok', text: 'Ama Mensah: on AdBox 1 year, email verified, no upheld reports.' }],
+    note: null, declineReason: null, decidedAt: null, account: null, company: null,
+  }
+  const pageRequest = {
+    id: '91000000-0000-4000-8000-000000000001', reference: 'PR-0001', name: "Catholic Students' Union (CSU)", username: 'ug.csu', kind: 'CHURCH', detail: 'Catholic',
+    institutionId: institution.id, institution: institution.name, school: 'UG', campus: 'Legon', about: 'Mass, fellowship and service for Catholic students at Legon.',
+    email: 'csu.legon@st.ug.edu.gh', phone: '+233241234567', hasLogo: false, hasCover: false, logoUrl: null, letter: { name: 'letter.pdf', sizeKb: 284 },
+    requester: { id: users[0].id, name: 'Kwame Asante', username: 'student1', role: 'President', joinedAt: '2025-01-10T10:00:00.000Z', emailVerified: true, badge: null, upheldReports: 0 },
+    sentAt: '2026-11-02T10:00:00.000Z', status: 'NEW', reviewer: null, reviewerId: null,
+    checks: [{ tone: 'ok', text: 'No page for this group at the University of Ghana yet.' }],
+    note: null, declineReason: null, decidedAt: null, page: null,
+  }
+  const pageDetail = () => ({ ...pageRequest, coverUrl: null, letterUrl: 'https://files.example.com/letter.pdf', history: [{ at: pageRequest.sentAt, text: 'Sent by @student1' }] })
+  const businessDetail = () => ({ ...business, coverUrl: null, proofUrl: 'https://files.example.com/certificate.pdf', history: [{ at: business.sentAt, text: 'Sent by @student1' }] })
   const requests = [{ id: '70000000-0000-4000-8000-000000000001', userId: users[0].id, institutionId: institution.id, evidenceUrl: 'https://files.example.com/id.jpg', status: 'PENDING', reviewedByAdminId: null, reviewedAt: null, rejectionNote: null, createdAt: '2026-09-29T00:00:00.000Z', reviewedBy: null }]
   const count = (key, value) => users.filter(user => key(user) === value).length
   const stats = institutionId => ({
@@ -100,6 +121,44 @@ export async function checkManageUsers(page, baseUrl) {
       entry.reviewedAt = new Date().toISOString()
       users[0].userProfile.verificationTier = 'VERIFIED'
       return reply(entry)
+    }
+    if (method === 'GET' && path === '/business-requests/counts') {
+      const open = business.status === 'APPROVED' ? 0 : 1
+      return reply({ open, NEW: business.status === 'NEW' ? 1 : 0, IN_REVIEW: business.status === 'IN_REVIEW' ? 1 : 0, NEEDS_CHANGES: 0, APPROVED: 1 - open, DECLINED: 0 })
+    }
+    if (method === 'GET' && path === '/business-requests') {
+      const items = [business].filter(entry => query.status === 'open' ? ['NEW', 'IN_REVIEW', 'NEEDS_CHANGES'].includes(entry.status) : entry.status === query.status)
+      return reply({ items, total: items.length, page: 1, limit: Number(query.limit ?? 20) })
+    }
+    if (path === `/business-requests/${business.id}/username-available`) return reply({ username: query.username, available: true, reason: null })
+    if (method === 'GET' && path === `/business-requests/${business.id}`) return reply(businessDetail())
+    if (method === 'POST' && path === `/business-requests/${business.id}/claim`) {
+      Object.assign(business, { status: 'IN_REVIEW', reviewer: 'Admin', reviewerId: '30000000-0000-4000-8000-000000000001' })
+      return reply(businessDetail())
+    }
+    if (method === 'POST' && path === `/business-requests/${business.id}/approve`) {
+      const body = request.postDataJSON()
+      Object.assign(business, { status: 'APPROVED', username: body.username, decidedAt: new Date().toISOString(), account: { userId: users[0].id, username: body.username }, company: { id: company.id, status: 'ACTIVE' } })
+      return reply(businessDetail())
+    }
+    if (method === 'GET' && path === '/page-requests/counts') {
+      const open = pageRequest.status === 'APPROVED' ? 0 : 1
+      return reply({ open, NEW: pageRequest.status === 'NEW' ? 1 : 0, IN_REVIEW: pageRequest.status === 'IN_REVIEW' ? 1 : 0, NEEDS_CHANGES: 0, APPROVED: 1 - open, DECLINED: 0 })
+    }
+    if (method === 'GET' && path === '/page-requests') {
+      const items = [pageRequest].filter(entry => query.status === 'open' ? ['NEW', 'IN_REVIEW', 'NEEDS_CHANGES'].includes(entry.status) : entry.status === query.status)
+      return reply({ items, total: items.length, page: 1, limit: Number(query.limit ?? 20) })
+    }
+    if (path === `/page-requests/${pageRequest.id}/username-available`) return reply({ username: query.username, available: true, reason: null })
+    if (method === 'GET' && path === `/page-requests/${pageRequest.id}`) return reply(pageDetail())
+    if (method === 'POST' && path === `/page-requests/${pageRequest.id}/claim`) {
+      Object.assign(pageRequest, { status: 'IN_REVIEW', reviewer: 'Admin', reviewerId: '30000000-0000-4000-8000-000000000001' })
+      return reply(pageDetail())
+    }
+    if (method === 'POST' && path === `/page-requests/${pageRequest.id}/approve`) {
+      const body = request.postDataJSON()
+      Object.assign(pageRequest, { status: 'APPROVED', username: body.username, decidedAt: new Date().toISOString(), page: { userId: users[0].id, username: body.username } })
+      return reply(pageDetail())
     }
     if (method === 'GET' && path === '/honour-review') {
       return reply({ year: 2026, rules: { nominationsRequired: 25, campusesRequired: 2, campusCapPer: 100 }, items: [], total: 0, page: 1, limit: 25 })
@@ -180,6 +239,23 @@ export async function checkManageUsers(page, baseUrl) {
   assert.equal(company.status, 'ACTIVE')
   await noOverflow('/manage-users/companies/:id')
 
+  // Business requests: claim on open, check the proof, approve.
+  await sections.getByRole('link', { name: /Business requests.*1 waiting/ }).click()
+  await page.getByRole('heading', { level: 1, name: 'Business requests' }).waitFor()
+  await page.getByRole('radio', { name: 'All open · 1' }).waitFor()
+  await noOverflow('/manage-users/business-requests')
+  await page.getByRole('link', { name: "Review Auntie Akos' Waakye" }).click()
+  await page.getByRole('heading', { level: 1, name: "Auntie Akos' Waakye" }).waitFor()
+  await page.getByText('In review · you').waitFor()
+  await page.getByText('What they asked for. Available.').waitFor()
+  for (const label of ["It's a Registrar-General certificate for Auntie Akos' Waakye", 'Its number reads BN123456789', 'Nothing on it looks edited']) {
+    await page.getByRole('checkbox', { name: label }).click()
+  }
+  await page.getByRole('button', { name: 'Approve and create the account' }).click()
+  await page.getByRole('heading', { name: 'Approved', exact: true }).waitFor()
+  assert.equal(business.status, 'APPROVED')
+  await noOverflow('/manage-users/business-requests/:id')
+
   // Verification queue.
   await sections.getByRole('link', { name: /Verification/ }).click()
   await page.getByRole('link', { name: /View evidence/ }).waitFor()
@@ -188,11 +264,28 @@ export async function checkManageUsers(page, baseUrl) {
   await page.getByText('No requests waiting').waitFor()
   assert.equal(requests[0].status, 'APPROVED')
 
+  // Page requests: claim on open, check the letter, approve; no email.
+  await sections.getByRole('link', { name: /Page requests.*1 waiting/ }).click()
+  await page.getByRole('heading', { level: 1, name: 'Page requests' }).waitFor()
+  await page.getByRole('radio', { name: 'All open · 1' }).waitFor()
+  await noOverflow('/manage-users/page-requests')
+  await page.getByRole('link', { name: "Review Catholic Students' Union (CSU)" }).click()
+  await page.getByRole('heading', { level: 1, name: "Catholic Students' Union (CSU)" }).waitFor()
+  await page.getByText('In review · you').waitFor()
+  await page.getByText('What they asked for. Available.').waitFor()
+  for (const label of ["On the group's or institution's letterhead", 'Signed by the patron, dean or chaplain', 'Names Kwame Asante as allowed to run the page', 'Dated in the last 6 months']) {
+    await page.getByRole('checkbox', { name: label }).click()
+  }
+  await page.getByRole('button', { name: 'Approve and create the page' }).click()
+  await page.getByRole('heading', { name: 'Approved', exact: true }).waitFor()
+  assert.equal(pageRequest.status, 'APPROVED')
+  await noOverflow('/manage-users/page-requests/:id')
+
   // Honours.
   await sections.getByRole('link', { name: 'Honours' }).click()
   await page.getByText('No nominations in 2026').waitFor()
   await noOverflow('/manage-users/honours')
 
   await page.unroute(usersApi, route)
-  console.log('Manage Users: overview breakdowns, filtered people, profile tabs and suspension, institutions, company approval, verification, honours, and responsive layouts passed')
+  console.log('Manage Users: overview breakdowns, filtered people, profile tabs and suspension, institutions, company approval, business requests, verification, page requests, honours, and responsive layouts passed')
 }

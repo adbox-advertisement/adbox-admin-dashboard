@@ -51,7 +51,7 @@ export function ContentField({ field, value, onChange }: {
       <SelectTrigger id={id} className="w-full">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="rdi-theme">
         {field.options.map(option => <SelectItem key={option} value={option}>
           {({ generation: "Solar & inverters", home: "Home batteries", business: "Business storage", video: "Video production", branding: "Branding", animation: "Animation", commercial: "Commercials" } as Record<string, string>)[option] ?? option}
         </SelectItem>)}

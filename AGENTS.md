@@ -28,7 +28,7 @@ architecture source of truth. Before making layout decisions, read `docs/grid.md
 the responsive grid guidance.
 
 Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
-Auth, Dashboard, Manage Users, User Content, Manage Admins, Recruitment, Settings, Video Management, and RDI own their lazy routes under `src/features/`.
+Auth, Dashboard, Manage Users, User Content, Ads, Financials, Manage Admins, Recruitment, Settings, Video Management, and RDI own their lazy routes under `src/features/`.
 Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
 
 Key wiring that spans several files:
@@ -74,8 +74,10 @@ it was: its code, appearance, behaviour, data and tests.
   - `src/routes/router.ts`: the `rdiRoutes` / `rdiPreviewRoutes` import and their use
   - `src/routes/paths.ts`: the `rdi` path
   - `src/config/navigation.ts`: the `rdiMark` import and the RDI sidebar entry
-  - `src/styles/index.css`: the `.rdi-cms`, `.rdi-cms-dialog` and `.rdi-website` rules and the fonts
-    loaded for them (DM Sans, Inter, Outfit)
+  - `src/styles/index.css`: the `.rdi-cms`, `.rdi-cms-dialog`, `.rdi-website` and `.rdi-theme` rules
+    (RDI's pinned fonts and its pinned pre-Royal-Indigo colours) and the fonts loaded for them
+    (DM Sans, Inter, Outfit). When you change a shared colour token, add its previous value to the
+    RDI colour block so RDI keeps looking the same.
   - `tests/smoke/app.smoke.mjs`: the RDI imports, checks and bundle assertions
 - RDI renders through shared code: `src/styles/index.css` tokens, `src/components/ui/`, `src/lib/`,
   the theme provider, the router, the build config and dependencies. Before changing any of these, make sure RDI's look and

@@ -15,7 +15,11 @@ export const usersRoutes: RouteObject[] = [{
     { path: "institutions/:institutionId", lazy: async () => ({ Component: (await import("./pages/InstitutionDetailPage")).InstitutionDetailPage }) },
     { path: "companies", lazy: async () => ({ Component: (await import("./pages/CompaniesPage")).CompaniesPage }) },
     { path: "companies/:companyId", lazy: async () => ({ Component: (await import("./pages/CompanyDetailPage")).CompanyDetailPage }) },
+    { path: "business-requests", lazy: async () => ({ Component: (await import("./pages/BusinessRequestsPage")).BusinessRequestsPage }) },
+    { path: "business-requests/:requestId", lazy: async () => ({ Component: (await import("./pages/BusinessRequestReviewPage")).BusinessRequestReviewPage }) },
     { path: "verification", lazy: async () => ({ Component: (await import("./pages/VerificationPage")).VerificationPage }) },
     { path: "honours", lazy: async () => ({ Component: (await import("./pages/HonoursPage")).HonoursPage }) },
+    { path: "page-requests", lazy: async () => ({ Component: (await import("./pages/PageRequestsPage")).PageRequestsPage }) },
+    { path: "page-requests/:requestId", lazy: async () => ({ Component: (await import("./pages/PageRequestReviewPage")).PageRequestReviewPage }) },
   ],
 }]

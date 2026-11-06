@@ -1,40 +1,13 @@
-import { Banknote, CircleHelp, CirclePlay, ClipboardList, Flag, WalletCards } from "lucide-react"
+import { Banknote, CircleHelp } from "lucide-react"
 import type { PendingFeaturePageProps } from "@/components/feedback/PendingFeaturePage"
 import { APP_ROUTES } from "@/routes/paths"
 
 export const pendingPages: Array<PendingFeaturePageProps & { path: string }> = [
   {
-    path: APP_ROUTES.adsManagement,
-    title: "Ads Management",
-    description: "The central workspace for reviewing, organizing, and managing advertisements is currently pending.",
-    icon: CirclePlay,
-  },
-  {
-    path: APP_ROUTES.adRequests,
-    title: "Ad Requests",
-    section: "Ads Management",
-    description: "The request review queue and approval workflow will be added to this page.",
-    icon: ClipboardList,
-  },
-  {
-    path: APP_ROUTES.reportedAds,
-    title: "Reported Ads",
-    section: "Ads Management",
-    description: "Reported advertisement reviews and moderation actions will be managed from this page.",
-    icon: Flag,
-  },
-  {
     path: APP_ROUTES.financials,
     title: "Financials",
     description: "Financial summaries, payments, and withdrawal management will be available here.",
     icon: Banknote,
-  },
-  {
-    path: APP_ROUTES.advertisersPayment,
-    title: "Advertisers Payment",
-    section: "Financials",
-    description: "Advertiser payment records and transaction-management tools are currently pending.",
-    icon: WalletCards,
   },
   {
     path: APP_ROUTES.withdrawals,

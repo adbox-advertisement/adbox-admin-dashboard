@@ -93,7 +93,7 @@ function PageEditor({ page }: {
             <SelectTrigger className="w-full" aria-label="Choose page section">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rdi-theme">
               {sections.map(section => <SelectItem key={section.id} value={section.id}>
                 {section.label}
               </SelectItem>)}

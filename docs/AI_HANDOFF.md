@@ -2,6 +2,205 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Ads Management, Advertisers Payment, ads in bars (2026-11-05)
+
+- Request (owner): redesign ads and payments — Phase 1 "fair and safe". Ads are paid in **gold bars only**: the
+  budget is held when an ad is made, views are charged per 1,000, the rest goes back; new people's ads and anything
+  with words or pictures of its own wait for AdBox's review; three reports pause an ad. Backend
+  `adbox-backend/docs/ad-delivery.md`, `docs/super-admin-api.md` "Ads".
+- New feature `src/features/ads/` (own `components/AdsBits.tsx`: features may not share UI). Routes replace the
+  pending pages: **Ads Management** (`/ads-management`: stage tiles linking the queue and reports, search, format,
+  stage chips with counts, every ad), **Ad Requests** (PENDING_REVIEW oldest first, with "Waiting …", account age,
+  unverified email), **Reported Ads** (reasons counted, "Paused by reports"). Each row opens `AdDetailSheet`:
+  creative, who runs it (made-up page/business emails never shown), who sees it, gold (held at start, charged,
+  still held or returned, price, views it buys), delivery with views by day, review history, reports; actions by
+  permission and stage — Approve/Refuse (`ads.review`), Pause/Resume/Stop/Dismiss/Uphold (`ads.manage`). Refuse,
+  Stop and Uphold ask for a reason (5–300) with AdBox's common reasons (betting, alcohol, loans, forex/crypto, paid
+  essays, misleading, bad link); Stop can return every bar. Actions use `mutateAsync`: the list refetch can remove
+  the ad and close the sheet before per-call callbacks would run (found live: the approval saved but no toast).
+- **Financials › Advertisers Payment** (`payments.read`): paid-in totals, status chips with counts, search by buyer
+  or Paystack reference, each purchase (bundle or "Exact top-up", channel, reference, failure reason).
+- **Gold & pricing**: ad fields now in bars — least/most a day, bars per 1,000 views (with its cedi value), fewest
+  people an ad may target, frequency cap; the example says what a plan holds, buys and reaches, or that the
+  audience is too small. `lib/gold-settings.ts` mirrors the backend (`viewsForBars`).
+- **User Content › Ads** parses the new shape (bars; no start or end while in review: "Starts when approved").
+- Tests: `ads/pages/AdsPages.test.tsx` (8), `financials/pages/AdvertisersPaymentPage.test.tsx` (2), Gold & pricing
+  (7), content (43). Smoke `tests/smoke/ads.smoke.mjs` (`ADBOX_SMOKE_FEATURE=ads`, and in the full run): overview
+  filters, pause, a refusal with a reason, dismissed reports, payments, dark mode, no overflow 320–1440 — passed;
+  `financials` and `content` smokes passed. The route loop in `app.smoke.mjs` no longer visits these pages (they
+  call the API). Lint, architecture, app and test types clean. Full vitest run (load average ~50): 345 of 353;
+  seven were 5 s timeouts in untouched Recruitment, User Content and Manage Users files and one the ads overview's
+  first wait (the file now allows 5 s, `configure({ asyncUtilTimeout })`); every one of those files passes alone.
+- Live against the local super-admin (temporary admin with `ads.*` and `payments.read`, removed): a real new
+  person's two ads — one approved (running 3 days), one refused with "Betting is not allowed in ads." (all 1,500
+  bars back); after three real reports paused the approved one, Dismiss ran it again; payments showed GHS 2,485.77
+  paid in; no console errors or failed calls, no overflow at 390/320, dark mode drawn. Dev server on
+  `http://localhost:5173`.
+
+## Financials › Gold & pricing (2026-11-04)
+
+- **One exchange rate** (asked: "make bars per cedi follow the store's base rate automatically … I want the exchange
+  to make sense"; chosen: one rate for everything). "Bars per cedi" is the exchange rate: a bundle is a price and a
+  bonus, its bars the price at the rate plus the bonus (no "Base bars" field; the dialog says "At GHS 1 = 50 bars,
+  GHS 9.99 is 500 bars; with the 10% bonus, buyers get 550 bars"). Changing the rate shows what each bundle becomes
+  before saving (`reprice-preview`), the server reprices them in the same write, and the bundles are read again.
+  The table's rate column is "Per cedi, with bonus". `lib/gold-settings.ts` mirrors `bundleBaseBars` /
+  `bundleTotalBars`. Tests 7; smoke covers the preview and repricing.
+
+- Request (owner): super-admin sets every number gold touches — the store, Spotlight, ads (and how audience size
+  limits reach), and the least and most a survey may pay. Backend `adbox-backend/docs/gold-wallet.md` "Settings",
+  `docs/super-admin-api.md` "Gold economy".
+- New feature `src/features/financials/` (own `components/Surface.tsx` and `lib/errors.ts`: the architecture check
+  forbids reaching into Manage Users). Route `/financials/gold-pricing` (`APP_ROUTES.goldPricing`), first child of
+  Financials in the sidebar; the other Financials pages are still pending.
+- One page, `pages/GoldPricingPage.tsx`:
+  - **Gold**: bars per cedi (prices ads), daily reward.
+  - **Survey rewards**: least/most per response (the creator types any whole number between), least/most total,
+    three formats from, any formats from, and a one-line summary.
+  - **Ads**: daily budget least/most, lengths on offer (chips, add/remove, up to 8), people per cedi low/high,
+    impressions per cedi, frequency cap; beside them the people each audience holds now (Everyone · Students ·
+    Alumni, from the server) and a worked example (GHS 30 × 7 days: cost, reach held to the audience).
+  - Each field shows its default when changed from it and a "Changed" mark; problems are shown on the field
+    before saving (`lib/gold-settings.ts` mirrors the backend's rules) and the server's `problems` after. A sticky
+    bar saves only what changed (`PATCH /gold-settings`) or discards.
+  - **Gold store**: bundles table (price, bars with bonus, bars per cedi, sold, on/off sale); add/edit dialog that
+    shows what buyers get; the total is the server's.
+  - **Spotlight**: plans (days, price in bars, label, on sale, bought) with add/edit, on super-admin's existing
+    `/spotlight-plans`.
+- Permissions `gold.settings.read` (view) and `gold.settings.manage` (change); Spotlight needs
+  `spotlight.plans.manage`. A reader sees everything disabled; no permission shows the usual no-access state.
+  Backend role presets: `FINANCE` (new) and `AUDITOR` (read).
+- Tests: `pages/GoldPricingPage.test.tsx` (6); smoke `tests/smoke/financials.smoke.mjs` (in the full run, or
+  `ADBOX_SMOKE_FEATURE=financials`): saves a widened survey range and a new ad length (only the changes sent),
+  catches a broken pair, audience-capped reach, a bundle edit, dark mode, no overflow 320–1440 — passed. Lint,
+  architecture, test types and build clean. Full `npm test`: 48 of
+  51 files pass; User Content, Recruitment and Manage Users hit 5 s timeouts under load and pass alone (34/34).
+- Live against the local super-admin (temporary admin with `gold.settings.*` and `spotlight.plans.manage`,
+  removed): the page loads real values and audience sizes; changing the daily reward to 60 and back saved both
+  times; a broken survey pair disabled Save; the bundle dialog opened; no console errors or failed calls on the
+  page; no overflow at 390 or 320; dark mode checked. The dev server must be on `http://localhost:5173`
+  (super-admin's `SUPER_ADMIN_CORS_ORIGIN`).
+
+## Who runs a page or business, in Manage Users (2026-11-04)
+
+- Request: the dashboard did not show who runs a company or page (backend `adbox-backend/docs/business-accounts.md`,
+  "People": pages and businesses are run by people who switch to them from their own accounts).
+- A person's **Publishing** tab: "Run by N people" (owners first, Owner/Editor, Invited or "since …") when the
+  account is a page or business, and "Pages and businesses they run" (Page/Business, role) for a person; the
+  "Not publishing for any company" empty state is not shown for a page run by people. **Company** page: "Who runs
+  its account" when it was asked for from someone's account. Shared lists in `components/RunAccounts.tsx`.
+- Made-up addresses (`…@accounts.adbox.invalid`, pages, businesses and erased accounts) are never shown as real:
+  hidden in the profile header, and the Email row says "None: nobody signs in to it by email"
+  (`isPlaceholderEmail` in `lib/format.ts`).
+- Data: `relationshipsSchema` gains `runBy`/`runs`, `companyDetailSchema` gains `runBy` — all default to empty
+  for an older server. `personFixture` is exported from `src/test/users-fixtures.ts`.
+- Backend (super-admin, uncommitted): relationships and company detail return them; container rebuilt.
+- Checks: `pages/RunAccounts.test.tsx` (5); users feature 70 passed; lint, test types and build clean; users smoke
+  passed. The full `npm run check` had 3 timeouts just over 5 s in User Content and Recruitment while the machine
+  was busy; those two files pass on their own (23/23) and were not touched. Live with a temporary admin
+  (removed): `@ug.legonhall` shows Adwoa Owusu as owner, Adwoa shows the page she runs, Abena's Kitchen's company
+  shows Abena; no errors; 390px has no overflow.
+
+## Page requests are real; pages are run like businesses (2026-11-03)
+
+- Request (owner): campus pages work like business accounts — run by the requester from their own account,
+  no password, no emailed login. Backend `adbox-backend/docs/group-pages.md` §14.
+- Page requests now use super-admin's `/page-requests` (the in-memory `page-requests-api.ts` and the sample
+  queue are deleted). Gated by `page_requests.read` / `page_requests.review` (new in `USER_PERMISSIONS`), not
+  the companies permissions. Queue: server counts, search, pagination, logo, "In review · you" from
+  `reviewerId`. Review: the letter (a photo inline, a PDF in a new tab; link refreshed every 4 minutes) with the
+  four letter checks gating Approve; approve with the server's username check; "Run by {requester} · owner";
+  **no email preview and no "email the login"** — approving creates the page account and the requester is told
+  in the app. Outcome links to the page's account.
+- Shared by both reviews: `components/RequestReview.tsx` (decision tabs, proof file, checklist, checks,
+  history, username/name fields, ask-for-changes and decline forms) and `lib/requests.ts` (`firstName`,
+  `isPicture`, `usernameHint`). `validation.ts` shares the request query, counts, username check, changes and
+  decline schemas. `lib/page-requests.ts` keeps only labels and helpers (`letterChecks(name)` is a function).
+- Tests: `pages/PageRequests.test.tsx` (5, mocked API), `lib/page-requests.test.ts` (helpers, `usernameHint`),
+  an API contract test; smoke reviews and approves a page request through mocked routes.
+- Checks: `npm run check` passed (331 tests, build); users smoke passed. Live: akosua.frimpong's request
+  (PR-0002, photo of a letter) reviewed in the real dashboard with a temporary admin (removed): claimed, letter
+  loaded, a taken username flagged, approved as `@ug.drama`; the page's account opened; no console errors or
+  failed calls; 390px has no overflow.
+- Next: member management (add an editor, hand over) needs backend routes; the company page has no "Ask for
+  changes" yet.
+
+## Business requests review, live (2026-11-03)
+
+- Request: a review screen for business requests (mobile app: someone asks for a business account from
+  their own; approving makes it its own account with a verified company, run by them). Built on the Page
+  requests review below, but on super-admin's real `/business-requests` (backend `docs/business-accounts.md`,
+  `docs/super-admin-api.md`).
+- Manage Users › **Business requests** (`/manage-users/business-requests`, sidebar child after Publishers &
+  Companies, open count in the section nav). Queue: status chips with server counts, debounced server search
+  (name, username, registration number, requester), pagination; logo, category, location/campus served,
+  requester and account age, worst check, waiting, status ("In review · you" from `reviewerId`). Review
+  `/manage-users/business-requests/:id`: cover, what they sent (requester links to the profile), proof
+  (number or "not registered"; a photo shown inline, a PDF opened in a new tab; the 5-minute presigned link is
+  refetched every 4 minutes) with three reviewer checks gating Approve, AdBox's checks, history. Opening a NEW
+  request claims it. Approve (username checked by `GET :id/username-available` as typed; name), Ask for
+  changes (note; not offered again while it waits), Decline (business reason labels, optional note, an empty
+  note is not sent). Decided: outcome with Open the account / Open the company. Permissions:
+  `companies.read` / `companies.verify`.
+- Files: `pages/BusinessRequestsPage.tsx`, `pages/BusinessRequestReviewPage.tsx`,
+  `components/BusinessRequestParts.tsx`, `lib/business-requests.ts`; sections in `api.ts`, `hooks.ts`,
+  `validation.ts`; `usernameFormatProblem` split out of `usernameProblem`; `PageRequestStatusPill` takes
+  `mine`; `companySizeLabels` now shared with `CompanyDetailPage`. Tests: `pages/BusinessRequests.test.tsx` (5),
+  3 contract tests in `api.test.ts`, fixtures in `src/test/users-fixtures.ts`; `manage-users.smoke.mjs`
+  reviews and approves one.
+- Backend (super-admin, uncommitted): the username route, `reviewerId` and `logoUrl` on every item; container
+  rebuilt and recreated.
+- Checks: `npm run check` passed (330 tests, build). `ADBOX_TEST_URL=http://127.0.0.1:5179
+  ADBOX_SMOKE_FEATURE=users npm run test:smoke` passed. Live against the local backend with a temporary admin
+  (removed): a real request (BR-0003, photo proof) was claimed, a taken username flagged, approved; the company
+  page opened; no console errors or failed calls; light, dark and 390px checked.
+- Next: Page requests are still sample data although super-admin has `/page-requests`; the company page has no
+  "Ask for changes" though the backend supports `NEEDS_CHANGES`.
+
+## Page requests (group pages), sample data (2026-10-31)
+
+- Request: the admin side of the mobile app's group pages (official pages for faculties, halls, churches,
+  clubs), as designed in `adbox-mobile-mvp/docs/design/group-pages/` (AdminQueue, AdminReview), with **no
+  endpoints**. Backend plan: `adbox-backend/docs/group-pages.md`.
+- Manage Users › **Page requests** (`/manage-users/page-requests`, sidebar child, section nav with the open
+  count): status chips with counts (All open · New · In review · Needs changes · Approved · Declined), search,
+  table oldest first (group, place, requester and account age, worst automatic check, waiting, status).
+  Review page `/manage-users/page-requests/:id`: what they sent, proof (a drawn sample letter, 4 checks the
+  reviewer must tick before Approve), automatic checks, history; decision panel Approve (username, name,
+  Staff & faculty, email preview: username and a set-password link, no password) / Ask for changes (note) /
+  Decline (reason, optional note); decided requests show the outcome. Opening a NEW request claims it.
+- Data: `lib/page-requests.ts` (types, 16 sample requests, helpers) served by `page-requests-api.ts`, an
+  in-memory stand-in with the call shapes a real service would have (hooks in `hooks.ts`, schemas in
+  `validation.ts`). Decisions last until reload; both pages say "Sample data". Gated by `companies.read` /
+  `companies.verify` until the backend adds `page_requests.*`.
+- New `lib/cn.ts` in the users feature: the content feature's font-size-aware `cn` (the shared one drops
+  `text-b*` sizes next to a colour); only the new files use it.
+- Checks: `npm run check` (architecture, lint, test types, build) passed; the Vitest suite passes, but with
+  the Flutter suite running alongside, nine tests in four files (recruitment, content, users) hit the 5 s
+  timeout; the page-request file now allows 15 s. `ADBOX_SMOKE_FEATURE=users npm run test:smoke` passed
+  (new page-requests steps, no overflow 320–1440). Screenshots checked light/dark, desktop and 390px.
+- Next: wire to the backend once `docs/group-pages.md` is built (its §12 lists the swaps).
+
+## Dashboard theme matches the mobile app (2026-10-25)
+
+- Source: `adbox-mobile-mvp/lib/ui/core/theme/app_colors.dart` (`AppColors`, `AppThemePalette`). The app
+  replaced magenta/violet/cyan and multicolour gradients with one Royal Indigo scale, neutral surfaces and
+  flat fills. `src/styles/index.css` now has `--adbox-royal-50…950` (`royal-*` utilities). Old names
+  resolve like the app's: purple → royal-600 (500 in dark), blue → 700, cyan → 400. Gradients are flat
+  indigo (the header panel is a 900→700 fade, charcoal in dark). Shadows are neutral. Light surfaces and
+  text use `AppThemePalette.light` (canvas `#f4f5f7`, border `#dce0e5`, text `#17191d`/`#555c66`). Dark
+  mode uses the charcoal palette (`#0d0f12`/`#191d22`/`#20252b`, border `#2c323a`). Grey/error/warning/
+  success scales were already identical.
+- RDI is unchanged: a block at the end of `index.css` pins every changed token to its previous value
+  inside `.rdi-cms`, `.rdi-cms-dialog`, `.rdi-website` and the new `.rdi-theme`. With the user's explicit
+  permission, `rdi-theme` was added to RDI's two `SelectContent`s (`cms/components/ContentField.tsx`,
+  `cms/pages/CmsEditorPage.tsx`), whose lists render outside those scopes. No other RDI edits.
+  Verified: 24 RDI captures (CMS, website pages, preview, dropdown; light and dark) are pixel-identical
+  to before within the viewport. Below the fold only the dashboard background behind them differs.
+- `appearance.smoke.mjs` expects the new muted text colour. `npm run check` passed (311 tests, build).
+  The full `npm run test:smoke` passed, including all RDI suites.
+- Not changed: brand logos/SVG icons, and `#6432ed` in `features/dashboard/data/approvals.ts` (mock data).
+
 ## User Content redesign (2026-10-25)
 
 - Request: total redesign of User Content (modern, easy to use), sub-pages allowed. Frontend only; no

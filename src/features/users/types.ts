@@ -166,8 +166,11 @@ export const connectionLabels: Record<ConnectionDirection, string> = {
 
 export const companyStatusLabels: Record<CompanyStatus, string> = {
   PENDING_VERIFICATION: "Awaiting review",
+  NEEDS_CHANGES: "Changes asked",
   ACTIVE: "Approved",
-  SUSPENDED: "Rejected",
+  // REJECTED was never approved; SUSPENDED was, then switched off.
+  REJECTED: "Rejected",
+  SUSPENDED: "Suspended",
   INACTIVE: "Inactive",
 }
 
@@ -205,6 +208,8 @@ export const USER_PERMISSIONS = {
   verificationReview: "verification.review",
   companiesRead: "companies.read",
   companiesVerify: "companies.verify",
+  pageRequestsRead: "page_requests.read",
+  pageRequestsReview: "page_requests.review",
   honoursReview: "honours.review",
   contentRead: "user.content.read",
 } as const

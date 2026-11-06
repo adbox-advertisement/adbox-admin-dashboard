@@ -89,13 +89,18 @@ export const adSchema = z.object({
   name: z.string(),
   goal: z.string(),
   audience: z.string(),
-  dailyBudgetGhs: z.number(),
+  // Gold bars only (backend docs/ad-delivery.md): the budget is held when it
+  // starts, views are charged per 1,000, the rest comes back when it ends.
+  dailyBudgetBars: z.number(),
   durationDays: z.number(),
-  costBars: z.number(),
-  refundedBars: z.number(),
+  budgetBars: z.number(),
+  cpmBars: z.number(),
+  chargedBars: z.number(),
+  returnedBars: z.number(),
   status: lenientEnum(adStatuses),
-  startsAt: timestamp,
-  endsAt: timestamp,
+  // Not set while an ad waits for review.
+  startsAt: optionalTimestamp,
+  endsAt: optionalTimestamp,
   cancelledAt: optionalTimestamp,
   content: adContentSchema,
   createdAt: timestamp,

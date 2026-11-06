@@ -83,7 +83,7 @@ export const companyFixture = {
   _count: { publishers: 2, campaigns: 3 },
 }
 
-const personFixture = (index: number, overrides: Record<string, unknown> = {}) => ({
+export const personFixture = (index: number, overrides: Record<string, unknown> = {}) => ({
   id: `60000000-0000-4000-8000-00000000010${index}`, role: "VIEWER", isActive: true, deactivationReason: null,
   userProfile: { fullName: `Person ${index}`, username: `person${index}`, image: null, studentStatus: "STUDENT", verificationTier: "VERIFIED", institution: { id: institutionFixtures[0].id, shortName: "UG" } },
   ...overrides,
@@ -135,4 +135,81 @@ export const honourPageFixture = (met = true) => ({
   year: 2026,
   rules: { minAccountDays: 365, minPosts: 24, minInteractions: 100, minEventsOrganised: 2, nominationsRequired: 25, campusesRequired: 2, campusCapPer: 100, termDays: 365 },
   items: [honourCandidateFixture(met)], total: 1, page: 1, limit: 25,
+})
+
+// Business requests, as super-admin's `/business-requests` sends them.
+const businessBase = {
+  reference: "BR-0001", category: "FOOD", categoryLabel: "Food & drinks",
+  about: "Waakye, wele and boiled eggs by the Legon gate, from 6am.", location: "East Legon, Accra",
+  serves: { institution: "University of Ghana", school: "UG", campus: "Legon" },
+  email: "abena.mensah@example.com", phone: "+233241234567", showPhone: true, website: null, size: "SOLO",
+  registrationNumber: "BN123456789", hasLogo: true, hasCover: true, logoUrl: "https://cdn.example.com/logo.png",
+  proof: { name: "certificate.jpg", sizeKb: 412 },
+  requester: { id: "60000000-0000-4000-8000-000000000001", name: "Abena Mensah", username: "abena.mensah", role: "Owner", joinedAt: "2025-01-10T10:00:00.000Z", emailVerified: true, upheldReports: 0 },
+  sentAt: "2026-11-02T10:00:00.000Z", status: "NEW", reviewer: null, reviewerId: null,
+  checks: [
+    { tone: "ok", text: "Registered: BN123456789. Check it against the certificate." },
+    { tone: "look", short: "Similar name", text: "Similar accounts: @akos." },
+    { tone: "ok", text: "Abena Mensah: on AdBox 1 year 9 months, email verified, no upheld reports." },
+  ],
+  note: null, declineReason: null, decidedAt: null, account: null, company: null,
+}
+
+export const businessRequestFixtures = [
+  { ...businessBase, id: "90000000-0000-4000-8000-000000000001", name: "Auntie Akos' Waakye", username: "akos.waakye" },
+  {
+    ...businessBase, id: "90000000-0000-4000-8000-000000000002", reference: "BR-0002", name: "Kofi Prints", username: "kofi.prints",
+    category: "SERVICES", categoryLabel: "Services", registrationNumber: null, proof: null, hasCover: false, logoUrl: null, serves: null,
+    requester: { ...businessBase.requester, id: "60000000-0000-4000-8000-000000000002", name: "Kofi Boateng", username: "kofi.b", joinedAt: "2026-10-20T10:00:00.000Z" },
+    sentAt: "2026-11-01T09:00:00.000Z",
+    checks: [
+      { tone: "look", short: "Not registered", text: "Not registered with the Registrar-General: the proof is a photo of the shop, stall or menu." },
+      { tone: "problem", short: "No proof", text: "No proof is attached. Ask for one before approving." },
+      { tone: "problem", short: "New account", text: "Kofi Boateng: on AdBox 2 weeks, email verified, no upheld reports." },
+    ],
+  },
+]
+
+export const businessDetail = (request: typeof businessRequestFixtures[number], extra: Record<string, unknown> = {}) => ({
+  ...request,
+  coverUrl: request.hasCover ? "https://cdn.example.com/cover.png" : null,
+  proofUrl: request.proof ? "https://s3.example.com/proof?signed" : null,
+  history: [{ at: request.sentAt, text: `Sent by @${request.requester.username}` }],
+  ...extra,
+})
+
+// Page requests, as super-admin's `/page-requests` sends them.
+const pageBase = {
+  kind: "CHURCH", detail: "Catholic", institutionId: "50000000-0000-4000-8000-000000000001", institution: "University of Ghana", school: "UG", campus: "Legon",
+  about: "Mass, fellowship and service for Catholic students at Legon.", email: "csu.legon@st.ug.edu.gh", phone: "+233241234567",
+  hasLogo: true, hasCover: false, logoUrl: "https://cdn.example.com/csu.png", letter: { name: "letter.jpg", sizeKb: 284 },
+  requester: { id: "60000000-0000-4000-8000-000000000001", name: "Kwame Asante", username: "kwame.asante", role: "President", joinedAt: "2025-08-15T12:00:00.000Z", emailVerified: true, badge: "Student badge (University of Ghana)", upheldReports: 0 },
+  sentAt: "2026-11-02T10:42:00.000Z", status: "NEW", reviewer: null, reviewerId: null,
+  checks: [
+    { tone: "ok", text: "No page for this group at the University of Ghana yet." },
+    { tone: "look", short: "Similar name", text: "Similar name: @ugcatholics, a personal account, not a page." },
+  ],
+  note: null, declineReason: null, decidedAt: null, page: null,
+}
+
+export const pageRequestFixtures = [
+  { ...pageBase, id: "91000000-0000-4000-8000-000000000001", reference: "PR-0001", name: "Catholic Students' Union (CSU)", username: "ug.csu" },
+  {
+    ...pageBase, id: "91000000-0000-4000-8000-000000000002", reference: "PR-0002", name: "Methodist Students' Union", username: "ug.msu",
+    kind: "CHURCH", detail: "Methodist", letter: null, logoUrl: null, hasLogo: false,
+    requester: { ...pageBase.requester, id: "60000000-0000-4000-8000-000000000002", name: "Yaw Boateng", username: "yaw.boateng", badge: null, emailVerified: false, joinedAt: "2026-10-12T10:00:00.000Z" },
+    sentAt: "2026-11-01T08:50:00.000Z",
+    checks: [
+      { tone: "problem", short: "No letter", text: "No letter of proof was attached." },
+      { tone: "problem", short: "new account", text: "Yaw Boateng: on AdBox 3 weeks, email not verified, no campus badge." },
+    ],
+  },
+]
+
+export const pageDetail = (request: typeof pageRequestFixtures[number], extra: Record<string, unknown> = {}) => ({
+  ...request,
+  coverUrl: null,
+  letterUrl: request.letter ? "https://s3.example.com/letter?signed" : null,
+  history: [{ at: request.sentAt, text: `Sent by @${request.requester.username}` }],
+  ...extra,
 })

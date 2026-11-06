@@ -1,8 +1,7 @@
 import { useState } from "react"
 import { Link, useParams, useSearchParams } from "react-router-dom"
 import {
-  AlertTriangle, Award, BadgeCheck, Building2, CalendarDays, Coins, Fingerprint, GraduationCap, KeyRound, LibraryBig, Mail, Medal, Pencil,
-  Phone, School, ShieldCheck, Smartphone, Sparkles, Trash2, UserCheck, UserRound, UsersRound, UserX,
+  AlertTriangle, Award, BadgeCheck, Building2, CalendarDays, Coins, Fingerprint, GraduationCap, KeyRound, LibraryBig, Mail, Medal, Pencil, Phone, School, ShieldCheck, Smartphone, Sparkles, Store, Trash2, UserCheck, UserRound, UsersRound, UserX,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -10,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
 import { usePlatformUser, useUserAccess, useUserRelationships } from "../hooks"
 import { usersErrorMessage } from "../lib/errors"
-import { ageFrom, formatDate, formatRelative } from "../lib/format"
+import { ageFrom, formatDate, formatRelative, isPlaceholderEmail } from "../lib/format"
 import { companyPath, institutionPath } from "../lib/paths"
 import {
   USER_PERMISSIONS,
@@ -32,6 +31,7 @@ import { badgeIcons } from "../lib/badge-icons"
 import { BackLink, EmptyState, ErrorState, NoAccess, ink, muted, surface } from "../components/Surface"
 import { Callout, CopyButton, MiniStat, Row, Rows, Section, Verified } from "../components/ProfileParts"
 import { ConnectionsList } from "../components/ConnectionsList"
+import { RunByList, RunsList } from "../components/RunAccounts"
 import { UserEditDialog } from "../components/UserEditDialog"
 import { UserStatusDialog } from "../components/UserStatusDialog"
 import { BadgesDialog } from "../components/BadgesDialog"
@@ -93,7 +93,7 @@ function Profile({ user, relationships, relationshipsError, onRetryRelationships
           <span className="-mt-10 inline-flex w-fit shrink-0 rounded-full bg-card p-1"><UserAvatar name={name} image={profile?.image ?? null} size="xl" /></span>
           <div className="min-w-0 sm:pt-3">
             <h1 className={cn("truncate font-heading text-h5 font-semibold", ink)}>{name}</h1>
-            <p className={cn("truncate text-b3", muted)}>{[profile?.username && `@${profile.username}`, profile?.email].filter(Boolean).join(" · ") || "No profile created"}</p>
+            <p className={cn("truncate text-b3", muted)}>{[profile?.username && `@${profile.username}`, !isPlaceholderEmail(profile?.email) && profile?.email].filter(Boolean).join(" · ") || "No profile created"}</p>
             <p className={cn("mt-0.5 text-b4", muted)}>Joined {formatDate(user.createdAt)} · {formatRelative(user.createdAt)}</p>
           </div>
         </div>
@@ -214,7 +214,9 @@ function ProfileTab({ user }: { user: PlatformUser }) {
     <div className="flex flex-col gap-4 lg:col-span-5">
       <Section icon={<Mail className="size-4" aria-hidden="true" />} title="Contact">
         <Rows>
-          <Row label="Email" value={profile?.email} trailing={profile ? <Verified ok={user.emailVerified} label={user.emailVerified ? "Verified" : "Unverified"} /> : null} />
+          {isPlaceholderEmail(profile?.email)
+            ? <Row label="Email" value="None: nobody signs in to it by email" />
+            : <Row label="Email" value={profile?.email} trailing={profile ? <Verified ok={user.emailVerified} label={user.emailVerified ? "Verified" : "Unverified"} /> : null} />}
           <Row label="Phone" value={profile?.contact} icon={<Phone className="size-3.5" aria-hidden="true" />} trailing={profile?.contact ? <Verified ok={user.isContactVerified} label={user.isContactVerified ? "Verified" : "Unverified"} /> : null} />
         </Rows>
       </Section>
@@ -231,13 +233,32 @@ function ProfileTab({ user }: { user: PlatformUser }) {
 }
 
 function PublishingTab({ user, relationships }: { user: PlatformUser; relationships: UserRelationships }) {
+  const { runBy, runs } = relationships
+  const runners = runBy.filter((member) => !member.invited).length
+  return <div className="flex flex-col gap-4">
+    {runBy.length > 0 && <Section icon={<UsersRound className="size-4" aria-hidden="true" />} title={`Run by ${runners} ${runners === 1 ? "person" : "people"}`}>
+      <p className={cn("px-4 pt-3 text-b3", muted)}>Nobody signs in to it: these people switch to it from their own accounts. Owners add people and hand it over.</p>
+      <RunByList members={runBy} label="People who run this account" />
+    </Section>}
+    {runs.length > 0 && <Section icon={<Store className="size-4" aria-hidden="true" />} title="Pages and businesses they run">
+      <RunsList runs={runs} />
+    </Section>}
+    <Companies user={user} relationships={relationships} />
+  </div>
+}
+
+function Companies({ user, relationships }: { user: PlatformUser; relationships: UserRelationships }) {
   const can = useUserAccess()
   const canOpen = can(USER_PERMISSIONS.companiesRead)
-  if (relationships.companies.length === 0) return <div className={surface}>
-    <EmptyState icon={Building2} title="Not publishing for any company">
-      {user.role === "PUBLISHER" ? "They signed up as a publisher but haven't created or joined a company yet." : `${user.role ? accountRoleLabels[user.role] : "This account"}: ${user.role ? accountRoleDescriptions[user.role].toLowerCase() : "no company links"}. Publishers advertise through companies.`}
-    </EmptyState>
-  </div>
+  if (relationships.companies.length === 0) {
+    // A page run by people says so above; there is nothing more to explain.
+    if (relationships.runBy.length > 0) return null
+    return <div className={surface}>
+      <EmptyState icon={Building2} title="Not publishing for any company">
+        {user.role === "PUBLISHER" ? "They signed up as a publisher but haven't created or joined a company yet." : `${user.role ? accountRoleLabels[user.role] : "This account"}: ${user.role ? accountRoleDescriptions[user.role].toLowerCase() : "no company links"}. Publishers advertise through companies.`}
+      </EmptyState>
+    </div>
+  }
   return <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
     {relationships.companies.map((company) => <li key={company.id} className={cn(surface, "flex flex-col gap-3 p-5")}>
       <div className="flex items-start gap-3">

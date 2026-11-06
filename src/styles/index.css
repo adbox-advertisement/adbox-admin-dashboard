@@ -45,6 +45,17 @@
   --text-b4--line-height: 0.9375rem;
 
   --color-white: var(--adbox-white);
+  --color-royal-50: var(--adbox-royal-50);
+  --color-royal-100: var(--adbox-royal-100);
+  --color-royal-200: var(--adbox-royal-200);
+  --color-royal-300: var(--adbox-royal-300);
+  --color-royal-400: var(--adbox-royal-400);
+  --color-royal-500: var(--adbox-royal-500);
+  --color-royal-600: var(--adbox-royal-600);
+  --color-royal-700: var(--adbox-royal-700);
+  --color-royal-800: var(--adbox-royal-800);
+  --color-royal-900: var(--adbox-royal-900);
+  --color-royal-950: var(--adbox-royal-950);
   --color-purple: var(--adbox-purple);
   --color-cyan: var(--adbox-cyan);
   --color-blue: var(--adbox-blue);
@@ -173,30 +184,47 @@
   --adbox-font-chart: "Manrope", sans-serif;
 
   --adbox-white: #ffffff;
-  --adbox-purple: #d132fb;
-  --adbox-cyan: #1de5e7;
-  --adbox-blue: #6432ed;
-  --adbox-accent-light-blue: #f4f7fe;
-  --adbox-accent-background: #ededff;
+  /* Royal Indigo, the brand scale of the mobile app (adbox-mobile-mvp AppColors). The older names
+     resolve to it the way the app's do: purple 600 (500 in dark mode), blue 700, cyan 400. */
+  --adbox-royal-50: #f5f3ff;
+  --adbox-royal-100: #eae7ff;
+  --adbox-royal-200: #d6d0ff;
+  --adbox-royal-300: #b7aeff;
+  --adbox-royal-400: #9184ff;
+  --adbox-royal-500: #6d5df6;
+  --adbox-royal-600: #5946e8;
+  --adbox-royal-700: #4736c7;
+  --adbox-royal-800: #392da0;
+  --adbox-royal-900: #30277f;
+  --adbox-royal-950: #1b1747;
+  --adbox-purple: var(--adbox-royal-600);
+  --adbox-cyan: var(--adbox-royal-400);
+  --adbox-blue: var(--adbox-royal-700);
+  /* The dashboard canvas (bg-auth-background) is the app's neutral page background. */
+  --adbox-accent-light-blue: #f4f5f7;
+  --adbox-accent-background: var(--adbox-royal-100);
   --adbox-date-accent: #7a68ea;
   --adbox-date-range: #f4ebf5;
   --adbox-date-muted: rgb(24 30 48 / 32%);
   --adbox-secondary-grey-600: #a3aed0;
-  --adbox-chart-cyan: #62d0ee;
-  --adbox-chart-ink: #1b2559;
+  --adbox-chart-cyan: var(--adbox-royal-300);
+  --adbox-chart-ink: var(--adbox-royal-950);
   --adbox-paragraph-text: #797979;
   --adbox-divider: #cbcbcb;
 
-  --gradient-primary: linear-gradient(56.31deg, #d600e0 5.2%, #6f73eb 57.81%, #1cd0f4 100.35%);
-  --gradient-purple: linear-gradient(-29.2deg, #4727fc 1.72%, #ac37ec 97.05%);
-  --gradient-blue: linear-gradient(90deg, #40a7fa 0%, #1de5e7 99.99%);
-  --gradient-pink: linear-gradient(90deg, #b644f5 0.58%, #f85aef 99.98%);
-  --gradient-dark-blue: linear-gradient(83.05deg, #060619 8.05%, #160874 95.57%);
+  /* The app replaced its multicolour gradients with flat indigo; header panels keep a quiet
+     indigo fade (AppColors.homeGradient), which turns charcoal in dark mode. */
+  --gradient-primary: linear-gradient(var(--adbox-royal-600), var(--adbox-royal-600));
+  --gradient-purple: linear-gradient(var(--adbox-royal-600), var(--adbox-royal-600));
+  --gradient-blue: linear-gradient(135deg, var(--adbox-royal-800), var(--adbox-royal-600));
+  --gradient-pink: linear-gradient(var(--adbox-royal-500), var(--adbox-royal-500));
+  --gradient-dark-blue: linear-gradient(135deg, var(--adbox-royal-900), var(--adbox-royal-700));
 
+  /* Neutral elevation, matching the app's restrained card shadow. */
   --adbox-shadow-text-drop: 1px 1px 0 rgb(0 0 0 / 30%);
-  --adbox-shadow-small: 0 1px 4px 1px rgb(78 17 94 / 10%);
-  --adbox-shadow-medium: 0 8px 16.9px rgb(201 76 255 / 20%);
-  --adbox-shadow-large: 0 17px 37.3px -1px rgb(158 26 192 / 26%);
+  --adbox-shadow-small: 0 1px 3px rgb(17 24 39 / 6%), 0 4px 14px rgb(17 24 39 / 5%);
+  --adbox-shadow-medium: 0 8px 24px rgb(17 24 39 / 10%);
+  --adbox-shadow-large: 0 18px 40px -4px rgb(17 24 39 / 16%);
   --adbox-shadow-hover-primary:
     0 2px 5px rgb(103 110 118 / 8%),
     0 0 0 1px rgb(0 0 0 / 64%),
@@ -217,10 +245,10 @@
     0 0 0 2px rgb(83 180 131 / 40%),
     0 1px 1px rgb(0 0 0 / 12%);
   --adbox-shadow-focus-primary:
-    0 0 0 4px rgb(172 55 236 / 16%),
+    0 0 0 4px rgb(89 70 232 / 18%),
     0 0 0 1px rgb(0 0 0 / 64%);
   --adbox-shadow-focus-secondary:
-    0 0 0 4px rgb(206 70 252 / 16%),
+    0 0 0 4px rgb(109 93 246 / 18%),
     0 0 0 1px rgb(103 110 118 / 16%);
   --adbox-shadow-focus-error:
     0 0 0 4px rgb(243 65 65 / 16%),
@@ -286,72 +314,80 @@
   --adbox-success-900: #255e46;
   --adbox-success-1000: #1e4d3a;
 
-  --background: var(--adbox-grey-50);
-  --foreground: var(--adbox-grey-1000);
+  --background: #f4f5f7;
+  --foreground: #17191d;
   --card: var(--adbox-white);
-  --card-foreground: var(--adbox-grey-1000);
+  --card-foreground: #17191d;
   --popover: var(--adbox-white);
-  --popover-foreground: var(--adbox-grey-1000);
+  --popover-foreground: #17191d;
   --primary: var(--adbox-purple);
   --primary-foreground: var(--adbox-white);
   --secondary: var(--adbox-blue);
   --secondary-foreground: var(--adbox-white);
   --muted: var(--adbox-grey-100);
-  --muted-foreground: var(--adbox-grey-500);
-  --accent: var(--adbox-cyan);
-  --accent-foreground: var(--adbox-grey-1000);
+  --muted-foreground: #555c66;
+  --accent: var(--adbox-royal-100);
+  --accent-foreground: var(--adbox-royal-800);
   --destructive: var(--adbox-error-600);
-  --border: var(--adbox-grey-200);
-  --input: var(--adbox-grey-300);
-  --ring: var(--adbox-blue);
-  --chart-1: var(--adbox-purple);
-  --chart-2: var(--adbox-blue);
-  --chart-3: var(--adbox-cyan);
+  --border: #dce0e5;
+  --input: #dce0e5;
+  --ring: var(--adbox-royal-500);
+  --chart-1: var(--adbox-royal-600);
+  --chart-2: var(--adbox-royal-300);
+  --chart-3: var(--adbox-royal-800);
   --chart-4: var(--adbox-warning-500);
   --chart-5: var(--adbox-success-600);
   --radius: 0.625rem;
-  --sidebar: var(--adbox-white);
-  --sidebar-foreground: var(--adbox-grey-1000);
-  --sidebar-primary: var(--adbox-blue);
+  --sidebar: #fcfcfd;
+  --sidebar-foreground: #17191d;
+  --sidebar-primary: var(--adbox-royal-600);
   --sidebar-primary-foreground: var(--adbox-white);
   --sidebar-accent: var(--adbox-grey-100);
   --sidebar-accent-foreground: var(--adbox-grey-1000);
-  --sidebar-border: var(--adbox-grey-200);
-  --sidebar-ring: var(--adbox-blue);
+  --sidebar-border: #dce0e5;
+  --sidebar-ring: var(--adbox-royal-500);
 }
 
 .dark {
-  --background: #060619;
-  --foreground: var(--adbox-white);
-  --card: color-mix(in srgb, var(--adbox-grey-1000) 90%, var(--adbox-blue));
-  --card-foreground: var(--adbox-white);
-  --popover: var(--card);
-  --popover-foreground: var(--adbox-white);
-  --primary: var(--adbox-purple);
+  /* The app's dark palette (AppThemePalette.dark): neutral charcoal, indigo only for actions. */
+  --adbox-purple: var(--adbox-royal-500);
+  --gradient-primary: linear-gradient(var(--adbox-royal-500), var(--adbox-royal-500));
+  --gradient-purple: linear-gradient(var(--adbox-royal-500), var(--adbox-royal-500));
+  --gradient-dark-blue: linear-gradient(135deg, #16191d, #23282f);
+  --adbox-shadow-small: 0 1px 3px rgb(0 0 0 / 20%), 0 4px 14px rgb(0 0 0 / 14%);
+  --adbox-shadow-medium: 0 8px 24px rgb(0 0 0 / 28%);
+  --adbox-shadow-large: 0 18px 40px -4px rgb(0 0 0 / 36%);
+  --background: #0d0f12;
+  --foreground: #f4f6f8;
+  --card: #191d22;
+  --card-foreground: #f4f6f8;
+  --popover: #20252b;
+  --popover-foreground: #f4f6f8;
+  --primary: var(--adbox-royal-500);
   --primary-foreground: var(--adbox-white);
-  --secondary: var(--adbox-cyan);
-  --secondary-foreground: #060619;
-  --muted: color-mix(in srgb, var(--adbox-grey-900) 92%, var(--adbox-blue));
-  --muted-foreground: var(--adbox-grey-300);
-  --accent: var(--adbox-blue);
+  --secondary: var(--adbox-royal-400);
+  --secondary-foreground: #0d0f12;
+  --muted: #20252b;
+  --muted-foreground: #a7adb7;
+  --accent: var(--adbox-royal-900);
   --accent-foreground: var(--adbox-white);
   --destructive: var(--adbox-error-400);
-  --border: rgb(255 255 255 / 12%);
-  --input: rgb(255 255 255 / 16%);
-  --ring: var(--adbox-cyan);
-  --chart-1: var(--adbox-cyan);
-  --chart-2: var(--adbox-purple);
-  --chart-3: var(--adbox-blue);
+  --border: #2c323a;
+  --input: #2c323a;
+  --ring: var(--adbox-royal-400);
+  --chart-1: var(--adbox-royal-400);
+  --chart-2: var(--adbox-royal-200);
+  --chart-3: var(--adbox-royal-600);
   --chart-4: var(--adbox-warning-400);
   --chart-5: var(--adbox-success-400);
-  --sidebar: var(--card);
-  --sidebar-foreground: var(--adbox-white);
-  --sidebar-primary: var(--adbox-cyan);
-  --sidebar-primary-foreground: #060619;
-  --sidebar-accent: var(--muted);
-  --sidebar-accent-foreground: var(--adbox-white);
-  --sidebar-border: rgb(255 255 255 / 12%);
-  --sidebar-ring: var(--adbox-cyan);
+  --sidebar: #13161a;
+  --sidebar-foreground: #f4f6f8;
+  --sidebar-primary: var(--adbox-royal-400);
+  --sidebar-primary-foreground: #0d0f12;
+  --sidebar-accent: #20252b;
+  --sidebar-accent-foreground: #f4f6f8;
+  --sidebar-border: #2c323a;
+  --sidebar-ring: var(--adbox-royal-400);
 }
 
 @layer base {
@@ -398,4 +434,138 @@
   --adbox-font-body: "Manrope", "Inter", sans-serif;
   --adbox-font-caption: "Inter", "Manrope", sans-serif;
   --adbox-font-chart: "DM Sans", "Inter", sans-serif;
+}
+
+/* RDI keeps the colours it was designed with: the dashboard's move to the mobile app's Royal Indigo
+   theme does not apply inside RDI (see AGENTS.md). These are the previous values, verbatim.
+   `.rdi-theme` carries them to RDI pop-ups that render outside these scopes (select lists). */
+.rdi-cms,
+.rdi-cms-dialog,
+.rdi-website,
+.rdi-theme {
+  --adbox-purple: #d132fb;
+  --adbox-cyan: #1de5e7;
+  --adbox-blue: #6432ed;
+  --adbox-accent-light-blue: #f4f7fe;
+  --adbox-accent-background: #ededff;
+  --adbox-chart-cyan: #62d0ee;
+  --adbox-chart-ink: #1b2559;
+
+  --gradient-primary: linear-gradient(56.31deg, #d600e0 5.2%, #6f73eb 57.81%, #1cd0f4 100.35%);
+  --gradient-purple: linear-gradient(-29.2deg, #4727fc 1.72%, #ac37ec 97.05%);
+  --gradient-blue: linear-gradient(90deg, #40a7fa 0%, #1de5e7 99.99%);
+  --gradient-pink: linear-gradient(90deg, #b644f5 0.58%, #f85aef 99.98%);
+  --gradient-dark-blue: linear-gradient(83.05deg, #060619 8.05%, #160874 95.57%);
+
+  --adbox-shadow-text-drop: 1px 1px 0 rgb(0 0 0 / 30%);
+  --adbox-shadow-small: 0 1px 4px 1px rgb(78 17 94 / 10%);
+  --adbox-shadow-medium: 0 8px 16.9px rgb(201 76 255 / 20%);
+  --adbox-shadow-large: 0 17px 37.3px -1px rgb(158 26 192 / 26%);
+  --adbox-shadow-hover-primary:
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(0 0 0 / 64%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-secondary:
+    0 0 0 1px rgb(103 110 118 / 24%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-error:
+    0 2px 5px rgb(243 65 65 / 8%),
+    0 0 0 2px rgb(243 65 65 / 40%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-warning:
+    0 2px 5px rgb(233 162 59 / 8%),
+    0 0 0 2px rgb(233 162 59 / 40%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-hover-success:
+    0 2px 5px rgb(83 180 131 / 8%),
+    0 0 0 2px rgb(83 180 131 / 40%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-focus-primary:
+    0 0 0 4px rgb(172 55 236 / 16%),
+    0 0 0 1px rgb(0 0 0 / 64%);
+  --adbox-shadow-focus-secondary:
+    0 0 0 4px rgb(206 70 252 / 16%),
+    0 0 0 1px rgb(103 110 118 / 16%);
+  --adbox-shadow-focus-error:
+    0 0 0 4px rgb(243 65 65 / 16%),
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(243 65 65 / 16%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-focus-warning:
+    0 0 0 4px rgb(233 162 59 / 16%),
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(233 162 59 / 16%),
+    0 1px 1px rgb(0 0 0 / 12%);
+  --adbox-shadow-focus-success:
+    0 0 0 4px rgb(83 180 131 / 16%),
+    0 2px 5px rgb(103 110 118 / 8%),
+    0 0 0 1px rgb(83 180 131 / 16%),
+    0 1px 1px rgb(0 0 0 / 12%);
+
+  --background: var(--adbox-grey-50);
+  --foreground: var(--adbox-grey-1000);
+  --card: var(--adbox-white);
+  --card-foreground: var(--adbox-grey-1000);
+  --popover: var(--adbox-white);
+  --popover-foreground: var(--adbox-grey-1000);
+  --primary: var(--adbox-purple);
+  --primary-foreground: var(--adbox-white);
+  --secondary: var(--adbox-blue);
+  --secondary-foreground: var(--adbox-white);
+  --muted: var(--adbox-grey-100);
+  --muted-foreground: var(--adbox-grey-500);
+  --accent: var(--adbox-cyan);
+  --accent-foreground: var(--adbox-grey-1000);
+  --destructive: var(--adbox-error-600);
+  --border: var(--adbox-grey-200);
+  --input: var(--adbox-grey-300);
+  --ring: var(--adbox-blue);
+  --chart-1: var(--adbox-purple);
+  --chart-2: var(--adbox-blue);
+  --chart-3: var(--adbox-cyan);
+  --chart-4: var(--adbox-warning-500);
+  --chart-5: var(--adbox-success-600);
+  --radius: 0.625rem;
+  --sidebar: var(--adbox-white);
+  --sidebar-foreground: var(--adbox-grey-1000);
+  --sidebar-primary: var(--adbox-blue);
+  --sidebar-primary-foreground: var(--adbox-white);
+  --sidebar-accent: var(--adbox-grey-100);
+  --sidebar-accent-foreground: var(--adbox-grey-1000);
+  --sidebar-border: var(--adbox-grey-200);
+  --sidebar-ring: var(--adbox-blue);
+}
+
+.dark :is(.rdi-cms, .rdi-cms-dialog, .rdi-website, .rdi-theme) {
+  --background: #060619;
+  --foreground: var(--adbox-white);
+  --card: color-mix(in srgb, var(--adbox-grey-1000) 90%, var(--adbox-blue));
+  --card-foreground: var(--adbox-white);
+  --popover: var(--card);
+  --popover-foreground: var(--adbox-white);
+  --primary: var(--adbox-purple);
+  --primary-foreground: var(--adbox-white);
+  --secondary: var(--adbox-cyan);
+  --secondary-foreground: #060619;
+  --muted: color-mix(in srgb, var(--adbox-grey-900) 92%, var(--adbox-blue));
+  --muted-foreground: var(--adbox-grey-300);
+  --accent: var(--adbox-blue);
+  --accent-foreground: var(--adbox-white);
+  --destructive: var(--adbox-error-400);
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 16%);
+  --ring: var(--adbox-cyan);
+  --chart-1: var(--adbox-cyan);
+  --chart-2: var(--adbox-purple);
+  --chart-3: var(--adbox-blue);
+  --chart-4: var(--adbox-warning-400);
+  --chart-5: var(--adbox-success-400);
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--adbox-white);
+  --sidebar-primary: var(--adbox-cyan);
+  --sidebar-primary-foreground: #060619;
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--adbox-white);
+  --sidebar-border: rgb(255 255 255 / 12%);
+  --sidebar-ring: var(--adbox-cyan);
 }

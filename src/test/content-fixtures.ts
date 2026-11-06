@@ -26,8 +26,8 @@ export const postFixtures = [
 ]
 
 export const adFixtures = [{
-  id: "90000000-0000-4000-8000-000000000001", type: "EVENT", name: "Freshers' night", goal: "REACH", audience: "STUDENTS", dailyBudgetGhs: 50, durationDays: 7,
-  costBars: 3500, refundedBars: 0, status: "ACTIVE", startsAt: "2026-10-01T00:00:00.000Z", endsAt: "2026-10-08T00:00:00.000Z", cancelledAt: null,
+  id: "90000000-0000-4000-8000-000000000001", type: "EVENT", name: "Freshers' night", goal: "REACH", audience: "STUDENTS", dailyBudgetBars: 500, durationDays: 7,
+  budgetBars: 3500, cpmBars: 1250, chargedBars: 1250, returnedBars: 0, status: "ACTIVE", startsAt: "2026-10-01T00:00:00.000Z", endsAt: "2026-10-08T00:00:00.000Z", cancelledAt: null,
   content: { headline: "Freshers' night is here", body: "Join us", destinationUrl: "https://example.com/event", eventLocation: "Great Hall", imageUrls: ["https://cdn.example.com/a/1.jpg"] },
   createdAt: "2026-09-30T00:00:00.000Z", updatedAt: "2026-09-30T00:00:00.000Z", user: uploaderFixture, resource: null,
 }]

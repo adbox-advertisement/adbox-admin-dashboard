@@ -110,7 +110,7 @@ function AdCard({ ad, onOpen, uploaderTo }: { ad: UserAd; onOpen: () => void; up
       <Schedule ad={ad} />
       <div className="relative z-10 mt-auto flex items-center justify-between gap-3 border-t border-grey-100 pt-3 dark:border-border">
         <UploaderChip user={ad.user} to={uploaderTo} size="xs" />
-        <span className={cn("shrink-0 text-b3 font-semibold tabular-nums", ink)}>GH₵{ad.dailyBudgetGhs.toLocaleString()}<span className={cn("font-normal", muted)}>/day</span></span>
+        <span className={cn("shrink-0 text-b3 font-semibold tabular-nums", ink)}>{ad.dailyBudgetBars.toLocaleString()} bars<span className={cn("font-normal", muted)}>/day</span></span>
       </div>
     </div>
   </li>
@@ -118,7 +118,8 @@ function AdCard({ ad, onOpen, uploaderTo }: { ad: UserAd; onOpen: () => void; up
 
 /** A running campaign shows how far through it is; any other shows its dates. */
 function Schedule({ ad }: { ad: UserAd }) {
-  const running = ad.status === "ACTIVE" || ad.status === "PAUSED"
+  const running = (ad.status === "ACTIVE" || ad.status === "PAUSED") && ad.startsAt && ad.endsAt
+  if (!ad.startsAt || !ad.endsAt) return <p className={cn("flex items-center gap-1.5 text-b3", muted)}><CalendarDays className="size-3.5" aria-hidden="true" />{ad.status === "PENDING_REVIEW" ? "Starts when approved" : "Never ran"} · {ad.durationDays} days</p>
   if (!running) return <p className={cn("flex items-center gap-1.5 text-b3", muted)}><CalendarDays className="size-3.5" aria-hidden="true" />{formatDate(ad.startsAt, "MMM d")} – {formatDate(ad.endsAt, "MMM d, yyyy")} · {ad.durationDays} days</p>
   const progress = campaignProgress(ad.startsAt, ad.endsAt)
   const percent = Math.round(progress.share * 100)
@@ -166,9 +167,10 @@ function AdSheet({ ad, uploaderTo }: { ad: UserAd; uploaderTo: string }) {
       <dl className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
         <Fact label="Goal" value={humanize(ad.goal)} />
         <Fact label="Audience" value={humanize(ad.audience)} />
-        <Fact label="Daily budget" value={`GH₵${ad.dailyBudgetGhs.toLocaleString()} × ${ad.durationDays} days`} />
-        <Fact label="Cost" value={`${ad.costBars.toLocaleString()} bars${ad.refundedBars ? ` (${ad.refundedBars.toLocaleString()} refunded)` : ""}`} />
-        <Fact label="Runs" value={`${formatDate(ad.startsAt)} – ${formatDate(ad.endsAt)}`} icon={<CalendarClock className="size-3.5" aria-hidden="true" />} />
+        <Fact label="Daily budget" value={`${ad.dailyBudgetBars.toLocaleString()} bars × ${ad.durationDays} days`} />
+        <Fact label="Gold" value={`${ad.budgetBars.toLocaleString()} held · ${ad.chargedBars.toLocaleString()} charged${ad.returnedBars ? ` · ${ad.returnedBars.toLocaleString()} returned` : ""}`} />
+        <Fact label="Price" value={`${ad.cpmBars.toLocaleString()} bars per 1,000 views`} />
+        <Fact label="Runs" value={ad.startsAt && ad.endsAt ? `${formatDate(ad.startsAt)} – ${formatDate(ad.endsAt)}` : "Not started"} icon={<CalendarClock className="size-3.5" aria-hidden="true" />} />
         <Fact label="Cancelled" value={formatDate(ad.cancelledAt, "MMM d, yyyy 'at' h:mm a")} />
         <Fact label="Event starts" value={formatDate(content.eventStartsAt ?? null, "MMM d, yyyy 'at' h:mm a")} />
         <Fact label="Event location" value={content.eventLocation} />

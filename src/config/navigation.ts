@@ -29,6 +29,8 @@ export const navItems: DashboardNavItem[] = [
       { label: "People", to: APP_ROUTES.manageUsersPeople },
       { label: "Institutions", to: APP_ROUTES.manageUsersInstitutions },
       { label: "Publishers & Companies", to: APP_ROUTES.manageUsersCompanies },
+      { label: "Business requests", to: APP_ROUTES.manageUsersBusinessRequests },
+      { label: "Page requests", to: APP_ROUTES.manageUsersPageRequests },
       { label: "Verification", to: APP_ROUTES.manageUsersVerification },
       { label: "Honours", to: APP_ROUTES.manageUsersHonours },
     ],
@@ -78,6 +80,7 @@ export const navItems: DashboardNavItem[] = [
     icon: Banknote,
     to: APP_ROUTES.financials,
     children: [
+      { label: "Gold & pricing", to: APP_ROUTES.goldPricing },
       { label: "Advertisers Payment", to: APP_ROUTES.advertisersPayment },
       { label: "Withdrawals", to: APP_ROUTES.withdrawals },
     ],

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { declineReasons, groupKinds, pageRequestStatuses } from "./lib/page-requests"
 
 export const verificationTiers = ["SELF_DECLARED", "PENDING", "VERIFIED"] as const
 export const studentStatuses = ["STUDENT", "ALUMNI", "STAFF"] as const
@@ -10,8 +11,9 @@ export const badgeKinds = ["campus", "company", "honour", "spotlight"] as const
 export const verificationRequestStatuses = ["PENDING", "APPROVED", "REJECTED"] as const
 export const followStatuses = ["ACTIVE", "REQUESTED", "BLOCKED", "MUTED"] as const
 export const connectionDirections = ["followers", "following", "blocking", "blockedBy"] as const
-export const companyStatuses = ["PENDING_VERIFICATION", "ACTIVE", "SUSPENDED", "INACTIVE"] as const
+export const companyStatuses = ["PENDING_VERIFICATION", "NEEDS_CHANGES", "ACTIVE", "REJECTED", "SUSPENDED", "INACTIVE"] as const
 export const identityProviders = ["GOOGLE", "FACEBOOK", "APPLE"] as const
+export const businessCategories = ["FOOD", "FASHION", "TECH", "SERVICES", "TUTORING", "EVENTS", "HEALTH", "OTHER"] as const
 
 // Prisma returns `Boolean?` columns as null for legacy rows; treat null as false.
 const flag = z.boolean().nullable().optional().transform((value) => value ?? false)
@@ -164,7 +166,7 @@ export const userStatsSchema = z.object({
 
 // ── Relationships ─────────────────────────────────────────────────────────
 
-export const relationshipsSchema = z.object({
+const relationshipsBaseSchema = z.object({
   counts: z.object({
     followers: count, following: count, requestsReceived: count, requestsSent: count,
     blocking: count, blockedBy: count, posts: count, comments: count, institutionsFollowed: count,
@@ -211,6 +213,27 @@ export const personSchema = z.object({
   })),
 })
 
+export const memberRoles = ["OWNER", "EDITOR"] as const
+export const runKinds = ["PAGE", "BUSINESS", "ACCOUNT"] as const
+
+const membership = {
+  role: lenientEnum(memberRoles).transform((value) => value ?? "EDITOR"),
+  /** Asked, not accepted yet: they do not run it until they do. */
+  invited: flag,
+  since: timestamp,
+}
+
+// Who runs a page or business, and what a person runs (`docs/business-accounts.md`, "People"). Older
+// servers send neither, so both default to empty.
+export const relationshipsSchema = relationshipsBaseSchema.extend({
+  runBy: z.array(z.object({ person: personSchema, ...membership })).default([]),
+  runs: z.array(z.object({
+    account: personSchema,
+    kind: lenientEnum(runKinds).transform((value) => value ?? "ACCOUNT"),
+    ...membership,
+  })).default([]),
+})
+
 export const connectionsPageSchema = pageOf(z.object({ user: personSchema, status: lenientEnum(followStatuses), since: timestamp })).extend({
   direction: z.enum(connectionDirections),
 })
@@ -246,6 +269,8 @@ export const companySchema = z.object({
 
 export const companyDetailSchema = companySchema.extend({
   publishers: z.array(z.object({ isOwner: z.boolean(), joinedAt: timestamp, user: personSchema })),
+  /** The people who run its account, when it was asked for from someone's own. */
+  runBy: z.array(z.object({ accountUserId: z.uuid(), user: personSchema, ...membership })).default([]),
 })
 
 export const companyPageSchema = pageOf(companySchema)
@@ -382,3 +407,187 @@ export type GrantHonourInput = z.infer<typeof grantHonourSchema>
 export type DeclineHonourInput = z.infer<typeof declineHonourSchema>
 export type VerificationQuery = z.input<typeof verificationQuerySchema>
 export type RejectVerificationInput = z.infer<typeof rejectVerificationSchema>
+
+// ── Page and business requests ────────────────────────────────────────────
+// Someone asks, from their own account, for a campus group's official page (`docs/group-pages.md`) or a
+// business account (`docs/business-accounts.md`). Approval makes it its own account that they run and
+// switch to, with no password. Both share statuses, decline reasons and the shape of the automatic checks.
+
+const requestCheckSchema = z.object({
+  tone: z.enum(["ok", "look", "problem"]),
+  text: z.string(),
+  short: z.string().optional(),
+})
+
+export const requestFilters = ["open", ...pageRequestStatuses] as const
+
+const requestQuerySchema = z.object({
+  status: z.enum(requestFilters).default("open"),
+  search: z.string().trim().max(100).optional(),
+  page: z.number().int().min(1).default(1),
+  limit: z.number().int().min(1).max(50).default(20),
+})
+
+export const requestCountsSchema = z.object({
+  open: count,
+  NEW: count,
+  IN_REVIEW: count,
+  NEEDS_CHANGES: count,
+  APPROVED: count,
+  DECLINED: count,
+})
+
+export const usernameCheckSchema = z.object({
+  username: z.string(),
+  available: z.boolean(),
+  reason: optionalText,
+})
+
+export const pageRequestChangesSchema = z.object({
+  note: z.string().trim().min(10, "Say what they should fix, in a sentence.").max(500, "At most 500 characters."),
+})
+
+export const declineRequestSchema = z.object({
+  reason: z.enum(declineReasons, { error: "Choose a reason." }),
+  note: z.string().trim().max(500, "At most 500 characters.").optional().transform((value) => value || undefined),
+})
+
+export const pageRequestSchema = z.object({
+  id: z.uuid(),
+  reference: z.string(),
+  name: z.string(),
+  username: z.string(),
+  kind: lenientEnum(groupKinds).transform((value) => value ?? "OTHER"),
+  detail: optionalText,
+  institutionId: z.uuid(),
+  institution: z.string(),
+  school: optionalText,
+  campus: optionalText,
+  about: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  hasLogo: flag,
+  hasCover: flag,
+  logoUrl: optionalText,
+  letter: nullableObject(z.object({ name: z.string(), sizeKb: count })),
+  requester: z.object({
+    id: z.uuid(),
+    name: z.string(),
+    username: optionalText,
+    role: z.string(),
+    joinedAt: timestamp,
+    emailVerified: flag,
+    /** "Student badge (University of Ghana)"; null without one. */
+    badge: optionalText,
+    upheldReports: count,
+  }),
+  sentAt: timestamp,
+  status: z.enum(pageRequestStatuses),
+  reviewer: optionalText,
+  reviewerId: optionalText,
+  checks: z.array(requestCheckSchema),
+  note: optionalText,
+  declineReason: lenientEnum(declineReasons),
+  decidedAt: optionalTimestamp,
+  page: nullableObject(z.object({ userId: z.uuid(), username: optionalText })),
+})
+
+export const pageRequestDetailSchema = pageRequestSchema.extend({
+  coverUrl: optionalText,
+  /** A presigned link that works for 5 minutes. */
+  letterUrl: optionalText,
+  history: z.array(z.object({ at: timestamp, text: z.string() })),
+})
+
+export const pageRequestPageSchema = pageOf(pageRequestSchema)
+export const pageRequestQuerySchema = requestQuerySchema
+
+export const approvePageRequestSchema = z.object({
+  username: z.string().trim().toLowerCase().transform((value) => value.replace(/^@/, "")).pipe(z.string().min(1, "Give the page a username.")),
+  name: z.string().trim().min(3, "Give the page its name.").max(80, "At most 80 characters."),
+})
+
+export type PageRequest = z.infer<typeof pageRequestSchema>
+export type PageRequestDetail = z.infer<typeof pageRequestDetailSchema>
+export type RequestCounts = z.infer<typeof requestCountsSchema>
+export type RequestFilter = typeof requestFilters[number]
+export type PageRequestQuery = z.input<typeof pageRequestQuerySchema>
+export type ApprovePageRequestInput = z.input<typeof approvePageRequestSchema>
+export type PageRequestChangesInput = z.input<typeof pageRequestChangesSchema>
+export type DeclineRequestInput = z.input<typeof declineRequestSchema>
+
+// ── Business requests ─────────────────────────────────────────────────────
+// Someone asks for a business account from their own account; whoever verifies companies decides
+// (backend `docs/business-accounts.md`). Statuses and decline reasons are the page requests' own.
+
+export const businessRequestSchema = z.object({
+  id: z.uuid(),
+  reference: z.string(),
+  name: z.string(),
+  username: z.string(),
+  category: lenientEnum(businessCategories),
+  categoryLabel: z.string(),
+  about: z.string(),
+  location: z.string(),
+  serves: nullableObject(z.object({ institution: z.string(), school: optionalText, campus: optionalText })),
+  email: z.string(),
+  phone: z.string(),
+  showPhone: flag,
+  website: optionalText,
+  size: optionalText,
+  registrationNumber: optionalText,
+  hasLogo: flag,
+  hasCover: flag,
+  logoUrl: optionalText,
+  proof: nullableObject(z.object({ name: z.string(), sizeKb: count })),
+  requester: z.object({
+    id: z.uuid(),
+    name: z.string(),
+    username: optionalText,
+    role: z.string(),
+    joinedAt: timestamp,
+    emailVerified: flag,
+    upheldReports: count,
+  }),
+  sentAt: timestamp,
+  status: z.enum(pageRequestStatuses),
+  reviewer: optionalText,
+  reviewerId: optionalText,
+  checks: z.array(requestCheckSchema),
+  note: optionalText,
+  declineReason: lenientEnum(declineReasons),
+  decidedAt: optionalTimestamp,
+  account: nullableObject(z.object({ userId: z.uuid(), username: optionalText })),
+  company: nullableObject(z.object({ id: z.uuid(), status: lenientEnum(companyStatuses) })),
+})
+
+export const businessRequestDetailSchema = businessRequestSchema.extend({
+  coverUrl: optionalText,
+  /** A presigned link that works for 5 minutes. */
+  proofUrl: optionalText,
+  history: z.array(z.object({ at: timestamp, text: z.string() })),
+})
+
+export const businessRequestPageSchema = pageOf(businessRequestSchema)
+
+export const businessRequestCountsSchema = requestCountsSchema
+export const businessRequestFilters = requestFilters
+export const businessRequestQuerySchema = requestQuerySchema
+
+/** The backend's username rules come back from the availability check; this only cleans it. */
+export const approveBusinessRequestSchema = z.object({
+  username: z.string().trim().toLowerCase().transform((value) => value.replace(/^@/, "")).pipe(z.string().min(1, "Give the account a username.")),
+  name: z.string().trim().min(2, "Give the business its name.").max(80, "At most 80 characters."),
+})
+
+export const businessRequestChangesSchema = pageRequestChangesSchema
+export const declineBusinessRequestSchema = declineRequestSchema
+
+export type BusinessRequest = z.infer<typeof businessRequestSchema>
+export type BusinessRequestDetail = z.infer<typeof businessRequestDetailSchema>
+export type BusinessRequestCounts = z.infer<typeof businessRequestCountsSchema>
+export type BusinessRequestFilter = typeof businessRequestFilters[number]
+export type BusinessRequestQuery = z.input<typeof businessRequestQuerySchema>
+export type ApproveBusinessRequestInput = z.input<typeof approveBusinessRequestSchema>
+export type BusinessRequestChangesInput = z.input<typeof businessRequestChangesSchema>
+export type DeclineBusinessRequestInput = z.input<typeof declineBusinessRequestSchema>

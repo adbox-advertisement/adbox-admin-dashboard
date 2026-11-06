@@ -36,3 +36,11 @@ export function percentOf(value: number, total: number) {
 export function endOfDayIso(date: string) {
   return new Date(`${date}T23:59:59`).toISOString()
 }
+
+/**
+ * An address AdBox made up for an account nobody signs in to by email — a page or business run from
+ * its members' own accounts, or an erased account (`…@accounts.adbox.invalid`). Never shown as if real.
+ */
+export function isPlaceholderEmail(email: string | null | undefined) {
+  return (email ?? "").trim().toLowerCase().endsWith(".adbox.invalid")
+}

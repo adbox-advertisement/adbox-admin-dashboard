@@ -2,7 +2,23 @@ import { useEffect, useState } from "react"
 import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useCurrentAdmin } from "@/features/auth"
 import {
+  approveBusinessRequest,
   approveCompany,
+  approvePageRequest,
+  askForBusinessRequestChanges,
+  askForPageRequestChanges,
+  checkBusinessUsername,
+  checkPageUsername,
+  claimBusinessRequest,
+  claimPageRequest,
+  declineBusinessRequest,
+  declinePageRequest,
+  getBusinessRequest,
+  getBusinessRequestCounts,
+  getBusinessRequests,
+  getPageRequest,
+  getPageRequestCounts,
+  getPageRequests,
   approveVerificationRequest,
   declineHonour,
   getCompanies,
@@ -24,7 +40,10 @@ import {
   updatePlatformUser,
   updateUserBadges,
 } from "./api"
-import type { CompanyQuery, ConnectionsQuery, HonourQuery, PlatformUserQuery, VerificationQuery } from "./validation"
+import type {
+  BusinessRequestDetail, BusinessRequestQuery, CompanyQuery, ConnectionsQuery, HonourQuery, PageRequestDetail, PageRequestQuery, PlatformUserQuery,
+  VerificationQuery,
+} from "./validation"
 
 // Every key lives under one root so a mutation can refresh the whole module:
 // suspending a publisher changes people, companies and stats alike.
@@ -41,6 +60,14 @@ const keys = {
   honours: (query: HonourQuery) => [...usersQueryKey, "honours", query] as const,
   honour: (userId: string) => [...usersQueryKey, "honour", userId] as const,
   verification: (query: VerificationQuery) => [...usersQueryKey, "verification", query] as const,
+  pageRequests: (query: PageRequestQuery) => [...usersQueryKey, "page-requests", query] as const,
+  pageRequestCounts: [...usersQueryKey, "page-requests", "counts"] as const,
+  pageRequest: (id: string) => [...usersQueryKey, "page-request", id] as const,
+  pageUsername: (id: string, username: string) => [...usersQueryKey, "page-username", id, username] as const,
+  businessRequests: (query: BusinessRequestQuery) => [...usersQueryKey, "business-requests", query] as const,
+  businessRequestCounts: [...usersQueryKey, "business-requests", "counts"] as const,
+  businessRequest: (id: string) => [...usersQueryKey, "business-request", id] as const,
+  businessUsername: (id: string, username: string) => [...usersQueryKey, "business-username", id, username] as const,
 }
 
 export function useUserAccess() {
@@ -215,4 +242,126 @@ export function useGrantHonour() {
 
 export function useDeclineHonour() {
   return useMutation({ mutationFn: declineHonour, onSettled: useRefreshUsers() })
+}
+
+// Page requests: super-admin `/page-requests`.
+export function usePageRequests(query: PageRequestQuery, enabled = true) {
+  return useQuery({
+    queryKey: keys.pageRequests(query),
+    queryFn: ({ signal }) => getPageRequests(query, signal),
+    placeholderData: keepPreviousData,
+    enabled,
+  })
+}
+
+/** Counts for the status chips and the section navigation's badge. */
+export function usePageRequestCounts(enabled = true) {
+  return useQuery({ queryKey: keys.pageRequestCounts, queryFn: ({ signal }) => getPageRequestCounts(signal), enabled, staleTime: 30_000 })
+}
+
+export function usePageRequest(id: string, enabled = true) {
+  return useQuery({
+    queryKey: keys.pageRequest(id),
+    queryFn: ({ signal }) => getPageRequest(id, signal),
+    enabled: Boolean(id) && enabled,
+    // The letter's link works for 5 minutes; keep a fresh one while the page is open.
+    refetchInterval: 4 * 60_000,
+  })
+}
+
+/** Whether the page could take [username]; asked only once it is worth asking. */
+export function usePageUsername(id: string, username: string, enabled = true) {
+  return useQuery({
+    queryKey: keys.pageUsername(id, username),
+    queryFn: ({ signal }) => checkPageUsername({ id, username }, signal),
+    enabled: Boolean(id && username) && enabled,
+    staleTime: 15_000,
+  })
+}
+
+/** Every decision answers with the request as it now is: show that at once, then refresh the rest. */
+function useRequestDecision<T, R extends { id: string }>(mutationFn: (input: T) => Promise<R>, key: (id: string) => readonly unknown[]) {
+  const client = useQueryClient()
+  const refresh = useRefreshUsers()
+  return useMutation({
+    mutationFn,
+    onSuccess: (request) => client.setQueryData(key(request.id), request),
+    onSettled: refresh,
+  })
+}
+
+const usePageDecision = <T,>(mutationFn: (input: T) => Promise<PageRequestDetail>) => useRequestDecision(mutationFn, keys.pageRequest)
+
+export function useClaimPageRequest() {
+  return usePageDecision(claimPageRequest)
+}
+
+export function useApprovePageRequest() {
+  return usePageDecision(approvePageRequest)
+}
+
+export function useAskForPageRequestChanges() {
+  return usePageDecision(askForPageRequestChanges)
+}
+
+export function useDeclinePageRequest() {
+  return usePageDecision(declinePageRequest)
+}
+
+// Business requests: the real queue (super-admin `/business-requests`).
+export function useBusinessRequests(query: BusinessRequestQuery, enabled = true) {
+  return useQuery({
+    queryKey: keys.businessRequests(query),
+    queryFn: ({ signal }) => getBusinessRequests(query, signal),
+    placeholderData: keepPreviousData,
+    enabled,
+  })
+}
+
+/** Counts for the status chips and the section navigation's badge. */
+export function useBusinessRequestCounts(enabled = true) {
+  return useQuery({ queryKey: keys.businessRequestCounts, queryFn: ({ signal }) => getBusinessRequestCounts(signal), enabled, staleTime: 30_000 })
+}
+
+export function useBusinessRequest(id: string, enabled = true) {
+  return useQuery({
+    queryKey: keys.businessRequest(id),
+    queryFn: ({ signal }) => getBusinessRequest(id, signal),
+    enabled: Boolean(id) && enabled,
+    // The proof's link works for 5 minutes; keep a fresh one while the page is open.
+    refetchInterval: 4 * 60_000,
+  })
+}
+
+/** Whether the account could take [username]; asked only once it is worth asking. */
+export function useBusinessUsername(id: string, username: string, enabled = true) {
+  return useQuery({
+    queryKey: keys.businessUsername(id, username),
+    queryFn: ({ signal }) => checkBusinessUsername({ id, username }, signal),
+    enabled: Boolean(id && username) && enabled,
+    staleTime: 15_000,
+  })
+}
+
+const useBusinessDecision = <T,>(mutationFn: (input: T) => Promise<BusinessRequestDetail>) => useRequestDecision(mutationFn, keys.businessRequest)
+
+export function useClaimBusinessRequest() {
+  return useBusinessDecision(claimBusinessRequest)
+}
+
+export function useApproveBusinessRequest() {
+  return useBusinessDecision(approveBusinessRequest)
+}
+
+export function useAskForBusinessRequestChanges() {
+  return useBusinessDecision(askForBusinessRequestChanges)
+}
+
+export function useDeclineBusinessRequest() {
+  return useBusinessDecision(declineBusinessRequest)
+}
+
+/** The signed-in admin's id, to tell their own claim from someone else's. */
+export function useAdminId() {
+  return useCurrentAdmin().data?.id
 }

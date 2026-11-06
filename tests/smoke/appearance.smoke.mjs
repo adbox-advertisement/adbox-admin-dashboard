@@ -89,7 +89,8 @@ export async function checkAppearance(page, baseUrl) {
       const post = page.getByRole('dialog')
       await post.getByRole('heading', { name: 'Post details', exact: true }).waitFor()
       const descriptionColor = await post.locator('[data-slot="sheet-description"]').evaluate(element => getComputedStyle(element).color)
-      assert.equal(descriptionColor, theme === 'dark' ? 'rgb(206, 210, 214)' : 'rgb(103, 110, 118)')
+      // The mobile app's secondary text colour (AppThemePalette): #a7adb7 dark, #555c66 light.
+      assert.equal(descriptionColor, theme === 'dark' ? 'rgb(167, 173, 183)' : 'rgb(85, 92, 102)')
       await post.getByRole('button', { name: 'Close post details', exact: true }).click()
 
       await page.goto(baseUrl + '/rdi/pages/home')

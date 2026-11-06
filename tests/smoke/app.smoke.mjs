@@ -9,11 +9,13 @@ import { checkManageUsers } from './manage-users.smoke.mjs'
 import { checkUserContent } from './user-content.smoke.mjs'
 import { checkRecruitment } from './recruitment.smoke.mjs'
 import { checkAppearance } from './appearance.smoke.mjs'
+import { checkFinancials } from './financials.smoke.mjs'
+import { checkAds } from './ads.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const smokeFeature = process.env.ADBOX_SMOKE_FEATURE
-if (smokeFeature && !['recruitment', 'appearance', 'users', 'content'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content or unset')
+if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads or unset')
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
@@ -79,9 +81,7 @@ try {
   console.log('Lazy startup, protected routes, failed sign-in, successful sign-in, and account display after token refresh passed')
 
   for (const [path, title] of [
-    ['/ads-management', 'Ads Management'],
-    ['/ads-management/ad-requests', 'Ad Requests'], ['/ads-management/reported-ads', 'Reported Ads'],
-    ['/financials', 'Financials'], ['/financials/advertisers-payment', 'Advertisers Payment'],
+    ['/financials', 'Financials'],
     ['/financials/withdrawals', 'Withdrawals'], ['/support', 'Support'], ['/settings', 'Settings'],
   ]) {
     await page.goto(baseUrl + path)
@@ -107,12 +107,16 @@ try {
   if (!smokeFeature || smokeFeature === 'recruitment') await checkRecruitment(page, baseUrl)
   if (smokeFeature === 'users') await checkManageUsers(page, baseUrl)
   if (smokeFeature === 'content') await checkUserContent(page, baseUrl)
+  if (smokeFeature === 'financials') await checkFinancials(page, baseUrl)
+  if (smokeFeature === 'ads') await checkAds(page, baseUrl)
   if (!smokeFeature) {
     await checkDashboardContent(page, baseUrl)
     await checkVideoManagement(page, baseUrl)
     await checkManageAdmins(page, baseUrl)
     await checkManageUsers(page, baseUrl)
     await checkUserContent(page, baseUrl)
+    await checkFinancials(page, baseUrl)
+    await checkAds(page, baseUrl)
     await checkRdiScreens(page, baseUrl)
     await checkRdiTouchScreens(browser, baseUrl, sessionKey, session)
     await checkRdiCms(page, baseUrl)

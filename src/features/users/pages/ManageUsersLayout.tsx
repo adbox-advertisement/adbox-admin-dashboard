@@ -1,9 +1,9 @@
 import { Navigate, NavLink, Outlet, useLocation, useSearchParams } from "react-router-dom"
-import { Award, Building2, LayoutDashboard, School, ShieldCheck, UsersRound, type LucideIcon } from "lucide-react"
+import { Award, Building2, Flag, LayoutDashboard, School, ShieldCheck, Store, UsersRound, type LucideIcon } from "lucide-react"
 import { useCurrentAdmin } from "@/features/auth"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
-import { usePendingCounts, useUserAccess } from "../hooks"
+import { useBusinessRequestCounts, usePageRequestCounts, usePendingCounts, useUserAccess } from "../hooks"
 import { userProfilePath } from "../lib/paths"
 import { USER_PERMISSIONS } from "../types"
 import { ErrorState, NoAccess } from "../components/Surface"
@@ -16,12 +16,17 @@ export function ManageUsersLayout() {
   const { pathname } = useLocation()
   const [params] = useSearchParams()
   const pending = usePendingCounts({ verification: can(USER_PERMISSIONS.verificationRead), companies: can(USER_PERMISSIONS.companiesRead) })
+  const openPageRequests = usePageRequestCounts(can(USER_PERMISSIONS.pageRequestsRead)).data?.open
+  const openBusinessRequests = useBusinessRequestCounts(can(USER_PERMISSIONS.companiesRead)).data?.open
 
   const sections: Section[] = [
     { label: "Overview", to: APP_ROUTES.manageUsers, icon: LayoutDashboard, permission: USER_PERMISSIONS.read, end: true },
     { label: "People", to: APP_ROUTES.manageUsersPeople, icon: UsersRound, permission: USER_PERMISSIONS.read },
     { label: "Institutions", to: APP_ROUTES.manageUsersInstitutions, icon: School, permission: USER_PERMISSIONS.read },
     { label: "Publishers & Companies", to: APP_ROUTES.manageUsersCompanies, icon: Building2, permission: USER_PERMISSIONS.companiesRead, count: pending.companies },
+    // A business account is a verified company, so whoever verifies companies decides.
+    { label: "Business requests", to: APP_ROUTES.manageUsersBusinessRequests, icon: Store, permission: USER_PERMISSIONS.companiesRead, count: openBusinessRequests },
+    { label: "Page requests", to: APP_ROUTES.manageUsersPageRequests, icon: Flag, permission: USER_PERMISSIONS.pageRequestsRead, count: openPageRequests },
     { label: "Verification", to: APP_ROUTES.manageUsersVerification, icon: ShieldCheck, permission: USER_PERMISSIONS.verificationRead, count: pending.verification },
     { label: "Honours", to: APP_ROUTES.manageUsersHonours, icon: Award, permission: USER_PERMISSIONS.honoursReview },
   ]
