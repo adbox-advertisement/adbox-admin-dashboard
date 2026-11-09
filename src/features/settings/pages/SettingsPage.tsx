@@ -1,7 +1,9 @@
-import { LogOut, Monitor, Moon, Sun, UserRound } from "lucide-react"
+import { Bell, LogOut, Monitor, Moon, Sun, UserRound, Volume2, VolumeX } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Form, useNavigation } from "react-router-dom"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
+import { Button } from "@/components/ui/button"
+import { playChime, useActivitySound } from "@/features/activity"
 import { APP_ROUTES } from "@/routes/paths"
 
 export function SettingsPage() {
@@ -10,6 +12,9 @@ export function SettingsPage() {
   const ThemeIcon = isDark ? Moon : Sun
   const navigation = useNavigation()
   const isLoggingOut = navigation.state !== "idle" && navigation.formAction === APP_ROUTES.logout
+  const soundEnabled = useActivitySound((state) => state.soundEnabled)
+  const setSoundEnabled = useActivitySound((state) => state.setSoundEnabled)
+  const SoundIcon = soundEnabled ? Volume2 : VolumeX
 
   return (
     <div className="space-y-8 px-4 pb-12 pt-2 sm:px-6">
@@ -48,6 +53,48 @@ export function SettingsPage() {
           </div>
           <p className="border-t border-border bg-muted/30 px-5 py-4 text-xs leading-5 text-muted-foreground sm:px-7">
             Your preference is remembered in this browser and shared across open AdBox tabs.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="notifications-heading" className="grid grid-cols-1 items-start gap-6 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-12">
+        <div className="sm:col-span-4 md:col-span-6 xl:col-span-3">
+          <span className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-blue/10 text-blue dark:bg-cyan/10 dark:text-cyan">
+            <Bell className="size-5" aria-hidden="true" />
+          </span>
+          <h2 id="notifications-heading" className="text-lg font-semibold">Notifications</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Know when new work arrives while AdBox is open.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-adbox-small sm:col-span-4 md:col-span-6 xl:col-span-9">
+          <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+            <div className="flex items-start gap-4">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-blue dark:text-cyan">
+                <SoundIcon className="size-6" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 className="text-base font-semibold">Sound for new work</h3>
+                <p role="status" className="mt-1 text-sm text-muted-foreground">
+                  {soundEnabled ? "Sound is on" : "Sound is off"}
+                </p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                  A short chime plays when something new needs a review, such as an ad request or a report. The menu always shows how many are waiting.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
+              <Button type="button" variant="outline" className="min-h-11 rounded-full bg-card px-5 text-foreground" onClick={() => setSoundEnabled(!soundEnabled)}>
+                {soundEnabled ? "Turn sound off" : "Turn sound on"}
+              </Button>
+              <Button type="button" variant="ghost" className="min-h-11 rounded-full px-5" onClick={() => playChime({ force: true })}>
+                Play sound
+              </Button>
+            </div>
+          </div>
+          <p className="border-t border-border bg-muted/30 px-5 py-4 text-xs leading-5 text-muted-foreground sm:px-7">
+            Your choice is remembered in this browser.
           </p>
         </div>
       </section>

@@ -11,11 +11,12 @@ import { checkRecruitment } from './recruitment.smoke.mjs'
 import { checkAppearance } from './appearance.smoke.mjs'
 import { checkFinancials } from './financials.smoke.mjs'
 import { checkAds } from './ads.smoke.mjs'
+import { checkActivity } from './activity.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const smokeFeature = process.env.ADBOX_SMOKE_FEATURE
-if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads or unset')
+if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity or unset')
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
@@ -32,6 +33,10 @@ try {
     const url = new URL(request.url())
     if (url.pathname.startsWith('/api/')) {
       const reply = (data, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(data) })
+      // The live-activity socket is not served; the dashboard falls back to polling the counts.
+      if (url.pathname.startsWith('/api/v1/socket.io')) return route.abort()
+      // Nothing waiting unless a check says otherwise (activity.smoke.mjs).
+      if (url.pathname.endsWith('/activity/counts')) return reply({})
       if (url.pathname.endsWith('/auth/login')) return reply(loginAllowed ? session : { message: 'Invalid credentials' }, loginAllowed ? 200 : 401)
       if (url.pathname.endsWith('/auth/logout')) return reply({ message: 'Server unavailable' }, 503)
       if (url.pathname.endsWith('/auth/me')) {
@@ -109,6 +114,7 @@ try {
   if (smokeFeature === 'content') await checkUserContent(page, baseUrl)
   if (smokeFeature === 'financials') await checkFinancials(page, baseUrl)
   if (smokeFeature === 'ads') await checkAds(page, baseUrl)
+  if (!smokeFeature || smokeFeature === 'activity') await checkActivity(page, baseUrl)
   if (!smokeFeature) {
     await checkDashboardContent(page, baseUrl)
     await checkVideoManagement(page, baseUrl)

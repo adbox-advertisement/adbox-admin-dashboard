@@ -26,6 +26,8 @@ export default defineConfig({
         target: 'http://localhost:3005',
         changeOrigin: true,
         secure: false,
+        // The live-activity socket (/api/v1/socket.io) upgrades through this proxy.
+        ws: true,
       },
     },
   },

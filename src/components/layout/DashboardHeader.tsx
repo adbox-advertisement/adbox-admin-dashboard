@@ -2,6 +2,7 @@ import { Bell, Menu, Search } from "lucide-react"
 import { useState, type ReactNode } from "react"
 
 import { DashboardSheetNavigation } from "@/components/layout/DashboardSidebar"
+import { useWaitingTotal } from "@/components/layout/nav-badges"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -15,6 +16,7 @@ import {
 
 export function DashboardHeader({ title = "Dashboard", account }: { title?: string; account: ReactNode }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const waiting = useWaitingTotal()
 
   return (
     <header className="grid min-h-[101px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 bg-auth-background dark:bg-background px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-6">
@@ -29,10 +31,11 @@ export function DashboardHeader({ title = "Dashboard", account }: { title?: stri
               type="button"
               variant="ghost"
               size="icon"
-              className="size-9 rounded-full text-grey-500 dark:text-muted-foreground lg:hidden"
-              aria-label="Open navigation"
+              className="relative size-9 rounded-full text-grey-500 dark:text-muted-foreground lg:hidden"
+              aria-label={waiting ? `Open navigation, ${waiting} waiting` : "Open navigation"}
             >
               <Menu className="size-5" strokeWidth={1.8} />
+              {waiting ? <span aria-hidden="true" className="absolute right-1 top-1 size-2.5 rounded-full bg-purple ring-2 ring-auth-background dark:ring-background" /> : null}
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="p-0 lg:hidden">

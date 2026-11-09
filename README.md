@@ -67,7 +67,7 @@ Vitest and React Testing Library cover logic-heavy code (Zustand stores, validat
 With the dev server running and Google Chrome installed, run `npm run test:smoke` for browser checks of authentication, protected routes, mobile navigation, the Dashboard, Video Management (school selection incl. search, folder create/rename, the Photos/Videos/Text upload tabs, and Posts), the six RDI screens, and CMS editing, previews, images, backups, and storage recovery. API calls are mocked and never change live content. Set `ADBOX_TEST_URL=http://127.0.0.1:4173` to check a running production preview, or `ADBOX_BROWSER_CHANNEL` to use another installed Playwright browser channel.
 
 For focused browser checks, set `ADBOX_SMOKE_FEATURE=recruitment`,
-`ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users` (Manage Users) or `ADBOX_SMOKE_FEATURE=content` (User Content) alongside `ADBOX_TEST_URL` when running
+`ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users` (Manage Users), `ADBOX_SMOKE_FEATURE=content` (User Content), `ADBOX_SMOKE_FEATURE=financials`, `ADBOX_SMOKE_FEATURE=ads` or `ADBOX_SMOKE_FEATURE=activity` (waiting-work badges and the sound setting) alongside `ADBOX_TEST_URL` when running
 `npm run test:smoke`. Appearance checks cover both themes throughout the app,
 including dialogs, RDI preview synchronization, and 320–1440px layouts. Shared
 authentication, shell, navigation, and logout checks still run.

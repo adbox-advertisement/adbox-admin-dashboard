@@ -2,6 +2,52 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Live activity: waiting-work badges, toasts and a chime (2026-11-08)
+
+- Request: "shows some sort of notification to every section of the navigation if something pops up, like
+  sockets with some audio". Chosen: badges count **waiting work** (from the database, shared by admins, drop as it
+  is handled); a **chime made with Web Audio** (no file); `socket.io-client` added (approved).
+- Backend (`adbox-backend`, branch `test`, uncommitted; docs `super-admin-api.md` "Live activity",
+  `architecture.md`): `libs/redis/src/admin-activity.ts` (`admin:activity` channel, `AdminActivityPublisher`); the
+  gateway publishes `{ section }` after committing an ad in review, an ad report, a post/comment/chat report, a page or
+  business request (sent, or resent after changes), a publisher's company (sign-up or resubmit), a verification
+  request, an honour nomination; recruitment's form too. Super-admin `src/activity/`: `GET /activity/counts` (only
+  queues the admin's permissions open), Socket.IO `/admin` on path `/api/v1/socket.io` (auth: access token; session
+  rechecked every minute; rooms per permission), recount after any successful super-admin write (interceptor) and
+  every 30 s while anyone is connected. HTTP auth checks moved unchanged into `common/admin-session.verifier.ts`,
+  shared by the guard and the socket.
+- Dashboard `src/features/activity/`: `useLiveActivity()` in `DashboardLayout` (counts query, lazy-loaded socket,
+  toast with View, chime, refreshes that queue's feature queries, polls every minute while the socket is down,
+  renews a refused session); off on `/rdi` routes (no requests, no badges: RDI rule). Badges reach the shared sidebar
+  through `components/layout/nav-badges.ts`; section totals, per-entry counts, a dot on the mobile menu buttons;
+  names read "Ad Requests, 3 waiting" (aria-label). Settings → Notifications: sound on/off (`adbox-activity-sound`)
+  and Play sound. Vite `/api` proxy has `ws: true`.
+- Found and fixed while testing: the chime's audio context was first created on the page's first click, which
+  stalled it ~0.5 s in headless Chrome (now made only when a chime plays, suspended after); super-admin subscribed
+  to Redis before its clients existed (global module init order; now `onApplicationBootstrap`).
+- Checks: dashboard lint, architecture, test types, build, vitest 58 files / 377 tests; smoke `activity` (new,
+  `ADBOX_SMOKE_FEATURE=activity`) and the full suite passed on a preview build (`ADBOX_TEST_URL=http://127.0.0.1:4173`).
+  Backend: both apps' `tsc`, Prettier and ESLint on touched files, full jest 184 suites / 2402 tests (before the last
+  fixes; affected suites rerun), super-admin e2e. Live against Docker (images rebuilt): 11 socket checks (permissions,
+  refusal, Vite proxy, rooms, increase/decrease, revoked session) and a real browser (toast, badge, View); temporary
+  admins and the test verification request were removed.
+- Known, not changed: `video-management.smoke.mjs` types the hashtag right after "Add hashtag" and sometimes loses
+  the first letters (also on the code without this work, 1 in 4 alone); the dev server on 5173 sometimes drops its
+  HMR socket under load and reloads the page mid-smoke. Existing `no-unsafe-*` lint errors in the backend's
+  `ad-campaign.service.spec.ts` and `page-requests.service.spec.ts` predate this work.
+- Docker note: `docker compose build` hung on the Docker Desktop credential helper; building with an empty
+  `DOCKER_CONFIG` (anonymous pulls) worked.
+- Not done: the header's Notifications bell still does nothing (could list waiting queues); the gateway → Redis
+  publish was verified by unit tests and `redis-cli PUBLISH`, not by a real app user's action.
+
+## Sidebar order (2026-11-06)
+
+- Request: "rearrange the left navigation … just rearrange them nothing else". Only the order of `navItems` in
+  `src/config/navigation.ts` changed: Dashboard, Manage Users, User Content, Ads Management, Financials, Video
+  Management, RDI, Recruitment, Support, Manage Admins, Settings. Ads and Financials now sit together; RDI's entry
+  is untouched and keeps its seventh place. No labels, icons, routes or children changed. ESLint on the file and
+  `npm run build` passed; no test depends on the order, so the Vitest suite was not rerun.
+
 ## Ads Management, Advertisers Payment, ads in bars (2026-11-05)
 
 - Request (owner): redesign ads and payments — Phase 1 "fair and safe". Ads are paid in **gold bars only**: the

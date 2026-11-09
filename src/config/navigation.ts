@@ -48,17 +48,22 @@ export const navItems: DashboardNavItem[] = [
     ],
   },
   {
-    label: "Recruitment",
-    icon: GraduationCap,
-    to: APP_ROUTES.recruitment,
-  },
-  {
     label: "Ads Management",
     icon: CirclePlay,
     to: APP_ROUTES.adsManagement,
     children: [
       { label: "Ad Requests", to: APP_ROUTES.adRequests },
       { label: "Reported Ads", to: APP_ROUTES.reportedAds },
+    ],
+  },
+  {
+    label: "Financials",
+    icon: Banknote,
+    to: APP_ROUTES.financials,
+    children: [
+      { label: "Gold & pricing", to: APP_ROUTES.goldPricing },
+      { label: "Advertisers Payment", to: APP_ROUTES.advertisersPayment },
+      { label: "Withdrawals", to: APP_ROUTES.withdrawals },
     ],
   },
   {
@@ -76,14 +81,9 @@ export const navItems: DashboardNavItem[] = [
     to: APP_ROUTES.rdi,
   },
   {
-    label: "Financials",
-    icon: Banknote,
-    to: APP_ROUTES.financials,
-    children: [
-      { label: "Gold & pricing", to: APP_ROUTES.goldPricing },
-      { label: "Advertisers Payment", to: APP_ROUTES.advertisersPayment },
-      { label: "Withdrawals", to: APP_ROUTES.withdrawals },
-    ],
+    label: "Recruitment",
+    icon: GraduationCap,
+    to: APP_ROUTES.recruitment,
   },
   {
     label: "Support",

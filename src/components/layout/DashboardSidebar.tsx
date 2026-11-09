@@ -6,6 +6,7 @@ import mainLogo from "@/assets/brand/mainlogo.svg"
 import { navItems, type DashboardNavItem } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
+import { navItemCount, useNavBadges } from "./nav-badges"
 
 // A child owns its nested pages (/manage-users/people/:id belongs to People),
 // except one that shares its group's path, which would otherwise match them all.
@@ -17,6 +18,26 @@ function groupMatches(pathname: string, item: DashboardNavItem) {
   return pathname === item.to || Boolean(item.children?.some((child) => childMatches(pathname, item, child.to)))
 }
 
+// Work waiting behind an entry: the pill is for sight; waitingName speaks the count as part of the name.
+function NavBadge({ count }: { count: number }) {
+  if (!count) return null
+  return (
+    <span
+      key={count}
+      aria-hidden="true"
+      className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-purple px-1.5 text-b4 font-bold tabular-nums text-white motion-safe:animate-in motion-safe:zoom-in-50"
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  )
+}
+
+// "Ad Requests, 3 waiting". An aria-label, because visually hidden text inside a flex row is
+// read with a stray space before the comma.
+function waitingName(label: string, count: number) {
+  return count ? `${label}, ${count} waiting` : undefined
+}
+
 function DashboardNavigationContent({
   onNavigate,
 }: {
@@ -24,6 +45,7 @@ function DashboardNavigationContent({
 }) {
   const { pathname } = useLocation()
   const navigationId = useId()
+  const badges = useNavBadges()
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
     () =>
       new Set(
@@ -79,6 +101,7 @@ function DashboardNavigationContent({
                   <button
                     type="button"
                     onClick={() => toggleGroup(item.label)}
+                    aria-label={waitingName(item.label, navItemCount(badges, item))}
                     className={cn(
                       "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
                       isGroupActive
@@ -94,6 +117,7 @@ function DashboardNavigationContent({
                       ) : null}
                     </span>
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                    <NavBadge count={navItemCount(badges, item)} />
                     <ChevronDown
                       aria-hidden="true"
                       className={cn("size-4 shrink-0 text-grey-400 transition-transform duration-200", isExpanded && "rotate-180")}
@@ -105,6 +129,7 @@ function DashboardNavigationContent({
                     to={item.to}
                     onClick={onNavigate}
                     end={item.to !== APP_ROUTES.rdi}
+                    aria-label={waitingName(item.label, navItemCount(badges, item))}
                     className={({ isActive }) =>
                       cn(
                         "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-b2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
@@ -122,6 +147,7 @@ function DashboardNavigationContent({
                       ) : null}
                     </span>
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                    <NavBadge count={navItemCount(badges, item)} />
                   </NavLink>
                 )}
 
@@ -140,6 +166,7 @@ function DashboardNavigationContent({
                             to={child.to}
                             onClick={onNavigate}
                             end={child.to === item.to}
+                            aria-label={waitingName(child.label, badges[child.to] ?? 0)}
                             className={({ isActive }) =>
                               cn(
                                 "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",
@@ -150,7 +177,8 @@ function DashboardNavigationContent({
                             }
                           >
                             <span className="size-1.5 shrink-0 rounded-full bg-grey-300 transition-colors group-aria-[current=page]/child:bg-purple" />
-                            <span className="truncate">{child.label}</span>
+                            <span className="min-w-0 flex-1 truncate">{child.label}</span>
+                            <NavBadge count={badges[child.to] ?? 0} />
                           </NavLink>
                         ))}
                       </div>

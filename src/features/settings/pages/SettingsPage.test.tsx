@@ -3,8 +3,14 @@ import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { createMemoryRouter, redirect, RouterProvider } from "react-router-dom"
 import { WorkspaceTheme } from "@/components/layout/WorkspaceTheme"
+import { playChime, useActivitySound } from "@/features/activity"
 import { APP_ROUTES } from "@/routes/paths"
 import { SettingsPage } from "./SettingsPage"
+
+vi.mock("@/features/activity", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/features/activity")>()),
+  playChime: vi.fn(),
+}))
 
 function renderSettings(logout = vi.fn(() => redirect(APP_ROUTES.login))) {
   const router = createMemoryRouter([
@@ -19,6 +25,8 @@ function renderSettings(logout = vi.fn(() => redirect(APP_ROUTES.login))) {
 afterEach(() => {
   localStorage.removeItem("adbox-theme")
   document.documentElement.classList.remove("dark", "light")
+  useActivitySound.setState({ soundEnabled: true })
+  vi.mocked(playChime).mockClear()
 })
 
 describe("Settings appearance", () => {
@@ -42,7 +50,8 @@ describe("Settings appearance", () => {
   it("reflects a previously saved choice when Settings opens", async () => {
     localStorage.setItem("adbox-theme", "dark")
     renderSettings()
-    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Dark mode is on"))
+    const appearance = within(screen.getByRole("region", { name: "Appearance" }))
+    await waitFor(() => expect(appearance.getByRole("status")).toHaveTextContent("Dark mode is on"))
     expect(screen.getByRole("button", { name: "Switch to light mode" })).toBeVisible()
   })
 
@@ -54,5 +63,29 @@ describe("Settings appearance", () => {
     await screen.findByRole("heading", { name: "Sign in" })
     expect(logout).toHaveBeenCalledOnce()
     expect(router.state.location.pathname).toBe(APP_ROUTES.login)
+  })
+})
+
+describe("Settings notifications", () => {
+  it("turns the new-work chime off and on, and remembers the choice", async () => {
+    const user = userEvent.setup()
+    renderSettings()
+    const notifications = within(screen.getByRole("region", { name: "Notifications" }))
+    expect(notifications.getByRole("status")).toHaveTextContent("Sound is on")
+
+    await user.click(notifications.getByRole("button", { name: "Turn sound off" }))
+    expect(notifications.getByRole("status")).toHaveTextContent("Sound is off")
+    expect(JSON.parse(localStorage.getItem("adbox-activity-sound") ?? "{}")).toMatchObject({ state: { soundEnabled: false } })
+
+    await user.click(notifications.getByRole("button", { name: "Turn sound on" }))
+    expect(notifications.getByRole("status")).toHaveTextContent("Sound is on")
+  })
+
+  it("plays the chime on request, even when another tab just played it", async () => {
+    const user = userEvent.setup()
+    renderSettings()
+    const notifications = within(screen.getByRole("region", { name: "Notifications" }))
+    await user.click(notifications.getByRole("button", { name: "Play sound" }))
+    expect(playChime).toHaveBeenCalledWith({ force: true })
   })
 })
