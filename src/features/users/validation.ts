@@ -480,6 +480,8 @@ export const pageRequestSchema = z.object({
     /** "Student badge (University of Ghana)"; null without one. */
     badge: optionalText,
     upheldReports: count,
+    /** A page or business asked: only people run accounts, so it can't be approved. */
+    isAccount: flag,
   }),
   sentAt: timestamp,
   status: z.enum(pageRequestStatuses),
@@ -548,6 +550,8 @@ export const businessRequestSchema = z.object({
     joinedAt: timestamp,
     emailVerified: flag,
     upheldReports: count,
+    /** A page or business asked: only people run accounts, so it can't be approved. */
+    isAccount: flag,
   }),
   sentAt: timestamp,
   status: z.enum(pageRequestStatuses),

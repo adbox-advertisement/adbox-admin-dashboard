@@ -1,5 +1,15 @@
 import assert from 'node:assert/strict'
 
+/** The institution catalogue the dashboard map reads (GET /institutions); app.smoke.mjs serves it. */
+export const dashboardInstitutions = [
+  { id: 'i-ug', name: 'University of Ghana', shortName: 'UG', type: 'TRADITIONAL_UNIVERSITY', region: 'Greater Accra', town: 'Legon', isActive: true },
+  { id: 'i-acce', name: 'Accra College of Education', shortName: 'ACCE', type: 'PUBLIC_COLLEGE_OF_EDUCATION', region: 'Greater Accra', town: 'Accra', isActive: true },
+  { id: 'i-knust', name: 'Kwame Nkrumah University of Science and Technology', shortName: 'KNUST', type: 'TRADITIONAL_UNIVERSITY', region: 'Ashanti', town: 'Kumasi', isActive: true },
+  { id: 'i-tnmtc', name: 'Tamale Nursing and Midwifery Training College', shortName: 'TNMTC', type: 'PUBLIC_HEALTH_TRAINING', region: 'Northern', town: 'Tamale', isActive: true },
+  // A town with no known position: drawn at its region's centre.
+  { id: 'i-new', name: 'New Volta College', shortName: 'NVC', type: 'PRIVATE_TERTIARY', region: 'Volta', town: 'Somewhere New', isActive: true },
+]
+
 export async function checkDashboardContent(page, baseUrl) {
   await page.setViewportSize({ width: 1440, height: 1100 })
   await page.goto(baseUrl + '/dashboard')
@@ -32,14 +42,21 @@ export async function checkDashboardContent(page, baseUrl) {
   await page.getByRole('button', { name: 'Last week', exact: true }).click()
   await page.getByRole('dialog').waitFor({ state: 'hidden' }).catch(() => {})
 
-  // Geography: switching the selected region updates the pressed state.
-  // Match the exact region row, not "Western North" which also contains "Western".
-  const western = page.getByRole('button', { name: /^Western \d+%$/ })
-  const greaterAccra = page.getByRole('button', { name: /^Greater Accra \d+%$/ })
+  // Institutions map: every institution on the 16 regions; the busiest region opens first.
+  const map = page.getByRole('article', { name: 'Institutions across Ghana' })
+  await map.getByText('5 institutions in 16 regions.', { exact: false }).waitFor()
+  await map.getByRole('img', { name: /Map of Ghana's 16 regions with 5 institutions/ }).waitFor()
+  assert.equal(await map.locator('svg[role=img] circle.pointer-events-none').count(), 5)
+  const regions = map.getByRole('region', { name: 'Regions' })
+  assert.equal(await regions.getByRole('button').count(), 16)
+  const greaterAccra = regions.getByRole('button', { name: 'Greater Accra, 2 institutions' })
+  const ashanti = regions.getByRole('button', { name: 'Ashanti, 1 institution' })
   assert.equal(await greaterAccra.getAttribute('aria-pressed'), 'true')
-  await western.click()
-  assert.equal(await western.getAttribute('aria-pressed'), 'true')
+  await map.getByRole('region', { name: 'Institutions in Greater Accra' }).getByText('University of Ghana').waitFor()
+  await ashanti.click()
+  assert.equal(await ashanti.getAttribute('aria-pressed'), 'true')
   assert.equal(await greaterAccra.getAttribute('aria-pressed'), 'false')
+  await map.getByRole('region', { name: 'Institutions in Ashanti' }).getByText('Kwame Nkrumah University of Science and Technology').waitFor()
 
   // Top publishers table.
   await page.getByRole('heading', { name: 'Top Publishers' }).waitFor()
@@ -50,8 +67,7 @@ export async function checkDashboardContent(page, baseUrl) {
   assert.equal(await page.getByRole('button', { name: /^Open actions for/ }).count(), 5)
   assert.ok((await page.getByText('Approve', { exact: true }).count()) >= 5)
 
-  // Earning breakdown legend. Scoped to its own card: percentages like "10%"
-  // also appear in the Top Regions table and would otherwise be ambiguous.
+  // Earning breakdown legend, scoped to its own card.
   const earningCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'Earning Breakdown', exact: true }) })
   await earningCard.waitFor()
   for (const [label, value] of [['Video Ad', '10%'], ['Survey Ad', '60%'], ['Picture Ad', '30%']]) {
@@ -66,5 +82,5 @@ export async function checkDashboardContent(page, baseUrl) {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, '/dashboard overflows at ' + width)
   }
   await page.setViewportSize({ width: 1440, height: 1000 })
-  console.log('Dashboard: KPI tiles with trend badges, chart, date range, geography selection, publishers, approvals, earning breakdown, and responsive layouts passed')
+  console.log('Dashboard: KPI tiles with trend badges, chart, date range, institutions map and region selection, publishers, approvals, earning breakdown, and responsive layouts passed')
 }

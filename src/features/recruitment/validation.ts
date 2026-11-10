@@ -24,7 +24,8 @@ export const applicationSchema = applicationSummarySchema.extend({
 })
 export const statsSchema = z.object({
   total: z.number().int().nonnegative(), byStatus: z.record(statusSchema, z.number().int().nonnegative()),
-  byInstitution: z.array(z.object({ institutionId: z.string(), slug: z.string().nullable(), name: z.string().nullable(), count: z.number().int().nonnegative() })),
+  // `byStatus` per institution arrived in November 2026; an older server leaves it out.
+  byInstitution: z.array(z.object({ institutionId: z.string(), slug: z.string().nullable(), name: z.string().nullable(), count: z.number().int().nonnegative(), byStatus: z.partialRecord(statusSchema, z.number().int().nonnegative()).optional() })),
 })
 export const campaignSchema = campaignSummarySchema.extend({
   referenceCode: z.string(), opensAt: date, closesAt: date, isActive: z.boolean(), isOpen: z.boolean(),

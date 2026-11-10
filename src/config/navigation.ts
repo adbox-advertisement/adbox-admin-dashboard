@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { Banknote, CircleHelp, CirclePlay, GraduationCap, LayoutDashboard, LibraryBig, Settings, UserRound, UsersRound, Video } from "lucide-react"
+import { Banknote, CircleHelp, CirclePlay, Gift, GraduationCap, LayoutDashboard, LibraryBig, Settings, UserRound, UsersRound, Video } from "lucide-react"
 import rdiMark from "@/assets/brand/rdi-mark.svg"
 import { APP_ROUTES } from "@/routes/paths"
 
@@ -11,6 +11,8 @@ export type DashboardNavItem = {
   children?: Array<{
     label: string
     to: string
+    /** Sub-items sharing a group are listed under its heading, in order. */
+    group?: string
   }>
 }
 
@@ -26,13 +28,13 @@ export const navItems: DashboardNavItem[] = [
     to: APP_ROUTES.manageUsers,
     children: [
       { label: "Overview", to: APP_ROUTES.manageUsers },
-      { label: "People", to: APP_ROUTES.manageUsersPeople },
-      { label: "Institutions", to: APP_ROUTES.manageUsersInstitutions },
-      { label: "Publishers & Companies", to: APP_ROUTES.manageUsersCompanies },
-      { label: "Business requests", to: APP_ROUTES.manageUsersBusinessRequests },
-      { label: "Page requests", to: APP_ROUTES.manageUsersPageRequests },
-      { label: "Verification", to: APP_ROUTES.manageUsersVerification },
-      { label: "Honours", to: APP_ROUTES.manageUsersHonours },
+      { label: "People", to: APP_ROUTES.manageUsersPeople, group: "Directory" },
+      { label: "Institutions", to: APP_ROUTES.manageUsersInstitutions, group: "Directory" },
+      { label: "Companies", to: APP_ROUTES.manageUsersCompanies, group: "Directory" },
+      { label: "Verification", to: APP_ROUTES.manageUsersVerification, group: "To review" },
+      { label: "Business requests", to: APP_ROUTES.manageUsersBusinessRequests, group: "To review" },
+      { label: "Page requests", to: APP_ROUTES.manageUsersPageRequests, group: "To review" },
+      { label: "Honours", to: APP_ROUTES.manageUsersHonours, group: "To review" },
     ],
   },
   {
@@ -41,10 +43,10 @@ export const navItems: DashboardNavItem[] = [
     to: APP_ROUTES.userContent,
     children: [
       { label: "Overview", to: APP_ROUTES.userContent },
-      { label: "Posts", to: APP_ROUTES.userContentPosts },
-      { label: "Ads", to: APP_ROUTES.userContentAds },
-      { label: "Surveys", to: APP_ROUTES.userContentSurveys },
-      { label: "Reports", to: APP_ROUTES.userContentReports },
+      // Ads live in Ads Management; one person's ads show in their content view (the uploader filter).
+      { label: "Posts", to: APP_ROUTES.userContentPosts, group: "Content" },
+      { label: "Surveys", to: APP_ROUTES.userContentSurveys, group: "Content" },
+      { label: "Reports", to: APP_ROUTES.userContentReports, group: "To review" },
     ],
   },
   {
@@ -64,6 +66,17 @@ export const navItems: DashboardNavItem[] = [
       { label: "Gold & pricing", to: APP_ROUTES.goldPricing },
       { label: "Advertisers Payment", to: APP_ROUTES.advertisersPayment },
       { label: "Withdrawals", to: APP_ROUTES.withdrawals },
+    ],
+  },
+  {
+    label: "Rewards",
+    icon: Gift,
+    to: APP_ROUTES.rewards,
+    children: [
+      { label: "Overview", to: APP_ROUTES.rewards },
+      { label: "Redemption requests", to: APP_ROUTES.rewardRequests, group: "To review" },
+      { label: "Rewards catalog", to: APP_ROUTES.rewardCatalog, group: "Manage" },
+      { label: "Partners", to: APP_ROUTES.rewardPartners, group: "Manage" },
     ],
   },
   {

@@ -3,13 +3,14 @@ import { ChevronRight, CircleCheck, CircleSlash, Flag, Inbox, MessagesSquare, Sh
 import { Pagination } from "@/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "../lib/cn"
+import { APP_ROUTES } from "@/routes/paths"
 import { useChatReports, useContentReports, useListParams, useOpenReportCounts } from "../hooks"
 import { contentErrorMessage } from "../lib/errors"
 import { formatDate, formatRelative } from "../lib/format"
 import { chatReportPath, contentReportPath } from "../lib/paths"
 import { reportReasonLabels, uploaderName, type ChatReport, type ContentReport, type ReportReason, type ReportStatus } from "../types"
 import { reportReasons, reportStatuses } from "../validation"
-import { EmptyState, ErrorState, FilterChips, Segmented, Toolbar, focusRing, ink, muted, skeleton, surface } from "../components/ContentBits"
+import { EmptyState, ErrorState, FilterChips, MoreLink, PageIntro, Segmented, Toolbar, focusRing, ink, muted, skeleton, surface } from "../components/ContentBits"
 import { ReasonPill } from "../components/ReportBits"
 import { isUrgent, reportTargetIcons, reportTargetLabels } from "../lib/reports"
 
@@ -31,12 +32,15 @@ export function ReportsPage() {
   const noun = queue === "content" ? "reports" : "message reports"
 
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
+    <PageIntro action={<MoreLink to={APP_ROUTES.reportedAds}>Reported ads</MoreLink>}>
+      Reports on posts, comments and messages, oldest first. Resolving one resolves every open report on the same {queue === "content" ? "post or comment" : "message or conversation"}. Reports on ads are in Ads Management.
+    </PageIntro>
     <Toolbar>
       <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <Segmented label="Report queue" value={queue} onChange={(next) => update({ ...values, queue: next })} className="max-w-full overflow-x-auto"
           options={[
-            { value: "content", label: `Posts & comments${open.content ? ` · ${open.content}` : ""}`, icon: Flag },
-            { value: "messages", label: `Messages${open.messages ? ` · ${open.messages}` : ""}`, icon: MessagesSquare },
+            { value: "content", label: "Posts & comments", icon: Flag, count: open.content },
+            { value: "messages", label: "Messages", icon: MessagesSquare, count: open.messages },
           ]} />
         <Select value={values.reason} onValueChange={(next) => update({ ...values, reason: next })}>
           <SelectTrigger aria-label="Report reason" className="h-11 w-full cursor-pointer rounded-full border-grey-200 bg-grey-50 text-b3 dark:border-border dark:bg-background md:w-[220px] md:text-b2"><SelectValue /></SelectTrigger>
@@ -52,8 +56,6 @@ export function ReportsPage() {
         { value: "DISMISSED", label: "Dismissed", icon: CircleSlash },
       ]} />
     </Toolbar>
-
-    {status === "OPEN" && <p className={cn("px-1 text-b3", muted)}>Oldest first. Resolving a report resolves every open report on the same {queue === "content" ? "post or comment" : "message or conversation"}.</p>}
 
     {list.isPending && <ReportsSkeleton />}
     {list.isError && <div className={surface}><ErrorState message={contentErrorMessage(list.error, "Could not load reports.")} onRetry={() => void list.refetch()} /></div>}

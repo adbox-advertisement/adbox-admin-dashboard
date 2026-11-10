@@ -2,6 +2,186 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Rewards: partners and gold-bar redemptions on sample data (2026-11-10)
+
+- Request: partners (MTN, Telecel, AT/AirtelTigo, Melcom) supply airtime, data bundles and vouchers; people redeem
+  them with gold bars; admins approve each request. Wanted a partners page, admin features, navigation and dummy data.
+- New feature `src/features/rewards/` (routes in `routes/paths.ts`, `rewardsRoutes` in `routes/router.ts` after
+  `supportRoutes`; RDI wiring untouched). Sidebar (`config/navigation.ts`, Gift icon, after Financials): Overview ·
+  To review: Redemption requests · Manage: Rewards catalog, Partners. New shared primitive `components/ui/switch.tsx`
+  (`@radix-ui/react-switch` was already a dependency).
+- Layers: `api.ts` (in-memory sample, returns copies; `sampleRewards.latency`/`deliveryMs`, `resetSampleRewards`) →
+  `hooks.ts` → pages. Data `data/sample-rewards.ts` (store rate 50 bars per GH₵; real partner names, invented
+  contacts/people/figures). Checks in `lib/rewards.ts`: new account (<14 days problem, <60 look), phone shared with
+  another account (problem), unverified phone (look), over the monthly limit, ≥3 requests in a day, voucher stock,
+  paused partner, switched-off reward → All clear / Take a look / High risk.
+- Pages: overview (how it works, figures, waiting list, delivered by partner, low codes); requests (status tabs
+  with counts, search, partner and checks filters in the URL, quick Approve for all-clear rows, Approve all N with
+  confirm, review sheet with checks/history/approve/reject with reason/retry/refund/next request, paging by 20);
+  catalog (price vs store rate, edit dialog, limit, stock, on/off switch); partners and partner detail (settlement
+  this month at face value less discount, voucher batches + Add codes, contact, pause/make active, recent requests).
+- Tests: `lib/rewards.test.ts`, `api.test.ts`, `pages/Rewards.test.tsx` (28); `tests/smoke/rewards.smoke.mjs` (default
+  run and `ADBOX_SMOKE_FEATURE=rewards`). `SupportPage.test.tsx` search wait raised to 3 s (flaked under full-suite
+  load). Checks: lint, architecture, `typecheck:test`, build pass; `npm run test` 441/442 with the known Recruitment
+  "displays every submitted answer" timeout under load (passes alone); full `npm run test:smoke` passed.
+- Not done / next: no backend. A real service needs redemption, offer, partner and code-batch endpoints plus a
+  gold hold/return ledger and partner top-up integrations; replace `api.ts` only. The mobile app has no redeem flow.
+
+## Support help desk on sample data (2026-11-10)
+
+- Request: "write a work of the art support page sample with no real endpoints but sample data". New feature
+  `src/features/support/` replaces the Support pending page (`config/pending-pages.ts` entry removed, `supportRoutes`
+  added to `routes/router.ts`; RDI wiring untouched).
+- Layers kept so a real service can drop in: `api.ts` (in-memory sample desk, `sampleDesk.latency`,
+  `resetSampleDesk`) → `hooks.ts` (TanStack Query; `useResetSampleDesk`, `useNow`) → components. Data:
+  `data/sample-desk.ts` (16 invented conversations, 12 customers, 3 agents, 6 saved replies; times relative to now so
+  reply deadlines tick). Logic: `lib/desk.ts` (views, urgency order, deadline states, labels).
+- UI (`pages/SupportPage.tsx`, `components/TicketList.tsx`, `TicketConversation.tsx`, `SupportBits.tsx`): sample banner
+  with Reset, four figures (need a reply with overdue, unassigned, median first reply, satisfaction; the last two are
+  fixed sample figures), views with counts, search across messages, topic and order, list + conversation from `lg`
+  (phones: list, then conversation with Back), customer rail from `2xl` (collapsible card below that), status /
+  priority / assignee, reply vs internal note, saved replies with the first name filled in, Send & resolve,
+  Ctrl+Enter, J/K/R/`/` shortcuts. Replies never leave the tab.
+- Tests: `lib/desk.test.ts`, `api.test.ts`, `pages/SupportPage.test.tsx` (16); `tests/smoke/support.smoke.mjs` (in the
+  default run and `ADBOX_SMOKE_FEATURE=support`). Checks: `npm run check` (64 files, 414 tests, build, architecture) and
+  the full `npm run test:smoke` passed.
+
+## Recruitment rewritten around the pipeline (2026-11-10)
+
+- Request: "write the recruitment side again. its a little confusing to know what is going on". Found: the same
+  counts three times (slogan banner with "84% progress", four stat cards, an overflowing stage tab bar), no picture
+  of the process, campus totals without outcomes, a filler tips card, the campaign repeated on every row, and a
+  candidate Review tab with two separate forms (assessment save + a stage dropdown). Owner chose **pipeline first**
+  and allowed **one backend addition**.
+- Page (`pages/RecruitmentPage.tsx`, `components/RecruitmentOverview.tsx`): campaign line (open/closed, places per
+  campus; picker only with several campaigns and `recruitment.campaigns.manage`), a "waiting for a first look"
+  callout (**Review new applications**), **Where every application is** (5 stages + Closed, each a filter;
+  **All candidates**), then candidates with a **Next step** column and **Campuses** (accepted · in progress when the
+  server sends it). Standard page header (route no longer `compactHeader`). Stage names: SUBMITTED → "New",
+  UNDER_REVIEW → "In review" everywhere (`lib/workflow.ts`: `pipeline`, `stageGuide`, `advanceLabels`, `nextStage`).
+- Candidate (`CandidateDetails.tsx`): stage tracker + **Next step** bar (one forward button such as Start review /
+  Shortlist / Mark as interviewed / Accept, then "Move to …" with an optional note; Reject… requires a reason;
+  Withdrawn…; final stages warned). Tabs: Application · Notes & history (`CandidateNotes.tsx`: rating, internal
+  note, history) · Contact. `CandidateReview.tsx` removed. Read-only admins see the next step in words, no buttons.
+- Backend (`adbox-backend`, uncommitted): `GET /recruitment/applications/stats` `byInstitution[]` gains `byStatus`
+  (groupBy institution+status; every status present); spec added; `docs/recruitment-api.md` noted. The super-admin
+  container needs a rebuild for campuses to show accepted/in progress; until then they show totals.
+- Tests: `RecruitmentPage.test.tsx` (pipeline, next step, reject reason, view-only, new tab names),
+  `tests/smoke/recruitment.smoke.mjs` (pipeline, Start review → Shortlist, campus counts). Checks: `npm run check`
+  (61 files, 398 tests, build), full `npm run test:smoke` passed; backend recruitment jest (58 admin, 125 all), tsc,
+  ESLint clean on touched files. The first recruitment-only smoke run stopped on the known
+  `/video-management/upload overflows at 320` flake in the shared shell check; the rerun passed.
+
+## Dashboard: institutions across Ghana (2026-11-10)
+
+- Request: "the map of ghana with all the 16 regions taking up a significant space … all the institutions in ghana
+  will be represented on there", then "bring the map to the middle". Owner chose a **dot per institution** and a
+  **full-width card with the map in the centre** (regions left, the selected region's institutions right).
+- Replaced the old design-file map (16 decorative SVG pieces with wrong region names such as "Central East" and
+  "Greater Accra Coast", mock users/viewers/publishers per region) and its "Top Regions" table; the 16
+  `src/assets/dashboard/ghana-map-*.svg` files and `geography-bar-icon.svg` are deleted. Top Publishers moved into
+  `DashboardTopPublishers.tsx`, under Earning Breakdown beside Pending Approvals; `data/geography.ts` now holds only
+  publishers. Page order (owner's request): filters, KPI tiles, audience cards, the map card, then User Overview.
+- New: `api.ts`/`hooks.ts` (`GET /institutions`, 5 min stale), `data/ghana-regions.ts` (generated: geoBoundaries
+  simplified ADM1, equirectangular at 8°N, ~0.6 km simplification, ~34 kB), `data/ghana-towns.ts` (143 places from
+  the local catalogue, looked up on OSM Nominatim and checked inside their region; Berekuso kept on OSM's
+  "Eastern" though it sits on the border), `lib/institution-map.ts` (groups, labels, placement, region summaries,
+  shade steps), `components/DashboardInstitutionMap.tsx`. Colours validated with the dataviz checker for every pair
+  in light (`#5946e8`, `#eb6834`, `#1baf7a`) and dark (`#6d5df6`, `#d95926`, `#199e70`); aqua is under 3:1 on white,
+  so the legend and lists label everything.
+- The local `adbox_test` catalogue: 265 institutions, all 16 regions; every town placed. A new town in the catalogue
+  shows at its region's centre until it is added to `ghana-towns.ts` (better long term: latitude/longitude on
+  `Institution` in the backend).
+- Tests: `lib/institution-map.test.ts`, `components/DashboardInstitutionMap.test.tsx`; `tests/smoke/dashboard.smoke.mjs`
+  checks the map and region selection; `app.smoke.mjs` serves `dashboardInstitutions` for `/api/v1/institutions`
+  (other parts unchanged). Checks: `npm run check` (61 files, 396 tests, build) and the full `npm run test:smoke`
+  passed.
+
+## User Content made consistent (2026-11-10)
+
+- Request: "do similar for user content make it less confusing" (after Manage Users, below). Same pattern: no in-page
+  section bar, a header title per route (Posts, Post, Ads, Surveys, Reports, Report, Message report), a `PageIntro`
+  line on each list (`components/ContentBits.tsx`, the feature's own copy; features don't share UI).
+- Owner chose **ads only in a person's view**: the User Content sidebar is Overview, **Content** (Posts, Surveys) and
+  **To review** (Reports). `/user-content/ads` without `?userId=` redirects to Ads Management (no request is made);
+  the Overview's "Ads running now" links there unless an uploader is selected. The ad sheet's note links to Ads
+  Management.
+- The uploader banner now carries that uploader's own sections (Overview, Posts, Ads, Surveys) as a nav named
+  "Content by <name>", since the sidebar can't keep `?userId=`. Reports stay unscoped.
+- Toolbars: Surveys' chips moved under its search like the other lists; Reports' queue counts are badges
+  (`Segmented` takes `count`), and its "oldest first" note is the intro, with a "Reported ads" link.
+- Shared: `DashboardSidebar` treats any page under a section's path as that section (so User Content stays open on
+  per-uploader Ads). RDI has no sub-items and is unaffected.
+- Tests: `UserContent.test.tsx` (banner sections, unscoped Ads redirect, Ads tile link), sidebar group tests scoped
+  per section, `tests/smoke/user-content.smoke.mjs` (Ads through the uploader, Surveys/Reports from the sidebar).
+  The uploader banner keeps the name whole on phones (buttons wrap below it).
+- Checks: content + layout vitest 53/53; `npm run check`: architecture, lint, test types pass, vitest 382/385 with
+  Recruitment timeouts under load (passes alone, 10/10), `npm run build` passes; the full default
+  `npm run test:smoke` (every section, RDI included) passed, as did `ADBOX_SMOKE_FEATURE=content` and `=users`. The
+  Manage Users smoke now finds its "To review" group inside the Manage Users menu (User Content has one too).
+
+## Manage Users made consistent (2026-11-10)
+
+- Request: "the manage users section is a little confusing … work all the sections or the sub pages". Found: the
+  sidebar and an in-page tab bar both listed the 8 sections (the tab bar overflowed at 1440 and hid Honours), every
+  page was titled "Manage Users", directories and review queues were mixed, each page had its own intro/filter style,
+  Verification had no column headings, and Companies' row Approve button was clipped. Owner chose: **sidebar only**
+  (grouped), **Business and Page requests stay separate**.
+- Navigation: `src/config/navigation.ts` children take an optional `group`; Manage Users is Overview, then
+  **Directory** (People, Institutions, Companies) and **To review** (Verification, Business requests, Page requests,
+  Honours). `DashboardSidebar` renders a heading per group (`role="group"`). "Publishers & Companies" is now
+  "Companies" (also the live-activity toast label). RDI's entry is untouched.
+- `ManageUsersLayout` keeps only the permission gate and redirects (no tab bar). Each child route has a header title
+  (`routes.ts`: People, Profile, Institutions, Institution, Companies, Company, Business request(s), Page request(s),
+  Verification, Honours).
+- Overview opens on **Waiting for review**: a tile per queue the admin may open (verification, companies to approve →
+  `companies?status=PENDING_VERIFICATION`, business and page requests, honour nominees), then the figures; the fourth
+  figure is now "Suspended by AdBox".
+- New `components/ListParts.tsx` (`PageIntro`, `ListToolbar`, `StatusFilter`, `SearchField`) used by People,
+  Institutions, Companies, Verification, Business and Page requests and Honours. Filter names read "All open 2"
+  (counts only when non-zero). Companies rows link to the company (Review/View) instead of inline approve/reject;
+  the company page keeps both actions. Verification is a table with headings and inline decisions. Honours' year
+  picker is in the list toolbar.
+- Tests: `ManageUsers.test.tsx` (queues instead of the tab bar), request tests' filter names, new
+  `ListParts.test.tsx`, a group test in `DashboardSidebar.test.tsx`; `tests/smoke/manage-users.smoke.mjs` navigates
+  by the sidebar and checks the Overview queues.
+- Checks: users + layout vitest (80) and the new tests passed; `ADBOX_SMOKE_FEATURE=users npm run test:smoke` passed
+  on the second run (the first stopped in the shared shell check: `/video-management/posts overflows at 320`, which
+  did not reproduce alone or on rerun). Full `npm run check`: architecture, lint, test types pass; vitest 381/383
+  with two Recruitment timeouts under load (that file passes alone, 10/10); `npm run build` passes. Phones now
+  scroll the Verification table sideways like the other lists (it used to stack each request).
+- Not changed: detail pages (profile, institution, company, request review) beyond their header titles; the sidebar
+  still shows sections an admin can't open (they show "no access"), as for every other section.
+
+## Only people run accounts: page and business requests (2026-11-09)
+
+- Reported: on @cool (a page run by @efua.quaye, @esi.arthur, @nii.lartey), switching to @coolshop said "Switch back
+  to your own account to open another one". @coolshop was requested while @cool was in use, so the gateway filed it
+  under @cool and approval made @cool its only owner: nobody could open it. Decided (owner): a page or business may
+  not own a page or business.
+- Backend (`adbox-backend`, branch `test`, uncommitted; `docs/business-accounts.md`, `docs/group-pages.md`): new
+  `@CurrentPerson()` (`apps/api-gateway/src/decorators/current-person.decorator.ts`, the person behind a switched
+  session); every `/page-requests` and `/business-requests` route uses it; their `create` refuses a page or business
+  (403, `isRunAccount` / `RUN_BY_PEOPLE_ONLY` in `libs/group-pages`). Super-admin: the request's `requester.isAccount`,
+  a first "Sent by a page or business" problem check, and approve refuses it (409). Invites use the shared message.
+- Dashboard: `requester.isAccount` in both request schemas (`src/features/users/validation.ts`); Page and Business
+  request review pages start on Decline for such a request and disable Approve with `sentByAccountNote`
+  (`lib/page-requests.ts`). Tests added to `PageRequests.test.tsx` and `BusinessRequests.test.tsx`.
+- App (`adbox-mobile-mvp`, uncommitted): Request a page says whose the request will be while a page or business is in
+  use; forms name that person and don't pre-fill the page's own contact. See its `docs/HANDOFF.md`.
+- Local data (`adbox_test`, with the owner's approval): @coolshop's `AccountMember` row and request BR-0005 moved from
+  @cool to @efua.quaye. No other account was run by a page or business.
+- Checks: dashboard architecture, lint, test types and `npm run build` pass; vitest passed except two unrelated
+  timeouts (User Content, Recruitment) under load, and both files pass alone. Backend: both apps' `tsc`, Prettier, 12 affected jest suites (gateway requests,
+  accounts, decorators, group-pages lib, super-admin requests). ESLint: no new errors in production files; the new
+  spec cases add a few `no-unsafe-*` errors of the kind those spec files already had. App: analyze clean, tests above.
+  Docker: `api-gateway` and `super-admin` images rebuilt and recreated (`up -d --no-deps`, no migration needed);
+  both healthy, gateway Swagger shows the new request text. Build with a `DOCKER_CONFIG` that links
+  `~/.docker/cli-plugins` and `contexts` but has no `credsStore` (an empty one hides the compose plugin).
+- Not changed: switching from a page or business straight to an account not yet saved on the phone still gets the
+  server's "switch back" refusal (by design, `accounts.service.ts`). Possible follow-ups: let `openSession` act for
+  the person behind the session, and make `GET /accounts/mine` do the same so the switcher lists all their accounts.
+
 ## Live activity: waiting-work badges, toasts and a chime (2026-11-08)
 
 - Request: "shows some sort of notification to every section of the navigation if something pops up, like

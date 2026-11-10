@@ -30,11 +30,19 @@ sibling repositories had unrelated uncommitted work; they were inspected only.
 
 ## What an administrator sees
 
-The AdBox welcome panel shows review progress (the share of applications moved
-beyond SUBMITTED) and a **Review new applications** shortcut. Summary cards for
-all applicants, new applications, shortlisted, and accepted candidates also act
-as filters. Every backend stage remains accessible in the queue's scrollable
-stage bar. A side panel shows institution coverage and review guidance.
+The page (redesigned November 2026) reads top to bottom: the campaign in view
+(title, open until / closed, places per campus; a campaign picker only when there
+are several and the admin manages campaigns), a **waiting for a first look**
+callout with **Review new applications** while new applications wait, then
+**Where every application is**: the five stages left to right (New, In review,
+Shortlisted, Interviewed, Accepted) with counts and what each means, and a
+Closed group (Rejected, Withdrawn). Selecting a stage filters the candidate list;
+**All candidates** clears it. One name per stage is used everywhere (SUBMITTED
+shows as "New", UNDER_REVIEW as "In review"). The list has a **Next step** column
+("Give it a first look", "Decide whether to shortlist", "Interview them", "Accept
+or reject"). **Campuses** beside it show each institution's applications and,
+from a super-admin with per-institution `byStatus` in the stats, how many are
+accepted and still in progress.
 
 Overview counts follow the campaign filter; text search, institution, and stage
 narrow the queue without redefining totals. The queue is server-paginated,
@@ -44,8 +52,11 @@ immediately. Filter chips can be removed individually. Changing filters or page
 size returns to page one. Queue/statistics refresh every minute while the page
 is active, and **Refresh** requests an immediate update.
 
-Open a candidate for four tabs: **Application**, **Review**, **Contact**, and
-**History**. Data stays in TanStack Query and component memory, without local
+A candidate opens with a stage tracker and a **Next step** bar: one button moves
+it forward (Start review, Shortlist, Mark as interviewed, Accept), beside
+**Reject…** (a reason is required) and **Withdrawn…**; each asks for an optional
+note before it is saved and warns when the stage is final. Tabs: **Application**,
+**Notes & history** (rating, private note, review history) and **Contact**. Data stays in TanStack Query and component memory, without local
 storage or Zustand copies. Review/contact drafts survive tab changes while the
 profile remains open; closing the profile discards unsaved drafts.
 
@@ -63,12 +74,12 @@ Both appearances cover navigation, account display, mobile menu, candidate list,
 profile tabs, review forms, video containers, exports, dropdown portals, errors,
 and success notifications. Shared AdBox fonts and existing purple/blue/cyan and
 neutral tokens supply the palette; dark surfaces use mixes of existing tokens.
-Sheets respect reduced-motion preferences. The profile has a **Go to review**
-shortcut, and the introduction video appears first on smaller screens.
+Sheets respect reduced-motion preferences. The introduction video appears first on
+smaller screens.
 
 `WorkspaceTheme` is mounted in `AppProviders` above the router. Every application
 section shares the preference, including sign-in, RDI/CMS, and website previews.
-`compactHeader: true` in recruitment route metadata selects its header layout.
+Recruitment uses the standard page header like every other section.
 
 | Applicant submission | Admin presentation |
 | --- | --- |

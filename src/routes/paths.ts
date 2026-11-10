@@ -29,6 +29,10 @@ export const APP_ROUTES = {
   advertisersPayment: "/financials/advertisers-payment",
   withdrawals: "/financials/withdrawals",
   support: "/support",
+  rewards: "/rewards",
+  rewardRequests: "/rewards/requests",
+  rewardCatalog: "/rewards/catalog",
+  rewardPartners: "/rewards/partners",
   manageAdmins: "/manage-admins",
   settings: "/settings",
 } as const

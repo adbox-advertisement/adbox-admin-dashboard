@@ -180,8 +180,13 @@ export async function checkManageUsers(page, baseUrl) {
   // Overview: breakdowns link straight into a filtered People list.
   await page.goto(baseUrl + '/manage-users')
   await page.getByRole('heading', { name: 'Manage Users', exact: true }).waitFor()
-  const sections = page.getByRole('navigation', { name: 'Manage Users sections' })
-  await sections.getByRole('link', { name: /Publishers & Companies.*1 waiting/ }).waitFor()
+  // The sidebar moves between sections; the Overview opens on what waits in each queue.
+  const sections = page.getByRole('navigation', { name: 'Dashboard navigation' })
+  const usersMenu = page.locator('#' + await sections.getByRole('button', { name: /^Manage Users/ }).getAttribute('aria-controls'))
+  await usersMenu.getByRole('group', { name: 'To review' }).getByRole('link', { name: 'Verification', exact: true }).waitFor()
+  const queues = page.getByRole('list', { name: 'Review queues' })
+  await queues.getByRole('link', { name: 'Companies to approve: 1 waiting' }).waitFor()
+  await queues.getByRole('link', { name: 'Verification: 1 waiting' }).waitFor()
   await page.getByRole('list', { name: 'People by account role' }).getByRole('link', { name: /^Publisher:/ }).waitFor()
   await noOverflow('/manage-users')
   await page.getByRole('list', { name: 'People by account role' }).getByRole('link', { name: /^Creator:/ }).click()
@@ -221,7 +226,8 @@ export async function checkManageUsers(page, baseUrl) {
   await noOverflow('/manage-users/people/:id')
 
   // Institutions drill down to campuses and members.
-  await sections.getByRole('link', { name: 'Institutions' }).click()
+  await sections.getByRole('link', { name: 'Institutions', exact: true }).click()
+  await page.getByRole('heading', { level: 1, name: 'Institutions' }).waitFor()
   await page.getByRole('button', { name: /^UG/ }).click()
   await page.getByRole('heading', { level: 1, name: 'University of Ghana' }).waitFor()
   await page.getByRole('radio', { name: 'Alumni' }).click()
@@ -230,8 +236,10 @@ export async function checkManageUsers(page, baseUrl) {
   await noOverflow('/manage-users/institutions/:id')
 
   // Companies: approve from the detail page.
-  await sections.getByRole('link', { name: /Publishers & Companies/ }).click()
-  await page.getByRole('button', { name: 'Kofi Foods' }).click()
+  await sections.getByRole('link', { name: 'Companies', exact: true }).click()
+  await page.getByRole('heading', { level: 1, name: 'Companies' }).waitFor()
+  await noOverflow('/manage-users/companies')
+  await page.getByRole('link', { name: 'Review Kofi Foods' }).click()
   await page.getByRole('heading', { level: 1, name: 'Kofi Foods' }).waitFor()
   await page.getByRole('button', { name: 'Approve', exact: true }).click()
   await page.getByRole('dialog').getByRole('button', { name: 'Approve company' }).click()
@@ -240,9 +248,9 @@ export async function checkManageUsers(page, baseUrl) {
   await noOverflow('/manage-users/companies/:id')
 
   // Business requests: claim on open, check the proof, approve.
-  await sections.getByRole('link', { name: /Business requests.*1 waiting/ }).click()
+  await sections.getByRole('link', { name: 'Business requests', exact: true }).click()
   await page.getByRole('heading', { level: 1, name: 'Business requests' }).waitFor()
-  await page.getByRole('radio', { name: 'All open · 1' }).waitFor()
+  await page.getByRole('radio', { name: 'All open 1' }).waitFor()
   await noOverflow('/manage-users/business-requests')
   await page.getByRole('link', { name: "Review Auntie Akos' Waakye" }).click()
   await page.getByRole('heading', { level: 1, name: "Auntie Akos' Waakye" }).waitFor()
@@ -257,17 +265,18 @@ export async function checkManageUsers(page, baseUrl) {
   await noOverflow('/manage-users/business-requests/:id')
 
   // Verification queue.
-  await sections.getByRole('link', { name: /Verification/ }).click()
-  await page.getByRole('link', { name: /View evidence/ }).waitFor()
+  await sections.getByRole('link', { name: 'Verification', exact: true }).click()
+  await page.getByRole('table', { name: /verification requests/ }).getByRole('link', { name: /View evidence/ }).waitFor()
+  await noOverflow('/manage-users/verification')
   await page.getByRole('button', { name: 'Approve', exact: true }).click()
   await page.getByRole('dialog').getByRole('button', { name: 'Approve', exact: true }).click()
   await page.getByText('No requests waiting').waitFor()
   assert.equal(requests[0].status, 'APPROVED')
 
   // Page requests: claim on open, check the letter, approve; no email.
-  await sections.getByRole('link', { name: /Page requests.*1 waiting/ }).click()
+  await sections.getByRole('link', { name: 'Page requests', exact: true }).click()
   await page.getByRole('heading', { level: 1, name: 'Page requests' }).waitFor()
-  await page.getByRole('radio', { name: 'All open · 1' }).waitFor()
+  await page.getByRole('radio', { name: 'All open 1' }).waitFor()
   await noOverflow('/manage-users/page-requests')
   await page.getByRole('link', { name: "Review Catholic Students' Union (CSU)" }).click()
   await page.getByRole('heading', { level: 1, name: "Catholic Students' Union (CSU)" }).waitFor()
@@ -282,10 +291,10 @@ export async function checkManageUsers(page, baseUrl) {
   await noOverflow('/manage-users/page-requests/:id')
 
   // Honours.
-  await sections.getByRole('link', { name: 'Honours' }).click()
+  await sections.getByRole('link', { name: 'Honours', exact: true }).click()
   await page.getByText('No nominations in 2026').waitFor()
   await noOverflow('/manage-users/honours')
 
   await page.unroute(usersApi, route)
-  console.log('Manage Users: overview breakdowns, filtered people, profile tabs and suspension, institutions, company approval, business requests, verification, page requests, honours, and responsive layouts passed')
+  console.log('Manage Users: sidebar sections and titles, review queues on the overview, breakdowns, filtered people, profile tabs and suspension, institutions, company approval, business requests, verification, page requests, honours, and responsive layouts passed')
 }

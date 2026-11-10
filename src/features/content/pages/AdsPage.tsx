@@ -1,16 +1,18 @@
 import { useCallback, useState } from "react"
+import { Link, Navigate } from "react-router-dom"
 import { CalendarClock, CalendarDays, Clapperboard, ExternalLink, GalleryHorizontal, Image as ImageIcon, Info, Megaphone, PartyPopper, Rocket, SquareUser, type LucideIcon } from "lucide-react"
 import { Pagination } from "@/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { cn } from "../lib/cn"
+import { APP_ROUTES } from "@/routes/paths"
 import { useContentScope, useListParams, useSearchInput, useUserAds } from "../hooks"
 import { contentErrorMessage } from "../lib/errors"
 import { campaignProgress, formatDate, formatRelative } from "../lib/format"
 import type { pillTones } from "../lib/styles"
 import { adStatusLabels, adTypeLabels, humanize, type AdStatus, type AdType, type UserAd } from "../types"
 import { adStatuses, adTypes } from "../validation"
-import { EmptyState, ErrorState, Fact, FilterChips, Pill, SearchBox, Toolbar, UploaderChip, focusRing, ink, muted, skeleton, surface } from "../components/ContentBits"
+import { EmptyState, ErrorState, Fact, FilterChips, MoreLink, PageIntro, Pill, SearchBox, Toolbar, UploaderChip, focusRing, ink, muted, skeleton, surface } from "../components/ContentBits"
 
 const PAGE_SIZE = 18
 const defaults = { status: "all", type: "all", q: "" }
@@ -39,11 +41,17 @@ export function AdsPage() {
   const [openId, setOpenId] = useState<string | null>(null)
   const status = isStatus(values.status) ? values.status : undefined
   const type = isType(values.type) ? values.type : undefined
-  const ads = useUserAds({ userId, search: values.q || undefined, status, type, page, limit: PAGE_SIZE })
+  const ads = useUserAds({ userId, search: values.q || undefined, status, type, page, limit: PAGE_SIZE }, Boolean(userId))
   const openAd = ads.data?.items.find((ad) => ad.id === openId) ?? null
   const filtered = Boolean(values.q || status || type)
 
+  // Everyone's ads are in Ads Management; this page shows one uploader's, beside their posts and surveys.
+  if (!userId) return <Navigate to={APP_ROUTES.adsManagement} replace />
+
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
+    <PageIntro action={<MoreLink to={APP_ROUTES.adsManagement}>Ads Management</MoreLink>}>
+      The ads this person made, as people see them. Approving, pausing and reports on ads are in Ads Management.
+    </PageIntro>
     <Toolbar>
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
         <SearchBox value={search} onChange={setSearch} label="Search ads by name or uploader" className="sm:flex-1" />
@@ -184,7 +192,7 @@ function AdSheet({ ad, uploaderTo }: { ad: UserAd; uploaderTo: string }) {
 
       <p className={cn("flex items-start gap-2 rounded-2xl bg-blue/5 px-4 py-3 text-b3 leading-5", muted)}>
         <Info className="mt-0.5 size-4 shrink-0 text-blue dark:text-cyan" aria-hidden="true" />
-        Ads are view-only here. Cancelling an ad requires refunding the advertiser's bars, which is not yet available to admins.
+        <span>Ads are view-only here. Approve, pause or check reports on it in <Link to={APP_ROUTES.adsManagement} className="font-semibold text-blue hover:underline dark:text-cyan">Ads Management</Link>.</span>
       </p>
     </div>
   </SheetContent>

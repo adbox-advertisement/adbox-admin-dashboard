@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom"
-import { BadgeCheck, Clock3, Eye, GraduationCap, Megaphone, School, Sparkles, UserPlus, UsersRound } from "lucide-react"
+import { Award, BadgeCheck, Building2, Eye, Flag, GraduationCap, Megaphone, School, ShieldCheck, Sparkles, Store, UserPlus, UserX, UsersRound, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
-import { usePendingCounts, useUserAccess, useUserStats } from "../hooks"
+import { useBusinessRequestCounts, useHonourNominees, usePageRequestCounts, usePendingCounts, useUserAccess, useUserStats } from "../hooks"
 import { usersErrorMessage } from "../lib/errors"
 import { formatRelative, percentOf } from "../lib/format"
 import { institutionPath, peoplePath } from "../lib/paths"
@@ -33,7 +33,7 @@ export function UsersOverviewPage() {
   const can = useUserAccess()
   const allowed = can(USER_PERMISSIONS.read)
   const stats = useUserStats(undefined, allowed)
-  const pending = usePendingCounts({ verification: can(USER_PERMISSIONS.verificationRead), companies: can(USER_PERMISSIONS.companiesRead) })
+  const queues = useReviewQueues()
 
   if (!allowed) return <NoAccess permission={USER_PERMISSIONS.read} what="platform users" />
   if (stats.isError) return <div className="px-4 sm:px-6"><div className={surface}><ErrorState message={usersErrorMessage(stats.error, "Could not load the user overview.")} onRetry={() => void stats.refetch()} /></div></div>
@@ -43,13 +43,15 @@ export function UsersOverviewPage() {
   const roles: AccountRole[] = data && data.roles.GUEST > 0 ? ["VIEWER", "CREATOR", "PUBLISHER", "GUEST"] : ["VIEWER", "CREATOR", "PUBLISHER"]
 
   return <div className="flex min-w-0 flex-col gap-5 px-4 sm:px-6">
+    {queues.length > 0 && <Panel title="Waiting for review" description="Each queue opens oldest first. The sidebar shows the same counts.">
+      <ReviewQueues queues={queues} />
+    </Panel>}
+
     <section aria-label="Headline figures" className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 xl:grid-cols-4">
       <StatCard icon={UsersRound} tone="purple" label="People on AdBox" value={data?.total} hint={data ? `${data.status.active.toLocaleString()} active` : undefined} to={APP_ROUTES.manageUsersPeople} />
       <StatCard icon={UserPlus} tone="success" label="Joined in 30 days" value={data?.newLast30Days} hint={data ? `${data.newLast7Days.toLocaleString()} this week` : undefined} />
       <StatCard icon={BadgeCheck} tone="blue" label="Verified campus members" value={data?.badges.campus} hint={data ? `${percentOf(data.badges.campus, total)} of people` : undefined} to={peoplePath({ badge: "campus" })} />
-      {can(USER_PERMISSIONS.verificationRead)
-        ? <StatCard icon={Clock3} tone="warning" label="Verification requests waiting" value={pending.verification} hint="Student IDs to review" to={APP_ROUTES.manageUsersVerification} />
-        : <StatCard icon={Clock3} tone="warning" label="Profiles pending verification" value={data?.verification.PENDING} to={peoplePath({ verificationTier: "PENDING" })} />}
+      <StatCard icon={UserX} tone="danger" label="Suspended by AdBox" value={data?.status.suspended} hint={data ? `${percentOf(data.status.suspended, total)} of people` : undefined} to={peoplePath({ status: "suspended" })} />
     </section>
 
     {!data ? <OverviewSkeleton /> : <>
@@ -96,6 +98,58 @@ export function UsersOverviewPage() {
       </div>
     </>}
   </div>
+}
+
+type Queue = { key: string; icon: LucideIcon; label: string; description: string; to: string; count: number | undefined; noun?: [string, string] }
+
+/** The review queues this admin can open, with what is waiting in each. */
+function useReviewQueues(): Queue[] {
+  const can = useUserAccess()
+  const verification = can(USER_PERMISSIONS.verificationRead)
+  const companies = can(USER_PERMISSIONS.companiesRead)
+  const pages = can(USER_PERMISSIONS.pageRequestsRead)
+  const honours = can(USER_PERMISSIONS.honoursReview)
+  const pending = usePendingCounts({ verification, companies })
+  const businessRequests = useBusinessRequestCounts(companies).data?.open
+  const pageRequests = usePageRequestCounts(pages).data?.open
+  const year = new Date().getUTCFullYear()
+  const nominees = useHonourNominees({ year, page: 1, limit: 1 }, honours).data?.total
+  const queues: Array<Queue | false> = [
+    verification && { key: "verification", icon: ShieldCheck, label: "Verification", description: "Student and staff IDs to check", to: APP_ROUTES.manageUsersVerification, count: pending.verification },
+    companies && { key: "companies", icon: Building2, label: "Companies to approve", description: "Advertisers waiting for the company seal", to: `${APP_ROUTES.manageUsersCompanies}?status=PENDING_VERIFICATION`, count: pending.companies },
+    companies && { key: "business", icon: Store, label: "Business requests", description: "Business accounts people asked for", to: APP_ROUTES.manageUsersBusinessRequests, count: businessRequests },
+    pages && { key: "pages", icon: Flag, label: "Page requests", description: "Official pages for campus groups", to: APP_ROUTES.manageUsersPageRequests, count: pageRequests },
+    honours && { key: "honours", icon: Award, label: "Honours", description: `Gye Nyame nominees in ${year}`, to: APP_ROUTES.manageUsersHonours, count: nominees, noun: ["nominee", "nominees"] },
+  ]
+  return queues.filter((queue): queue is Queue => queue !== false)
+}
+
+function ReviewQueues({ queues }: { queues: Queue[] }) {
+  return <ul aria-label="Review queues" className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+    {queues.map(({ key, icon: Icon, label, description, to, count, noun }) => {
+      // Nominees are people put forward, not work left over, so they never read as waiting.
+      const waiting = !noun && Boolean(count)
+      const unit = noun ? (count === 1 ? noun[0] : noun[1]) : "waiting"
+      return <li key={key}>
+        <Link to={to} aria-label={count === undefined ? label : `${label}: ${count.toLocaleString()} ${unit}`}
+          className="group flex h-full items-center gap-3 rounded-2xl border border-grey-200 px-4 py-3 transition-colors hover:border-purple/40 hover:bg-grey-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple dark:border-border dark:hover:bg-background">
+          <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", waiting ? "bg-warning-500/10 text-warning-700 dark:text-warning-300" : "bg-purple/10 text-purple")}>
+            <Icon className="size-5" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className={cn("block text-b2 font-semibold leading-5 group-hover:text-purple", ink)}>{label}</span>
+            <span className={cn("mt-0.5 line-clamp-2 block text-b4", muted)}>{description}</span>
+          </span>
+          <span className="shrink-0 text-right">
+            {count === undefined
+              ? <span className="block h-6 w-8 animate-pulse rounded bg-grey-100 dark:bg-muted" />
+              : <span className={cn("block text-h5 font-semibold leading-6 tabular-nums", waiting ? "text-warning-700 dark:text-warning-300" : ink)}>{count.toLocaleString()}</span>}
+            <span className={cn("block text-b4", muted)}>{unit}</span>
+          </span>
+        </Link>
+      </li>
+    })}
+  </ul>
 }
 
 function RelationshipMap({ stats }: { stats: UserStats }) {

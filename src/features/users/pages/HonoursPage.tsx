@@ -14,6 +14,7 @@ import { userProfilePath } from "../lib/paths"
 import { USER_PERMISSIONS, honourCheckLabels, type HonourCandidate } from "../types"
 import { UserAvatar, pill } from "../components/UserBadges"
 import { EmptyState, ErrorState, NoAccess, RowsSkeleton, ink, muted, surface } from "../components/Surface"
+import { ListToolbar, PageIntro } from "../components/ListParts"
 import { HonourDecisionDialog } from "../components/HonourDecisionDialog"
 
 const PAGE_SIZE = 25
@@ -42,24 +43,23 @@ export function HonoursPage() {
   const years = Array.from({ length: Math.max(1, thisYear - FIRST_YEAR + 1) }, (_, index) => thisYear - index)
 
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
-    <section aria-label="About Gye Nyame" className={cn(surface, "flex flex-col gap-3 p-5 md:flex-row md:items-start md:justify-between")}>
-      <div className="flex min-w-0 gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-warning-500/10 text-warning-700 dark:text-warning-300"><Award className="size-5" aria-hidden="true" /></span>
-        <div className="min-w-0">
-          <h2 className={cn("font-heading text-b1 font-semibold", ink)}>Gye Nyame review</h2>
-          <p className={cn("text-b3", muted)}>
-            The earned honour. Never sold, renewed yearly.
-            {rules && ` Needs ${rules.nominationsRequired} nominations from at least ${rules.campusesRequired} campuses, a year on AdBox, a verified badge, good standing and real contribution. At most 1 per ${rules.campusCapPer} active people per school each year.`}
-          </p>
-        </div>
-      </div>
-      <Select value={String(year)} onValueChange={(value) => { setYear(Number(value)); setPage(1) }}>
-        <SelectTrigger aria-label="Nomination year" className="h-10 w-full shrink-0 cursor-pointer rounded-full md:w-[130px]"><SelectValue /></SelectTrigger>
-        <SelectContent>{years.map((value) => <SelectItem key={value} value={String(value)}>{value}</SelectItem>)}</SelectContent>
-      </Select>
-    </section>
+    <PageIntro>
+      Gye Nyame is the earned honour: never sold, renewed yearly.
+      {rules && ` It needs ${rules.nominationsRequired} nominations from at least ${rules.campusesRequired} campuses, a year on AdBox, a verified badge, good standing and real contribution. At most 1 per ${rules.campusCapPer} active people per school each year.`}
+    </PageIntro>
 
     <article aria-label="Nominees" className={cn(surface, "overflow-hidden")}>
+      <ListToolbar className="xl:justify-between">
+        <p className={cn("text-b3 md:text-b2", muted)}>
+          {nominees.data ? `${nominees.data.total.toLocaleString()} ${nominees.data.total === 1 ? "person" : "people"} nominated in ${year}` : `Nominations in ${year}`}
+          {!decidable && " · decisions are made in the current year only"}
+        </p>
+        <Select value={String(year)} onValueChange={(value) => { setYear(Number(value)); setPage(1) }}>
+          <SelectTrigger aria-label="Nomination year" className="h-11 w-full shrink-0 cursor-pointer rounded-full border-grey-200 bg-grey-50 text-b3 dark:border-border dark:bg-background sm:w-[160px] md:text-b2"><SelectValue /></SelectTrigger>
+          <SelectContent>{years.map((value) => <SelectItem key={value} value={String(value)}>{value}</SelectItem>)}</SelectContent>
+        </Select>
+      </ListToolbar>
+
       {nominees.isPending && <RowsSkeleton label="Loading nominees" />}
       {nominees.isError && <ErrorState message={usersErrorMessage(nominees.error, "Could not load nominees.")} onRetry={() => void nominees.refetch()} />}
       {nominees.data && <>

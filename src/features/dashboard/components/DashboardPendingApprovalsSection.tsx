@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
 import { Button } from "@/components/ui/button"
 import { type EarningBreakdownDatum, pendingApprovals, earningBreakdownData } from "../data/approvals"
+import { DashboardTopPublishers } from "./DashboardTopPublishers"
 
 function PendingPostThumbnail() {
   return (
@@ -241,8 +242,9 @@ export function DashboardPendingApprovalsSection() {
         <div className="lg:col-span-8">
           <PendingApprovalsTable />
         </div>
-        <div className="lg:col-span-4">
+        <div className="flex flex-col gap-5 lg:col-span-4">
           <EarningBreakdownCard />
+          <DashboardTopPublishers />
         </div>
       </div>
     </section>

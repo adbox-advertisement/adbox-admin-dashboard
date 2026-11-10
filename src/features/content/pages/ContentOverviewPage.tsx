@@ -30,8 +30,9 @@ export function ContentOverviewPage() {
       <section aria-label="Content overview" className={cn("grid grid-cols-1 gap-4 min-[400px]:grid-cols-2", userId ? "lg:col-span-12 xl:grid-cols-4" : "lg:col-span-7")}>
         <StatCard icon={LibraryBig} tone="purple" label="Live posts" value={live} to={withScope(APP_ROUTES.userContentPosts)}
           hint={data ? `${compactNumber(data.videos)} videos · ${compactNumber(data.images)} pictures · ${compactNumber(data.text)} text` : undefined} />
-        <StatCard icon={Megaphone} tone="blue" label="Ads running now" value={data?.activeAds} to={withScope(APP_ROUTES.userContentAds, { status: "ACTIVE" })}
-          hint={data ? `${data.ads.toLocaleString()} ${data.ads === 1 ? "ad" : "ads"} in total` : undefined} />
+        {/* Everyone's ads are in Ads Management; one uploader's are listed with their content. */}
+        <StatCard icon={Megaphone} tone="blue" label="Ads running now" value={data?.activeAds} to={userId ? withScope(APP_ROUTES.userContentAds, { status: "ACTIVE" }) : APP_ROUTES.adsManagement}
+          hint={data ? `${data.ads.toLocaleString()} ${data.ads === 1 ? "ad" : "ads"} in total${userId ? "" : " · Ads Management"}` : undefined} />
         <StatCard icon={ClipboardList} tone="success" label="Surveys collecting" value={data?.activeSurveys} to={withScope(APP_ROUTES.userContentSurveys, { status: "active" })}
           hint={data ? `${data.surveys.toLocaleString()} ${data.surveys === 1 ? "survey" : "surveys"} in total` : undefined} />
         <StatCard icon={Trash2} tone="danger" label="Removed posts" value={data?.removedPosts} to={withScope(APP_ROUTES.userContentPosts, { state: "removed" })} hint="Taken down by admins" />

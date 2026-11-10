@@ -70,16 +70,16 @@ describe("Page requests", { timeout: 15_000 }, () => {
     const user = userEvent.setup()
     renderAt("/manage-users/page-requests")
     expect(await screen.findByText("Catholic Students' Union (CSU)")).toBeInTheDocument()
-    expect(await screen.findByRole("radio", { name: "All open · 2" })).toHaveAttribute("aria-checked", "true")
+    expect(await screen.findByRole("radio", { name: "All open 2" })).toHaveAttribute("aria-checked", "true")
     expect(screen.queryByRole("note")).not.toBeInTheDocument()
     expect(screen.getByText("No letter · new account")).toBeInTheDocument()
     expect(screen.getAllByText("University of Ghana · Legon")).toHaveLength(2)
 
-    await user.click(screen.getByRole("radio", { name: "Declined · 1" }))
+    await user.click(screen.getByRole("radio", { name: "Declined 1" }))
     await waitFor(() => expect(get).toHaveBeenCalledWith("/page-requests", expect.objectContaining({ params: expect.objectContaining({ status: "DECLINED" }) })))
     expect(await screen.findByText("No requests here")).toBeInTheDocument()
 
-    await user.click(screen.getByRole("radio", { name: "All open · 2" }))
+    await user.click(screen.getByRole("radio", { name: "All open 2" }))
     await user.type(screen.getByRole("searchbox", { name: "Search page requests" }), "kwame")
     await waitFor(() => expect(get).toHaveBeenCalledWith("/page-requests", expect.objectContaining({ params: expect.objectContaining({ search: "kwame" }) })))
   })
@@ -138,6 +138,18 @@ describe("Page requests", { timeout: 15_000 }, () => {
     await user.click(screen.getByRole("button", { name: "Decline request" }))
     expect(await screen.findByRole("heading", { name: "Declined" })).toBeInTheDocument()
     expect(post).toHaveBeenCalledWith(`/page-requests/${msu.id}/decline`, { reason: "NOT_OFFICIAL" })
+  })
+
+  it("starts on Decline when a page or business asked, and never approves it", async () => {
+    const user = userEvent.setup()
+    current[csu.id] = pageDetail(csu, { requester: { ...csu.requester, name: "Cool", username: "cool", isAccount: true } })
+    renderAt(`/manage-users/page-requests/${csu.id}`)
+    expect(await screen.findByRole("heading", { name: "Catholic Students' Union (CSU)" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Decline" })).toHaveAttribute("aria-checked", "true")
+
+    await user.click(screen.getByRole("radio", { name: "Approve" }))
+    expect(screen.getByText("Sent by a page or business, which can't run another account. Decline it: they can ask again from their own account.")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Approve and create the page" })).toBeDisabled()
   })
 
   it("shows the request but neither claims it nor offers a decision without permission to review", async () => {

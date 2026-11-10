@@ -71,16 +71,16 @@ describe("Business requests", { timeout: 15_000 }, () => {
     const user = userEvent.setup()
     renderAt("/manage-users/business-requests")
     expect(await screen.findByText("Auntie Akos' Waakye")).toBeInTheDocument()
-    expect(await screen.findByRole("radio", { name: "All open · 2" })).toHaveAttribute("aria-checked", "true")
+    expect(await screen.findByRole("radio", { name: "All open 2" })).toHaveAttribute("aria-checked", "true")
     expect(screen.getByText("Serves University of Ghana · Legon")).toBeInTheDocument()
     expect(screen.getByText("No proof · New account")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "Review Kofi Prints" })).toHaveAttribute("href", `/manage-users/business-requests/${kofi.id}`)
 
-    await user.click(screen.getByRole("radio", { name: "Approved · 3" }))
+    await user.click(screen.getByRole("radio", { name: "Approved 3" }))
     await waitFor(() => expect(get).toHaveBeenCalledWith("/business-requests", expect.objectContaining({ params: expect.objectContaining({ status: "APPROVED" }) })))
     expect(await screen.findByText("No requests here")).toBeInTheDocument()
 
-    await user.click(screen.getByRole("radio", { name: "All open · 2" }))
+    await user.click(screen.getByRole("radio", { name: "All open 2" }))
     await user.type(screen.getByRole("searchbox", { name: "Search business requests" }), "BN123")
     await waitFor(() => expect(get).toHaveBeenCalledWith("/business-requests", expect.objectContaining({ params: expect.objectContaining({ search: "BN123" }) })))
   })
@@ -151,6 +151,18 @@ describe("Business requests", { timeout: 15_000 }, () => {
     // An empty note is left out, not sent blank.
     expect(post).toHaveBeenCalledWith(`/business-requests/${kofi.id}/decline`, { reason: "NOT_OFFICIAL" })
     expect(screen.getByText("Not a real business")).toBeInTheDocument()
+  })
+
+  it("starts on Decline when a page or business asked, and never approves it", async () => {
+    const user = userEvent.setup()
+    current[akos.id] = businessDetail(akos, { requester: { ...akos.requester, name: "Cool", username: "cool", isAccount: true } })
+    renderAt(`/manage-users/business-requests/${akos.id}`)
+    expect(await screen.findByRole("heading", { name: "Auntie Akos' Waakye" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Decline" })).toHaveAttribute("aria-checked", "true")
+
+    await user.click(screen.getByRole("radio", { name: "Approve" }))
+    expect(screen.getByText("Sent by a page or business, which can't run another account. Decline it: they can ask again from their own account.")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Approve and create the account" })).toBeDisabled()
   })
 
   it("shows the request but neither claims it nor offers a decision without permission to verify", async () => {

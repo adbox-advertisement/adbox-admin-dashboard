@@ -18,7 +18,7 @@ import {
 import { cn } from "../lib/cn"
 import { usersErrorMessage } from "../lib/errors"
 import { formatDate } from "../lib/format"
-import { declineReasonLabels, kindLine, letterChecks, placeLine, usernameFormatProblem, waitingFor } from "../lib/page-requests"
+import { declineReasonLabels, kindLine, letterChecks, placeLine, sentByAccountNote, usernameFormatProblem, waitingFor } from "../lib/page-requests"
 import { userProfilePath } from "../lib/paths"
 import { USER_PERMISSIONS } from "../types"
 import { approvePageRequestSchema, type PageRequestDetail } from "../validation"
@@ -134,7 +134,7 @@ export function PageRequestReviewPage() {
 }
 
 function DecisionPanel({ request, letterReady, canDecide }: { request: PageRequestDetail; letterReady: boolean; canDecide: boolean }) {
-  const [mode, setMode] = useState<DecisionMode>(request.letter ? "approve" : "changes")
+  const [mode, setMode] = useState<DecisionMode>(request.requester.isAccount ? "decline" : request.letter ? "approve" : "changes")
   const ask = useAskForPageRequestChanges()
   const decline = useDeclinePageRequest()
   const who = firstName(request.requester.name)
@@ -166,9 +166,10 @@ function ApproveForm({ request, letterReady }: { request: PageRequestDetail; let
     answer: asked === cleaned ? check.data : undefined, failed: check.isError,
   })
   const who = firstName(request.requester.name)
+  const blocked = request.requester.isAccount
 
   function confirm() {
-    if (approve.isPending) return
+    if (approve.isPending || blocked) return
     const parsed = approvePageRequestSchema.safeParse({ username: cleaned, name })
     if (!parsed.success) { setError(parsed.error.issues[0].message); return }
     if (usernameError) { setError(usernameError); return }
@@ -190,11 +191,11 @@ function ApproveForm({ request, letterReady }: { request: PageRequestDetail; let
     <p className={cn("text-b3", muted)}>
       {who} switches to it from their own account, with no password. They're told in the app; no email is sent.
     </p>
-    {!letterReady && <p className="text-b4 text-warning-700 dark:text-warning-300">
-      {request.letter ? "Tick all four letter checks first." : "No letter, so it can't be approved. Ask for changes."}
+    {(blocked || !letterReady) && <p className="text-b4 text-warning-700 dark:text-warning-300">
+      {blocked ? sentByAccountNote : request.letter ? "Tick all four letter checks first." : "No letter, so it can't be approved. Ask for changes."}
     </p>}
     {error && <p role="alert" className="text-b3 text-destructive">{error}</p>}
-    <Button type="button" disabled={!letterReady || approve.isPending} className="h-11 cursor-pointer rounded-full bg-[image:var(--gradient-purple)] text-white hover:opacity-90" onClick={confirm}>
+    <Button type="button" disabled={blocked || !letterReady || approve.isPending} className="h-11 cursor-pointer rounded-full bg-[image:var(--gradient-purple)] text-white hover:opacity-90" onClick={confirm}>
       <BadgeCheck className="size-4" aria-hidden="true" />{approve.isPending ? "Approving…" : "Approve and create the page"}
     </Button>
   </div>

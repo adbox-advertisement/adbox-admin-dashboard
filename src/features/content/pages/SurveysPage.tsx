@@ -10,7 +10,7 @@ import { contentErrorMessage } from "../lib/errors"
 import { compactNumber, formatDate, formatRelative } from "../lib/format"
 import { postPath } from "../lib/paths"
 import { CONTENT_PERMISSIONS, type UserSurvey } from "../types"
-import { EmptyState, ErrorState, FilterChips, Pill, SearchBox, Toolbar, UploaderChip, focusRing, ink, muted, skeleton, surface } from "../components/ContentBits"
+import { EmptyState, ErrorState, FilterChips, PageIntro, Pill, SearchBox, Toolbar, UploaderChip, focusRing, ink, muted, skeleton, surface } from "../components/ContentBits"
 import { ReasonDialog } from "../components/ReasonDialog"
 
 const PAGE_SIZE = 18
@@ -32,12 +32,11 @@ export function SurveysPage() {
   const filtered = Boolean(values.q || status)
 
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
+    <PageIntro>Surveys people run, usually on one of their posts. Deactivate one to stop it collecting responses.</PageIntro>
     <Toolbar>
-      <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center">
-        <SearchBox value={search} onChange={setSearch} label="Search surveys by title or uploader" className="md:flex-1" />
-        <FilterChips label="Survey status" value={status ?? "all"} onChange={(next) => update({ ...values, status: next })}
-          options={[{ value: "all", label: "All surveys", icon: ClipboardList }, { value: "active", label: "Collecting", icon: CircleCheck }, { value: "inactive", label: "Stopped", icon: CirclePause }]} />
-      </div>
+      <SearchBox value={search} onChange={setSearch} label="Search surveys by title or uploader" />
+      <FilterChips label="Survey status" value={status ?? "all"} onChange={(next) => update({ ...values, status: next })}
+        options={[{ value: "all", label: "All surveys", icon: ClipboardList }, { value: "active", label: "Collecting", icon: CircleCheck }, { value: "inactive", label: "Stopped", icon: CirclePause }]} />
     </Toolbar>
 
     {surveys.isPending && <SurveysSkeleton />}

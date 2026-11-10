@@ -145,10 +145,19 @@ export async function checkUserContent(page, baseUrl) {
   await page.getByRole('link', { name: /Kofi Boateng, 15 posts/ }).click()
   await page.getByRole('region', { name: 'Selected uploader' }).getByText('Kofi Boateng').waitFor()
   assert.ok(page.url().includes('userId=' + uploaders[1].id))
-  await page.getByRole('navigation', { name: 'User Content sections' }).getByRole('link', { name: 'Posts' }).click()
+  // One uploader's content has its own sections, Ads among them; everyone's ads are in Ads Management.
+  const scoped = page.getByRole('navigation', { name: 'Content by Kofi Boateng' })
+  await scoped.getByRole('link', { name: 'Ads' }).click()
+  await page.getByRole('heading', { level: 1, name: 'Ads' }).waitFor()
+  await page.getByRole('button', { name: "Freshers' night" }).click()
+  await page.getByRole('dialog', { name: "Freshers' night" }).getByText('Great Hall').waitFor()
+  await page.keyboard.press('Escape')
+  await noOverflow('/user-content/ads?userId=')
+  await scoped.getByRole('link', { name: 'Posts' }).click()
   await page.getByText('Showing 1–15 of 15 posts').waitFor()
   await page.getByRole('region', { name: 'Selected uploader' }).getByRole('link', { name: 'Show everyone' }).click()
   await page.getByText('Showing 1–24 of 30 posts').waitFor()
+  await page.getByRole('heading', { level: 1, name: 'Posts' }).waitFor()
 
   // Posts: type chips, then a post on its own page with removal and restore.
   await page.getByRole('button', { name: /^Videos/ }).click()
@@ -172,20 +181,18 @@ export async function checkUserContent(page, baseUrl) {
   await page.getByText('Showing 1–10 of 10 videos').waitFor()
   assert.ok(page.url().endsWith('/user-content/posts?type=VIDEO'))
 
-  // Ads and surveys.
-  await page.getByRole('navigation', { name: 'User Content sections' }).getByRole('link', { name: 'Ads' }).click()
-  await page.getByRole('button', { name: "Freshers' night" }).click()
-  await page.getByRole('dialog', { name: "Freshers' night" }).getByText('Great Hall').waitFor()
-  await page.keyboard.press('Escape')
-  await noOverflow('/user-content/ads')
-  await page.getByRole('navigation', { name: 'User Content sections' }).getByRole('link', { name: 'Surveys' }).click()
+  // Surveys, from the sidebar.
+  const sidebar = page.getByRole('navigation', { name: 'Dashboard navigation' })
+  await sidebar.getByRole('link', { name: 'Surveys', exact: true }).click()
+  await page.getByRole('heading', { level: 1, name: 'Surveys' }).waitFor()
   await page.getByRole('button', { name: 'Deactivate' }).click()
   await page.getByRole('dialog').getByRole('button', { name: 'Deactivate survey' }).click()
   await page.getByRole('button', { name: 'Reactivate' }).waitFor()
   assert.equal(surveys[0].isActive, false)
 
   // Reports: resolve a reported post by removing it, then check a message report.
-  await page.getByRole('navigation', { name: 'User Content sections' }).getByRole('link', { name: /Reports/ }).click()
+  await sidebar.getByRole('link', { name: /^Reports/ }).click()
+  await page.getByRole('heading', { level: 1, name: 'Reports' }).waitFor()
   await page.getByRole('link', { name: 'Post reported by Kofi Boateng' }).click()
   await page.getByText('“Targets a classmate by name”').waitFor()
   await noOverflow('/user-content/reports/:id')
@@ -205,5 +212,5 @@ export async function checkUserContent(page, baseUrl) {
   await page.unroute('https://cdn.example.com/**', imageRoute)
   await page.unroute('https://cdn.example.com/**/*.mp4', videoRoute)
   await Promise.all(heldVideos.map(held => held.abort().catch(() => {})))
-  console.log('User Content: sections, overview, uploader scope, posts library and detail page with removal/restore, ads sheet, survey deactivation, report resolution, message report transcript, and responsive layouts passed')
+  console.log('User Content: sidebar sections and titles, overview, uploader scope with its own sections and ads sheet, posts library and detail page with removal/restore, survey deactivation, report resolution, message report transcript, and responsive layouts passed')
 }

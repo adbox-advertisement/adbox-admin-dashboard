@@ -14,8 +14,23 @@ function childMatches(pathname: string, item: DashboardNavItem, to: string) {
   return pathname === to || (to !== item.to && pathname.startsWith(to + "/"))
 }
 
+// Any page under a section's path belongs to it, including ones without a sidebar entry
+// (User Content's per-uploader Ads).
 function groupMatches(pathname: string, item: DashboardNavItem) {
-  return pathname === item.to || Boolean(item.children?.some((child) => childMatches(pathname, item, child.to)))
+  return pathname === item.to || pathname.startsWith(item.to + "/") || Boolean(item.children?.some((child) => childMatches(pathname, item, child.to)))
+}
+
+type NavChild = NonNullable<DashboardNavItem["children"]>[number]
+
+// Consecutive sub-items with the same group sit under its heading; ungrouped ones stand alone.
+function childSections(children: NavChild[]) {
+  const sections: Array<{ group?: string; items: NavChild[] }> = []
+  for (const child of children) {
+    const last = sections[sections.length - 1]
+    if (last && child.group && last.group === child.group) last.items.push(child)
+    else sections.push({ group: child.group, items: [child] })
+  }
+  return sections
 }
 
 // Work waiting behind an entry: the pill is for sight; waitingName speaks the count as part of the name.
@@ -160,27 +175,39 @@ function DashboardNavigationContent({
                   >
                     <div className="overflow-hidden" inert={!isExpanded}>
                       <div id={groupId} className="ml-7 flex flex-col gap-0.5 border-l border-sidebar-border py-1 pl-4">
-                        {item.children.map((child) => (
-                          <NavLink
-                            key={child.to}
-                            to={child.to}
-                            onClick={onNavigate}
-                            end={child.to === item.to}
-                            aria-label={waitingName(child.label, badges[child.to] ?? 0)}
-                            className={({ isActive }) =>
-                              cn(
-                                "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",
-                                isActive
-                                  ? "bg-sidebar-accent font-semibold text-sidebar-foreground"
-                                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                              )
-                            }
-                          >
-                            <span className="size-1.5 shrink-0 rounded-full bg-grey-300 transition-colors group-aria-[current=page]/child:bg-purple" />
-                            <span className="min-w-0 flex-1 truncate">{child.label}</span>
-                            <NavBadge count={badges[child.to] ?? 0} />
-                          </NavLink>
-                        ))}
+                        {childSections(item.children).map((section, index) => {
+                          const links = section.items.map((child) => (
+                            <NavLink
+                              key={child.to}
+                              to={child.to}
+                              onClick={onNavigate}
+                              end={child.to === item.to}
+                              aria-label={waitingName(child.label, badges[child.to] ?? 0)}
+                              className={({ isActive }) =>
+                                cn(
+                                  "group/child flex min-h-9 items-center gap-2 rounded-lg px-3 text-b3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan",
+                                  isActive
+                                    ? "bg-sidebar-accent font-semibold text-sidebar-foreground"
+                                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                                )
+                              }
+                            >
+                              <span className="size-1.5 shrink-0 rounded-full bg-grey-300 transition-colors group-aria-[current=page]/child:bg-purple" />
+                              <span className="min-w-0 flex-1 truncate">{child.label}</span>
+                              <NavBadge count={badges[child.to] ?? 0} />
+                            </NavLink>
+                          ))
+                          if (!section.group) return links
+                          const headingId = `${groupId}-${index}`
+                          return (
+                            <div key={section.group} role="group" aria-labelledby={headingId} className="mt-2 flex flex-col gap-0.5">
+                              <p id={headingId} className="px-3 pb-0.5 text-b4 font-semibold uppercase tracking-wide text-grey-400 dark:text-muted-foreground">
+                                {section.group}
+                              </p>
+                              {links}
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>

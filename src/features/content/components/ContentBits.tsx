@@ -67,15 +67,16 @@ export function Segmented<T extends string>({ label, value, options, onChange, c
   /** Show only icons below the `sm` breakpoint; the text stays available to screen readers. */
   iconOnlyOnMobile?: boolean
   value: T
-  options: Array<{ value: T; label: string; icon?: LucideIcon }>
+  options: Array<{ value: T; label: string; icon?: LucideIcon; count?: number }>
   onChange: (value: T) => void
   className?: string
 }) {
   return <div role="radiogroup" aria-label={label} className={cn("flex w-fit shrink-0 gap-1 rounded-full bg-grey-50 p-1 dark:bg-background", className)}>
-    {options.map(({ value: option, label: text, icon: Icon }) => <button key={option} type="button" role="radio" aria-checked={value === option} onClick={() => onChange(option)}
+    {options.map(({ value: option, label: text, icon: Icon, count }) => <button key={option} type="button" role="radio" aria-checked={value === option} onClick={() => onChange(option)}
       className={cn("flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-b3 font-semibold transition-colors", focusRing,
         value === option ? "bg-white text-purple shadow-adbox-small dark:bg-card" : "text-grey-500 hover:text-grey-1000 dark:text-muted-foreground dark:hover:text-foreground")}>
       {Icon && <Icon className="size-4" aria-hidden="true" />}{iconOnlyOnMobile && Icon ? <span className="sr-only sm:not-sr-only">{text}</span> : text}
+      {Boolean(count) && <> <span className={cn("rounded-full px-1.5 py-0.5 text-[11px] leading-none tabular-nums", value === option ? "bg-purple/10" : "bg-grey-100 dark:bg-muted")}>{count?.toLocaleString()}</span></>}
     </button>)}
   </div>
 }
@@ -146,6 +147,14 @@ export function Section({ title, description, action, children, className, bodyC
     </header>
     <div className={cn("px-5 pb-5", bodyClassName)}>{children}</div>
   </section>
+}
+
+/** What a page holds, in a line or two under the header; an optional link on the right. */
+export function PageIntro({ children, action }: { children: ReactNode; action?: ReactNode }) {
+  return <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
+    <p className={cn("max-w-3xl text-b3 md:text-b2", muted)}>{children}</p>
+    {action}
+  </div>
 }
 
 /** The bar above a list: search and filters. Wraps to stacked rows on narrow screens. */

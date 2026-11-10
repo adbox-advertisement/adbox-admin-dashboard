@@ -48,6 +48,9 @@ export const declineReasonLabels: Record<DeclineReason, string> = {
 }
 
 /** What the reviewer confirms on the letter before approving. */
+/** Said where a page or business asked for a page or business: approving refuses it too. */
+export const sentByAccountNote = "Sent by a page or business, which can't run another account. Decline it: they can ask again from their own account."
+
 export function letterChecks(requester: string) {
   return [
     { key: "letterhead", label: "On the group's or institution's letterhead" },

@@ -6,7 +6,7 @@ import { useContentScope, useContentSummary, useListParams, useSearchInput, useU
 import { contentErrorMessage } from "../lib/errors"
 import { mediaTypeLabels, type MediaType } from "../types"
 import { mediaTypes } from "../validation"
-import { EmptyState, ErrorState, FilterChips, SearchBox, Segmented, Toolbar, surface } from "../components/ContentBits"
+import { EmptyState, ErrorState, FilterChips, PageIntro, SearchBox, Segmented, Toolbar, surface } from "../components/ContentBits"
 import { PostCard, PostGridSkeleton, PostRow } from "../components/PostCards"
 import { mediaIcons } from "../lib/media"
 
@@ -33,6 +33,7 @@ export function PostsPage() {
   const filtered = Boolean(values.q)
 
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
+    <PageIntro>Every video, picture and text post. Open one to watch it, see who posted it, or take it down; removed posts stay under Removed.</PageIntro>
     <Toolbar>
       <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center">
         <SearchBox value={search} onChange={setSearch} label="Search by title, caption or uploader" className="lg:flex-1" />

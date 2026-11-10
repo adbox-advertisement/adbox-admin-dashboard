@@ -73,9 +73,10 @@ describe("User Content", () => {
     const overview = await screen.findByRole("region", { name: "Content overview" })
     await waitFor(() => expect(within(overview).getByRole("link", { name: /Removed posts/ })).toHaveTextContent("2"))
     expect(within(overview).getByRole("link", { name: /Live posts/ })).toHaveAttribute("href", "/user-content/posts")
+    // Everyone's ads are in Ads Management.
+    expect(within(overview).getByRole("link", { name: /Ads running now/ })).toHaveAttribute("href", "/ads-management")
     const attention = screen.getByRole("region", { name: "Needs attention" })
     expect(await within(attention).findByText("5")).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /^Reports/ })).toHaveTextContent("5")
     expect(await screen.findByRole("link", { name: /Ama Mensah, 2 posts/ })).toHaveAttribute("href", `/user-content?userId=${uploaderFixture.id}`)
     expect(await screen.findByRole("link", { name: "Open Campus tour" })).toBeInTheDocument()
   })
@@ -88,11 +89,23 @@ describe("User Content", () => {
     expect(await within(banner).findByText("Ama Mensah")).toBeInTheDocument()
     expect(get).toHaveBeenCalledWith("/user-content/summary", expect.objectContaining({ params: { userId: uploaderFixture.id } }))
     expect(screen.queryByRole("region", { name: "Needs attention" })).not.toBeInTheDocument()
-    await user.click(screen.getByRole("link", { name: "Ads" }))
+    // One uploader's ads are listed with their content.
+    expect(await screen.findByRole("link", { name: /Ads running now/ })).toHaveAttribute("href", `/user-content/ads?status=ACTIVE&userId=${uploaderFixture.id}`)
+    const sections = within(banner).getByRole("navigation", { name: "Content by Ama Mensah" })
+    expect(within(sections).getByRole("link", { name: "Overview" })).toHaveAttribute("aria-current", "page")
+    await user.click(within(sections).getByRole("link", { name: "Ads" }))
     expect(location()).toBe(`/user-content/ads?userId=${uploaderFixture.id}`)
     await waitFor(() => expect(get).toHaveBeenCalledWith("/user-content/ads", expect.objectContaining({ params: expect.objectContaining({ userId: uploaderFixture.id }) })))
+    await user.click(within(sections).getByRole("link", { name: "Posts" }))
+    expect(location()).toBe(`/user-content/posts?userId=${uploaderFixture.id}`)
     await user.click(within(banner).getByRole("link", { name: "Show everyone" }))
-    expect(location()).toBe("/user-content/ads")
+    expect(location()).toBe("/user-content/posts")
+  })
+
+  it("lists ads only for one uploader, and sends everyone's to Ads Management", async () => {
+    renderAt("/user-content/ads?status=ACTIVE")
+    await waitFor(() => expect(location()).toBe("/ads-management"))
+    expect(vi.mocked(superAdminApi.get)).not.toHaveBeenCalledWith("/user-content/ads", expect.anything())
   })
 
   it("redirects old ?tab= links to the matching section", async () => {
@@ -150,7 +163,7 @@ describe("User Content", () => {
 
   it("shows ad details in a side panel, read-only", async () => {
     const user = userEvent.setup()
-    renderAt("/user-content/ads")
+    renderAt(`/user-content/ads?userId=${uploaderFixture.id}`)
     expect(await screen.findByRole("progressbar", { name: "Campaign progress" })).toBeInTheDocument()
     await user.click(screen.getByRole("button", { name: "Freshers' night" }))
     const sheet = await screen.findByRole("dialog", { name: "Freshers' night" })
@@ -159,7 +172,7 @@ describe("User Content", () => {
     await user.keyboard("{Escape}")
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
     await user.click(screen.getByRole("button", { name: /Pending review/ }))
-    expect(location()).toBe("/user-content/ads?status=PENDING_REVIEW")
+    expect(location()).toBe(`/user-content/ads?userId=${uploaderFixture.id}&status=PENDING_REVIEW`)
   })
 
   it("lets moderators deactivate a survey", async () => {

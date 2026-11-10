@@ -1,7 +1,6 @@
-import { useId, useState } from "react"
+import { useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
-import { Flag, Search, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Flag } from "lucide-react"
 import { Pagination } from "@/components/ui/pagination"
 import { useAdminId, useDebouncedValue, usePageRequestCounts, usePageRequests, useUserAccess } from "../hooks"
 import { cn } from "../lib/cn"
@@ -14,6 +13,7 @@ import { requestFilters, type RequestFilter } from "../validation"
 import { BusinessLogo } from "../components/BusinessRequestParts"
 import { CheckPill, PageRequestStatusPill } from "../components/PageRequestParts"
 import { EmptyState, ErrorState, NoAccess, RowsSkeleton, ink, muted, surface } from "../components/Surface"
+import { ListToolbar, PageIntro, SearchField, StatusFilter } from "../components/ListParts"
 
 const PAGE_SIZE = 20
 
@@ -35,7 +35,6 @@ export function PageRequestsPage() {
   const debounced = useDebouncedValue(search.trim())
   const requests = usePageRequests({ status: filter, search: debounced || undefined, page, limit: PAGE_SIZE }, allowed)
   const counts = usePageRequestCounts(allowed).data
-  const searchId = useId()
 
   if (!allowed) return <NoAccess permission={USER_PERMISSIONS.pageRequestsRead} what="page requests" />
 
@@ -49,37 +48,19 @@ export function PageRequestsPage() {
     }, { replace: true })
   }
 
-  const label = (value: RequestFilter) => {
-    const name = value === "open" ? "All open" : pageRequestStatusLabels[value]
-    const count = counts?.[value]
-    return count === undefined ? name : `${name} · ${count}`
-  }
+  const options = requestFilters.map((value) => ({ value, label: value === "open" ? "All open" : pageRequestStatusLabels[value], count: counts?.[value] }))
   const open = filter === "open" || openPageRequestStatuses.includes(filter)
 
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
-    <section aria-label="About page requests" className={cn(surface, "px-5 py-4")}>
-      <h1 className={cn("font-heading text-h5 font-semibold", ink)}>Page requests</h1>
-      <p className={cn("mt-1 max-w-3xl text-b3", muted)}>
-        Campus groups asking for an official page. Approving makes it its own account with the Staff &amp; faculty badge, run by the person who asked. Oldest first.
-      </p>
-    </section>
+    <PageIntro>
+      Campus groups asking for an official page. Approving makes it its own account with the Staff &amp; faculty badge, run by the person who asked. Oldest first.
+    </PageIntro>
 
     <article aria-label="Page requests" className={cn(surface, "overflow-hidden")}>
-      <div className="flex flex-col gap-3 border-b border-grey-200 p-4 dark:border-border sm:p-5 xl:flex-row xl:items-center">
-        <div role="radiogroup" aria-label="Filter page requests by status" className="flex flex-wrap gap-1 rounded-3xl bg-grey-50 p-1 dark:bg-background">
-          {requestFilters.map((value) => <button key={value} type="button" role="radio" aria-checked={filter === value} onClick={() => setFilter(value)}
-            className={cn("cursor-pointer whitespace-nowrap rounded-full px-3.5 py-2 text-b3 font-semibold transition-colors", filter === value ? "bg-white text-purple shadow-adbox-small dark:bg-card" : "text-grey-500 hover:text-grey-1000 dark:text-muted-foreground dark:hover:text-foreground")}>
-            {label(value)}
-          </button>)}
-        </div>
-        <div className="relative min-w-0 xl:min-w-[260px] xl:flex-1">
-          <label htmlFor={searchId} className="sr-only">Search page requests</label>
-          <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-grey-400 dark:text-muted-foreground" />
-          <Input id={searchId} type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="Group, username, school or requester" autoComplete="off" maxLength={100}
-            className="h-11 rounded-full border-grey-200 bg-grey-50 pl-10 pr-10 text-b3 focus-visible:ring-0 dark:border-border dark:bg-background md:text-b2 [&::-webkit-search-cancel-button]:hidden" />
-          {search && <button type="button" aria-label="Clear search" onClick={() => { setSearch(""); setPage(1) }} className="absolute right-0 top-0 flex h-11 w-10 cursor-pointer items-center justify-center text-grey-400 hover:text-grey-1000"><X className="size-4" aria-hidden="true" /></button>}
-        </div>
-      </div>
+      <ListToolbar>
+        <StatusFilter label="Filter page requests by status" value={filter} onChange={setFilter} options={options} />
+        <SearchField label="Search page requests" value={search} onChange={(value) => { setSearch(value); setPage(1) }} placeholder="Group, username, school or requester" maxLength={100} />
+      </ListToolbar>
 
       {requests.isPending && <RowsSkeleton label="Loading page requests" />}
       {requests.isError && <ErrorState message={usersErrorMessage(requests.error, "Could not load page requests.")} onRetry={() => void requests.refetch()} />}

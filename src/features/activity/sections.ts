@@ -19,7 +19,7 @@ export const activitySectionInfo: Record<ActivitySection, SectionInfo> = {
   contentReports: { label: "User Content reports", route: APP_ROUTES.userContentReports, queryKey: ["user-content"] },
   pageRequests: { label: "Page requests", route: APP_ROUTES.manageUsersPageRequests, queryKey: ["users", "page-requests"] },
   businessRequests: { label: "Business requests", route: APP_ROUTES.manageUsersBusinessRequests, queryKey: ["users", "business-requests"] },
-  companies: { label: "Publishers & Companies", route: APP_ROUTES.manageUsersCompanies, queryKey: ["users", "companies"] },
+  companies: { label: "Companies", route: APP_ROUTES.manageUsersCompanies, queryKey: ["users", "companies"] },
   verification: { label: "Verification", route: APP_ROUTES.manageUsersVerification, queryKey: ["users", "verification"] },
   honours: { label: "Honours", route: APP_ROUTES.manageUsersHonours, queryKey: ["users", "honours"] },
   recruitment: { label: "Recruitment", route: APP_ROUTES.recruitment, queryKey: ["recruitment"] },

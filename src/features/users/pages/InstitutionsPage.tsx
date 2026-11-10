@@ -1,7 +1,6 @@
-import { useId, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { BriefcaseBusiness, GraduationCap, School, Search, UsersRound } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { BriefcaseBusiness, GraduationCap, School, UsersRound } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { useUserAccess, useUserStats } from "../hooks"
@@ -11,6 +10,7 @@ import { institutionPath } from "../lib/paths"
 import { USER_PERMISSIONS, institutionTypeLabels, type UserStats } from "../types"
 import { EmptyState, ErrorState, NoAccess, RowsSkeleton, StatCard, ink, muted, surface } from "../components/Surface"
 import { UserAvatar } from "../components/UserBadges"
+import { ListToolbar, PageIntro, SearchField } from "../components/ListParts"
 
 const ALL = "all"
 
@@ -19,7 +19,6 @@ export function InstitutionsPage() {
   const allowed = can(USER_PERMISSIONS.read)
   const stats = useUserStats(undefined, allowed)
   const navigate = useNavigate()
-  const searchId = useId()
   const [search, setSearch] = useState("")
   const [type, setType] = useState(ALL)
   const [withMembers, setWithMembers] = useState(false)
@@ -39,7 +38,9 @@ export function InstitutionsPage() {
   const largest = Math.max(1, ...institutions.map((institution) => institution.members.total))
   const types = [...new Set(data?.institutions.map((institution) => institution.type) ?? [])].sort()
 
-  return <div className="flex min-w-0 flex-col gap-5 px-4 sm:px-6">
+  return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
+    <PageIntro>Schools on AdBox and the people who belong to each. Select one to see its campuses and members.</PageIntro>
+
     <section aria-label="Institution figures" className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 xl:grid-cols-4">
       <StatCard icon={School} tone="purple" label="Institutions" value={data?.institutions.length} hint={data ? `${data.institutions.filter((institution) => institution.members.total > 0).length} with members` : undefined} />
       <StatCard icon={UsersRound} tone="blue" label="People with an institution" value={affiliated} hint={data && affiliated !== undefined ? `${percentOf(affiliated, data.total)} of everyone` : undefined} />
@@ -48,13 +49,8 @@ export function InstitutionsPage() {
     </section>
 
     <article aria-label="Institutions" className={cn(surface, "overflow-hidden")}>
-      <div className="grid grid-cols-1 gap-3 border-b border-grey-200 p-4 dark:border-border sm:flex sm:flex-wrap sm:items-center sm:p-5">
-        <div className="relative min-w-0 sm:min-w-[240px] sm:flex-1">
-          <label htmlFor={searchId} className="sr-only">Search institutions</label>
-          <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-grey-400 dark:text-muted-foreground" />
-          <Input id={searchId} type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name, short name or region" autoComplete="off"
-            className="h-11 rounded-full border-grey-200 bg-grey-50 pl-10 text-b3 focus-visible:ring-0 dark:border-border dark:bg-background md:text-b2" />
-        </div>
+      <ListToolbar className="sm:flex-row sm:flex-wrap sm:items-center">
+        <SearchField label="Search institutions" value={search} onChange={setSearch} placeholder="Search by name, short name or region" className="sm:min-w-[240px] sm:flex-1" />
         <Select value={type} onValueChange={setType}>
           <SelectTrigger aria-label="Filter by institution type" className="h-11 w-full cursor-pointer rounded-full border-grey-200 bg-grey-50 text-b3 dark:border-border dark:bg-background sm:w-[210px] md:text-b2"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -66,7 +62,7 @@ export function InstitutionsPage() {
           <input type="checkbox" checked={withMembers} onChange={(event) => setWithMembers(event.target.checked)} className="size-4 accent-purple" />
           Only with members
         </label>
-      </div>
+      </ListToolbar>
 
       {stats.isPending && <RowsSkeleton label="Loading institutions" />}
       {stats.isError && <ErrorState message={usersErrorMessage(stats.error, "Could not load institutions.")} onRetry={() => void stats.refetch()} />}

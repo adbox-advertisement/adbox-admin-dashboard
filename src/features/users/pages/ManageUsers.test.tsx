@@ -67,18 +67,26 @@ describe("Manage Users", () => {
       if (url.startsWith("/companies/")) return { data: companyDetailFixture }
       if (url === "/verification-requests") return { data: page(verificationFixtures) }
       if (url === "/honour-review") return { data: honourPageFixture(honoursMet) }
+      if (url === "/business-requests/counts") return { data: { open: 2, NEW: 1, IN_REVIEW: 1, NEEDS_CHANGES: 0, APPROVED: 0, DECLINED: 0 } }
       throw new Error("Unexpected GET " + url)
     })
   })
 
-  it("shows only the sections an admin may use, with waiting counts", async () => {
+  it("opens on the review queues an admin may use, with what waits in each", async () => {
     permissions = ["platform.users.read", "companies.read"]
     renderAt("/manage-users")
-    const nav = await screen.findByRole("navigation", { name: "Manage Users sections" })
-    expect(within(nav).getByRole("link", { name: "Overview" })).toBeInTheDocument()
-    expect(await within(nav).findByRole("link", { name: /Publishers & Companies.*1 waiting/ })).toBeInTheDocument()
-    expect(within(nav).queryByRole("link", { name: /Verification/ })).not.toBeInTheDocument()
-    expect(within(nav).queryByRole("link", { name: "Honours" })).not.toBeInTheDocument()
+    const queues = await screen.findByRole("list", { name: "Review queues" })
+    expect(await within(queues).findByRole("link", { name: "Companies to approve: 1 waiting" })).toHaveAttribute("href", "/manage-users/companies?status=PENDING_VERIFICATION")
+    expect(await within(queues).findByRole("link", { name: "Business requests: 2 waiting" })).toHaveAttribute("href", "/manage-users/business-requests")
+    expect(within(queues).queryByRole("link", { name: /Verification/ })).not.toBeInTheDocument()
+    expect(within(queues).queryByRole("link", { name: /Page requests|Honours/ })).not.toBeInTheDocument()
+  })
+
+  it("leaves the queues out for an admin who can open none of them", async () => {
+    permissions = ["platform.users.read"]
+    renderAt("/manage-users")
+    expect(await screen.findByRole("list", { name: "People by account role" })).toBeInTheDocument()
+    expect(screen.queryByRole("list", { name: "Review queues" })).not.toBeInTheDocument()
   })
 
   it("sends admins without user access to the first section they can open", async () => {

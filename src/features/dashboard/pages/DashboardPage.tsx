@@ -11,8 +11,8 @@ export function DashboardPage() {
       <DashboardFilters />
       <DashboardMetricCards />
       <DashboardAudienceCards />
-      <DashboardUserOverviewChart />
       <DashboardGeographySection />
+      <DashboardUserOverviewChart />
       <DashboardPendingApprovalsSection />
     </div>
   )

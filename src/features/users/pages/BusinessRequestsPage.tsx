@@ -1,7 +1,6 @@
-import { useId, useState } from "react"
+import { useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
-import { Search, Store, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Store } from "lucide-react"
 import { Pagination } from "@/components/ui/pagination"
 import { useAdminId, useBusinessRequestCounts, useBusinessRequests, useDebouncedValue, useUserAccess } from "../hooks"
 import { servesLine } from "../lib/business-requests"
@@ -15,6 +14,7 @@ import { businessRequestFilters, type BusinessRequestFilter } from "../validatio
 import { BusinessLogo } from "../components/BusinessRequestParts"
 import { CheckPill, PageRequestStatusPill } from "../components/PageRequestParts"
 import { EmptyState, ErrorState, NoAccess, RowsSkeleton, ink, muted, surface } from "../components/Surface"
+import { ListToolbar, PageIntro, SearchField, StatusFilter } from "../components/ListParts"
 
 const PAGE_SIZE = 20
 
@@ -36,7 +36,6 @@ export function BusinessRequestsPage() {
   const debounced = useDebouncedValue(search.trim())
   const requests = useBusinessRequests({ status: filter, search: debounced || undefined, page, limit: PAGE_SIZE }, allowed)
   const counts = useBusinessRequestCounts(allowed).data
-  const searchId = useId()
 
   if (!allowed) return <NoAccess permission={USER_PERMISSIONS.companiesRead} what="business requests" />
 
@@ -50,37 +49,19 @@ export function BusinessRequestsPage() {
     }, { replace: true })
   }
 
-  const label = (value: BusinessRequestFilter) => {
-    const name = value === "open" ? "All open" : pageRequestStatusLabels[value]
-    const count = counts?.[value]
-    return count === undefined ? name : `${name} · ${count}`
-  }
+  const options = businessRequestFilters.map((value) => ({ value, label: value === "open" ? "All open" : pageRequestStatusLabels[value], count: counts?.[value] }))
   const open = filter === "open" || openPageRequestStatuses.includes(filter)
 
   return <div className="flex min-w-0 flex-col gap-4 px-4 sm:px-6">
-    <section aria-label="About business requests" className={cn(surface, "px-5 py-4")}>
-      <h1 className={cn("font-heading text-h5 font-semibold", ink)}>Business requests</h1>
-      <p className={cn("mt-1 max-w-3xl text-b3", muted)}>
-        People asking for a business account from their own. Approving makes it its own account with the verified company seal, run by them. Oldest first.
-      </p>
-    </section>
+    <PageIntro>
+      People asking for a business account from their own. Approving makes it its own account with the verified company seal, run by them. Oldest first.
+    </PageIntro>
 
     <article aria-label="Business requests" className={cn(surface, "overflow-hidden")}>
-      <div className="flex flex-col gap-3 border-b border-grey-200 p-4 dark:border-border sm:p-5 xl:flex-row xl:items-center">
-        <div role="radiogroup" aria-label="Filter business requests by status" className="flex flex-wrap gap-1 rounded-3xl bg-grey-50 p-1 dark:bg-background">
-          {businessRequestFilters.map((value) => <button key={value} type="button" role="radio" aria-checked={filter === value} onClick={() => setFilter(value)}
-            className={cn("cursor-pointer whitespace-nowrap rounded-full px-3.5 py-2 text-b3 font-semibold transition-colors", filter === value ? "bg-white text-purple shadow-adbox-small dark:bg-card" : "text-grey-500 hover:text-grey-1000 dark:text-muted-foreground dark:hover:text-foreground")}>
-            {label(value)}
-          </button>)}
-        </div>
-        <div className="relative min-w-0 xl:min-w-[260px] xl:flex-1">
-          <label htmlFor={searchId} className="sr-only">Search business requests</label>
-          <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-grey-400 dark:text-muted-foreground" />
-          <Input id={searchId} type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="Business, username, number or requester" autoComplete="off" maxLength={100}
-            className="h-11 rounded-full border-grey-200 bg-grey-50 pl-10 pr-10 text-b3 focus-visible:ring-0 dark:border-border dark:bg-background md:text-b2 [&::-webkit-search-cancel-button]:hidden" />
-          {search && <button type="button" aria-label="Clear search" onClick={() => { setSearch(""); setPage(1) }} className="absolute right-0 top-0 flex h-11 w-10 cursor-pointer items-center justify-center text-grey-400 hover:text-grey-1000"><X className="size-4" aria-hidden="true" /></button>}
-        </div>
-      </div>
+      <ListToolbar>
+        <StatusFilter label="Filter business requests by status" value={filter} onChange={setFilter} options={options} />
+        <SearchField label="Search business requests" value={search} onChange={(value) => { setSearch(value); setPage(1) }} placeholder="Business, username, number or requester" maxLength={100} />
+      </ListToolbar>
 
       {requests.isPending && <RowsSkeleton label="Loading business requests" />}
       {requests.isError && <ErrorState message={usersErrorMessage(requests.error, "Could not load business requests.")} onRetry={() => void requests.refetch()} />}
