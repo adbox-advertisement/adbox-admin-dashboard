@@ -2,6 +2,29 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Vercel deployment setup (2026-11-10)
+
+- Added `vercel.json` (Vite, `npm ci`, `npm run build`, `dist/`, catch-all rewrite to `index.html`, one-year
+  immutable cache for `/assets/*`) and a "Vercel" subsection under README → Build and deployment (Node 22,
+  `VITE_SUPER_ADMIN_API_URL=https://admin-api.adboxgh.com/api/v1`, custom domain because the API accepts one
+  origin, no `/api` proxy through Vercel, server-side requirements).
+- Backend repo (`adbox-backend`, uncommitted): `deploy/ec2/nginx-admin.conf` now passes WebSocket upgrades on
+  `location /` (map `$admin_connection_upgrade`, named apart from nginx-api.conf's) and repeats the forwarded
+  headers there (a location that sets headers inherits none). `deploy/ec2/README.md` gained in-place `sed`
+  commands for a certbot-edited live site and an "Admin dashboard on Vercel" section (`SUPER_ADMIN_CORS_ORIGIN`,
+  allowlist, preflight `curl` check). Verified with `nginx -t` in Docker: fresh file alongside nginx-api.conf,
+  and the `sed` commands applied to the previous file.
+- Live server (`ssh adbox`, done at the owner's request, backups in `~/adbox/*.bak-20261110-*`): WebSocket lines
+  added to `/etc/nginx/sites-available/adbox-admin`; `allow 197.251.158.2;` added to
+  `/etc/nginx/adbox-admin-allow.conf` (kept `102.176.30.25`); `SUPER_ADMIN_CORS_ORIGIN=https://admin.adboxgh.com`
+  in `~/adbox/.env` (was `http://localhost:5173`); `nginx -t`, reload, `pm2 restart super-admin --update-env`.
+  Verified: both health checks 200, preflight from `https://admin.adboxgh.com` allowed, localhost refused.
+- Found: the deployed `super-admin` release (`20261029-165745`) predates several dashboard features. 404 on the
+  live API: `activity/counts` and the socket (badges, ring), `ads`, `ads/reported`, `business-requests*`,
+  `page-requests*`, `gold-settings`, `gold-bundles`, `gold-purchases`. Needs a new super-admin release (with its
+  migrations); not deployed. Backend working tree also has uncommitted work.
+- Still to do in Vercel (owner): Node 22, `VITE_SUPER_ADMIN_API_URL`, add `admin.adboxgh.com` and its DNS record.
+
 ## Rewards: partners and gold-bar redemptions on sample data (2026-11-10)
 
 - Request: partners (MTN, Telecel, AT/AirtelTigo, Melcom) supply airtime, data bundles and vouchers; people redeem

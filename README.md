@@ -121,3 +121,21 @@ npm run preview
 Deploy `dist/` to a static host. Configure SPA fallback to `index.html` for application paths such as `/video-management/upload`, while preserving real `/api/*` responses and asset paths. Serve the API at `/api/v1` behind the same origin, or set `VITE_SUPER_ADMIN_API_URL` when building and configure backend CORS for that origin.
 
 `npm run preview` is a local build check. Database scripts under `database/rdi-cms/` are separate operational tools; frontend commands never execute them.
+
+### Vercel
+
+`vercel.json` sets the build (`npm ci`, `npm run build`, output `dist/`), sends every application path to `index.html` so links such as `/rewards/requests` open on refresh (real files such as `/assets/*` and `/rdi-assets/*` are served first), and caches the hashed files in `/assets/` for a year.
+
+In the Vercel project:
+
+- **Node.js version:** 22, as in CI.
+- **Environment variable** `VITE_SUPER_ADMIN_API_URL=https://admin-api.adboxgh.com/api/v1`. Vite writes it into the bundle at build time, so set it before the first build and redeploy after changing it. Without it the dashboard calls `/api/v1` on Vercel and every request fails.
+- **Domain:** a custom domain such as `admin.adboxgh.com`. The API accepts one dashboard origin, so `*.vercel.app` preview links cannot sign in.
+- Don't proxy `/api` through a Vercel rewrite: the admin API only answers allowlisted IP addresses, and Vercel's change.
+
+On the API server (`adbox-backend`, `deploy/ec2/README.md`):
+
+- `SUPER_ADMIN_CORS_ORIGIN` must be the dashboard's exact origin (for example `https://admin.adboxgh.com`), then `pm2 restart super-admin --update-env`. It also sets the origin of the live-activity socket.
+- The admin's browser calls the API directly, so each admin's own IP address must be in `/etc/nginx/adbox-admin-allow.conf`. Anyone else can open the dashboard but can't sign in; the browser usually reports that as a CORS or network error, because Nginx's refusal carries no CORS headers.
+- The API must be on HTTPS: a page served over HTTPS can't call a plain-HTTP API.
+- Support and Rewards run on sample data. Anyone signed in sees their "Sample data" banners and invented records until those features get real services.
