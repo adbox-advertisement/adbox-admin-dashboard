@@ -2,6 +2,54 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Admin API opened to every network for collaborators (2026-11-13)
+
+- Request: other networks couldn't reach the Super Admin API (Nginx IP allowlist); owner wants collaborators to use
+  it from anywhere, both the deployed dashboard and `npm run dev`. Owner chose "open, with a sign-in limit".
+- Live server (`ssh adbox`, done at the owner's request): `/etc/nginx/sites-available/adbox-admin` no longer applies
+  the allowlist to `location /`; new `limit_req_zone admin_auth` (10r/m per IP, burst 20, `429`) on
+  `^/api/v1/auth/(bootstrap|login|refresh)$`; `^~ /api/docs` (Swagger) still uses `adbox-admin-allow.conf`.
+  Backup `~/adbox/adbox-admin.nginx.bak-20261113-083318`; `~/adbox/nginx-admin.conf` synced (old copy `.bak-20261113`).
+  `nginx -t` ok, reloaded. Verified from the server's own non-allowlisted IP: health 200, `/auth/me` and `/admins`
+  401, `/api/docs` 403, preflight from `https://admin.adboxgh.com` allowed, socket polling 200, 21st rapid login 429.
+  To close again: put `include /etc/nginx/adbox-admin-allow.conf; deny all;` back in `location /`.
+- Backend repo (uncommitted): `deploy/ec2/nginx-admin.conf`, `deploy/ec2/README.md`, "Deployment posture" in
+  `docs/super-admin-api.md`. The API itself still has no login rate limit or 2FA; the Nginx limit is the only one.
+- Dashboard: `vite.config.ts` reads `ADBOX_API_PROXY_TARGET` (no `VITE_` prefix, default `http://localhost:3005`);
+  `.env.example`, README (Run locally, Vercel notes), AGENTS.md Dev API line. Checked a Vite on :5199 proxying to the
+  live API (health 200, `/auth/me` 401, socket polling 200). `npm run build`, `npm run lint`, `npm run test`
+  (427/427) pass.
+- Still to do: each collaborator needs their own admin account (Manage Admins); commit backend and dashboard changes.
+
+## Manage Admins redesign + Super Admin-only access changes (2026-11-11)
+
+- Request: make admins, roles and permissions clear and modern; only the Super Admin may make critical changes.
+  Owner chose **all access changes** are Super Admin only (roles, extra permissions, status, role CRUD and role
+  permissions, any change to a Super Admin's account), enforced in the API too.
+- Backend (`adbox-backend`, uncommitted, **not deployed**): `SUPER_ADMIN_ROLE` constant; `@RequireRoles(SUPER_ADMIN_ROLE)`
+  on `PUT /admins/:id/roles|permissions|schools`, role create/update/delete/permissions, permission create/update/delete;
+  `admins/admin-access.policy.ts` for `POST /admins` with roles and `PATCH /admins/:id` with `isActive` or a Super
+  Admin target; guard message "Only a Super Admin can do this". Spec `admins/super-admin-only.spec.ts`. Docs in
+  `docs/super-admin-api.md`. Checks: jest admins/common/rbac/auth 389 passed, super-admin tsc clean, eslint clean on
+  changed files except a pre-existing prettier error at `permission.constants.ts:133`.
+- Dashboard: sidebar Manage Admins → Admins / Roles / Permissions (`paths.ts`, `navigation.ts`, RDI untouched);
+  `/manage-admins` redirects to `/manage-admins/admins`. New pages `AdminsPage`, `AdminDetailPage`, `RolesPage`,
+  `RoleDetailPage`, `PermissionsPage`; components `AdminBits`, `Checklists` (grouped permission checklist, role
+  cards), `AccessDialogs`, `RoleDialogs`, `PermissionGroups`, rewritten `AdminFormDialog`/`AdminStatusDialog`;
+  `lib/catalog.ts`, `lib/access.ts`, `lib/links.ts`, `useViewer()`; 403s show the API's reason. Removed the old
+  tab page, tables, row menus, pickers and dialogs and their tests.
+- Tests: `lib/catalog.test.ts`, `pages/ManageAdmins.test.tsx` (admins feature 53 passing); `tests/smoke/manage-admins.smoke.mjs`
+  rewritten, `appearance.smoke.mjs` Manage Admins lines updated, new `ADBOX_SMOKE_FEATURE=admins`. `npm run check`:
+  lint, architecture, typecheck:test, build pass; vitest 425/427 with the known Recruitment timeouts under load
+  (12/12 alone). Full `npm run test:smoke` passed.
+- Deployed 2026-11-12 02:01 UTC (owner's request): `super-admin` only, built from `4f95072` plus the uncommitted
+  changes above (all 46 super-admin suites / 769 tests passed first); release `super-admin/releases/20261112-020110`,
+  previous `20261110-212714` kept for rollback; no migrations. DB backup
+  `~/adbox/backups/adbox_test-before-super-admin-20261112-020021.dump`. Health 200 on both APIs, routes 401 unauthenticated.
+  Production then had 2 admins: 1 Super Admin and 1 with role ADMIN_MANAGER, who can no longer change access.
+- Still to do: commit the backend change (the server now runs code that isn't committed); deploy this dashboard to
+  Vercel for the new Manage Admins screens.
+
 ## Vercel deployment setup (2026-11-10)
 
 - Added `vercel.json` (Vite, `npm ci`, `npm run build`, `dist/`, catch-all rewrite to `index.html`, one-year
@@ -19,10 +67,17 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
   `/etc/nginx/adbox-admin-allow.conf` (kept `102.176.30.25`); `SUPER_ADMIN_CORS_ORIGIN=https://admin.adboxgh.com`
   in `~/adbox/.env` (was `http://localhost:5173`); `nginx -t`, reload, `pm2 restart super-admin --update-env`.
   Verified: both health checks 200, preflight from `https://admin.adboxgh.com` allowed, localhost refused.
-- Found: the deployed `super-admin` release (`20261029-165745`) predates several dashboard features. 404 on the
-  live API: `activity/counts` and the socket (badges, ring), `ads`, `ads/reported`, `business-requests*`,
-  `page-requests*`, `gold-settings`, `gold-bundles`, `gold-purchases`. Needs a new super-admin release (with its
-  migrations); not deployed. Backend working tree also has uncommitted work.
+- Backend redeployed (owner's request, 2026-11-10 21:26 UTC): all six apps from `adbox-backend` branch `test`
+  commit `4f95072` (clean tree; full jest 186 suites / 2419 tests passed; built with `deploy/ec2/package.sh`,
+  installed with `~/adbox/install.sh` from `~/adbox/incoming/*.tar`, log `~/adbox/incoming/deploy-*.log`).
+  7 migrations applied (20261030…20261108). Previous releases (2026-10-29) kept under `<app>/releases/` for
+  rollback. DB backup before deploy: `~/adbox/backups/adbox_test-before-deploy-20261110-205733.dump`.
+  Every dashboard endpoint now exists (401 unauthenticated); socket polling 200, WebSocket via Nginx 101.
+- Institutions: `npm run seed -- --only=institutions` run against production through an SSH tunnel → 265
+  institutions, all with GTEC ids (243 added, 22 linked), same as local.
+- Live `adbox-api` Nginx site got the repo's JSON gzip lines (backup `~/adbox/adbox-api.nginx.bak-*`);
+  `~/adbox/{install.sh,ecosystem.config.js,nginx-admin.conf,nginx-api.conf}` match the repo.
+- Server disk 69% used (8.9 GB free); each release is ~800 MB, three kept per app.
 - Still to do in Vercel (owner): Node 22, `VITE_SUPER_ADMIN_API_URL`, add `admin.adboxgh.com` and its DNS record.
 
 ## Rewards: partners and gold-bar redemptions on sample data (2026-11-10)

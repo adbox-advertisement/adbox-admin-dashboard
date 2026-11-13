@@ -107,6 +107,11 @@ export const navItems: DashboardNavItem[] = [
     label: "Manage Admins",
     icon: UsersRound,
     to: APP_ROUTES.manageAdmins,
+    children: [
+      { label: "Admins", to: APP_ROUTES.manageAdminsList },
+      { label: "Roles", to: APP_ROUTES.manageAdminsRoles },
+      { label: "Permissions", to: APP_ROUTES.manageAdminsPermissions },
+    ],
   },
   {
     label: "Settings",

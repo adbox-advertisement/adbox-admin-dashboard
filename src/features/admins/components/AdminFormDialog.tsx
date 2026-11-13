@@ -2,24 +2,25 @@ import { useId, useState, type FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useCreateAdmin, useRbacAccess, useRoles, useUpdateAdmin } from "../hooks"
+import { useCreateAdmin, useRoles, useUpdateAdmin, useViewer } from "../hooks"
+import { access } from "../lib/access"
 import { createAdminSchema, updateAdminSchema } from "../validation"
 import { rbacErrorMessage } from "../lib/errors"
 import type { Admin } from "../types"
-import { RolesPicker } from "./RolesPicker"
+import { LockNote, primaryButton } from "./AdminBits"
+import { RoleChecklist } from "./Checklists"
 
-type Props = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-} & ({ mode: "create" } | { mode: "edit"; admin: Admin })
+type Props = { onClose: () => void } & ({ mode: "create"; onCreated: (admin: Admin) => void } | { mode: "edit"; admin: Admin })
 
+/** A new admin (name, sign-in email, password and, for a Super Admin, roles), or an admin's name. */
 export function AdminFormDialog(props: Props) {
-  const { open, onOpenChange } = props
+  const { onClose } = props
   const isEdit = props.mode === "edit"
-  const can = useRbacAccess()
+  const viewer = useViewer()
   const create = useCreateAdmin()
   const update = useUpdateAdmin()
-  const roles = useRoles(open && !isEdit && can("roles.read"))
+  const withRoles = !isEdit && access.giveNewAdminRoles(viewer)
+  const roles = useRoles(withRoles)
   const [values, setValues] = useState(() => ({
     firstName: isEdit ? props.admin.firstName : "",
     lastName: isEdit ? props.admin.lastName : "",
@@ -30,7 +31,7 @@ export function AdminFormDialog(props: Props) {
   const [error, setError] = useState("")
   const formId = useId()
   const pending = create.isPending || update.isPending
-  const allowed = can(isEdit ? "admins.update" : "admins.create")
+  const allowed = isEdit ? access.editName(viewer, props.admin) : access.addAdmin(viewer)
 
   function setField(field: "firstName" | "lastName" | "email" | "password", value: string) {
     setValues((current) => ({ ...current, [field]: value }))
@@ -42,66 +43,70 @@ export function AdminFormDialog(props: Props) {
     if (pending || !allowed) return
     setError("")
     try {
-      if (isEdit) {
+      if (props.mode === "edit") {
         const parsed = updateAdminSchema.safeParse({ firstName: values.firstName, lastName: values.lastName })
         if (!parsed.success) { setError(parsed.error.issues[0].message); return }
         await update.mutateAsync({ id: props.admin.id, input: parsed.data })
+        onClose()
       } else {
-        const parsed = createAdminSchema.safeParse(values)
+        const parsed = createAdminSchema.safeParse({ ...values, roleIds: withRoles ? values.roleIds : [] })
         if (!parsed.success) { setError(parsed.error.issues[0].message); return }
-        if (values.roleIds.length > 0 && (!roles.isSuccess || roles.isFetching)) {
-          setError("Reload the roles before creating an account with role assignments.")
-          return
-        }
-        await create.mutateAsync(parsed.data)
+        const admin = await create.mutateAsync(parsed.data)
         create.reset()
-        setValues((current) => ({ ...current, password: "" }))
+        props.onCreated(admin)
       }
-      onOpenChange(false)
-    } catch (error) {
-      setError(rbacErrorMessage(error, "Could not save the admin. Check the account list before retrying.", "admin"))
+    } catch (failure) {
+      setError(rbacErrorMessage(failure, "Could not save the admin. Check the list before trying again.", "admin"))
     }
   }
 
-  return <Dialog open={open} onOpenChange={(next) => { if (!pending) onOpenChange(next) }}>
-    <DialogContent className="max-w-lg gap-0 rounded-3xl p-0">
-      <div className="border-b border-border px-6 py-5 pr-14">
-        <DialogTitle>{isEdit ? "Edit profile" : "Add Admin"}</DialogTitle>
-        <DialogDescription className="mt-2">{isEdit ? "Update this admin's name. Their sign-in email stays the same." : "Create an admin account with a password and optional roles."}</DialogDescription>
+  return <Dialog open onOpenChange={(open) => { if (!open && !pending) onClose() }}>
+    <DialogContent className="flex max-h-[calc(100svh-2rem)] max-w-xl flex-col gap-0 overflow-hidden rounded-3xl p-0">
+      <div className="border-b border-grey-200 px-6 py-5 pr-14 dark:border-border">
+        <DialogTitle>{isEdit ? "Edit name" : "Add admin"}</DialogTitle>
+        <DialogDescription className="mt-1.5">{isEdit ? "Their sign-in email stays the same." : "They sign in to this dashboard with this email and password. Share the password with them privately."}</DialogDescription>
       </div>
-      <form onSubmit={submit} noValidate className="flex flex-col gap-5 p-6">
-        <fieldset disabled={pending || !allowed} className="contents">
+      <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
+        <fieldset disabled={pending || !allowed} className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor={`${formId}-first-name`} className="mb-2 block text-sm font-medium">First Name</label>
-              <Input id={`${formId}-first-name`} value={values.firstName} onChange={(event) => setField("firstName", event.target.value)} autoComplete="given-name" maxLength={100} className="h-11 rounded-xl" />
+              <label htmlFor={`${formId}-first-name`} className="mb-1.5 block text-sm font-medium">First name</label>
+              <Input id={`${formId}-first-name`} value={values.firstName} onChange={(event) => setField("firstName", event.target.value)} autoComplete="off" maxLength={100} className="h-11 rounded-xl" />
             </div>
             <div>
-              <label htmlFor={`${formId}-last-name`} className="mb-2 block text-sm font-medium">Last Name</label>
-              <Input id={`${formId}-last-name`} value={values.lastName} onChange={(event) => setField("lastName", event.target.value)} autoComplete="family-name" maxLength={100} className="h-11 rounded-xl" />
+              <label htmlFor={`${formId}-last-name`} className="mb-1.5 block text-sm font-medium">Last name</label>
+              <Input id={`${formId}-last-name`} value={values.lastName} onChange={(event) => setField("lastName", event.target.value)} autoComplete="off" maxLength={100} className="h-11 rounded-xl" />
             </div>
-          </div>
-          <div>
-            <label htmlFor={`${formId}-email`} className="mb-2 block text-sm font-medium">Email</label>
-            <Input id={`${formId}-email`} type="email" value={values.email} readOnly={isEdit} onChange={(event) => setField("email", event.target.value)} autoComplete="email" className="h-11 rounded-xl" />
           </div>
           {!isEdit && <>
             <div>
-              <label htmlFor={`${formId}-password`} className="mb-2 block text-sm font-medium">Password</label>
-              <Input id={`${formId}-password`} type="password" value={values.password} onChange={(event) => setField("password", event.target.value)} autoComplete="new-password" minLength={5} maxLength={128} aria-describedby={`${formId}-password-help`} className="h-11 rounded-xl" />
-              <p id={`${formId}-password-help`} className="mt-2 text-sm text-muted-foreground">Use 5–128 characters.</p>
+              <label htmlFor={`${formId}-email`} className="mb-1.5 block text-sm font-medium">Email</label>
+              <Input id={`${formId}-email`} type="email" value={values.email} onChange={(event) => setField("email", event.target.value)} autoComplete="off" className="h-11 rounded-xl" />
             </div>
-            {!can("roles.read") ? <p className="text-sm text-muted-foreground">You can create the account without roles. An authorized admin can assign roles later.</p> : roles.isPending ? <p role="status">Loading roles…</p> : roles.isError ? <div role="alert">
-              <p className="text-sm text-destructive">Could not load roles. You can retry or create the account without roles.</p>
-              <Button type="button" variant="outline" onClick={() => void roles.refetch()}>Retry roles</Button>
-            </div> : <RolesPicker options={roles.data} value={values.roleIds} onChange={(roleIds) => setValues((current) => ({ ...current, roleIds }))} disabled={pending} />}
+            <div>
+              <label htmlFor={`${formId}-password`} className="mb-1.5 block text-sm font-medium">Password</label>
+              <Input id={`${formId}-password`} type="password" value={values.password} onChange={(event) => setField("password", event.target.value)} autoComplete="new-password" minLength={5} maxLength={128} aria-describedby={`${formId}-password-help`} className="h-11 rounded-xl" />
+              <p id={`${formId}-password-help`} className="mt-1.5 text-xs text-muted-foreground">5 to 128 characters.</p>
+            </div>
+            <div className="flex min-h-0 flex-col gap-2">
+              <p className="text-sm font-medium">Roles</p>
+              {!withRoles ? <LockNote>Only a Super Admin can give roles. The account starts with none; ask a Super Admin to add them.</LockNote>
+                : roles.isPending ? <p role="status" className="text-sm text-muted-foreground">Loading roles…</p>
+                  : roles.isError ? <div role="alert" className="flex flex-wrap items-center gap-3">
+                    <p className="text-sm text-destructive">Could not load roles. Try again, or add the account without roles.</p>
+                    <Button type="button" variant="outline" className="h-9 rounded-full" onClick={() => void roles.refetch()}>Retry roles</Button>
+                  </div>
+                    : <RoleChecklist roles={roles.data} value={values.roleIds} onChange={(roleIds) => setValues((current) => ({ ...current, roleIds }))} disabled={pending} />}
+            </div>
           </>}
-          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-          <div className="flex justify-end gap-3">
-            <DialogClose asChild><Button type="button" variant="outline" className="h-11 rounded-full px-5">Cancel</Button></DialogClose>
-            <Button type="submit" className="h-11 rounded-full bg-[image:var(--gradient-purple)] px-5 text-white">{pending ? "Saving…" : isEdit ? "Save changes" : "Add Admin"}</Button>
-          </div>
         </fieldset>
+        <div className="flex flex-col gap-3 border-t border-grey-200 px-6 py-4 dark:border-border">
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+          <div className="flex justify-end gap-2">
+            <DialogClose asChild><Button type="button" variant="outline" disabled={pending} className="h-10 rounded-full px-4">Cancel</Button></DialogClose>
+            <Button type="submit" disabled={pending || !allowed} className={primaryButton}>{pending ? "Saving…" : isEdit ? "Save name" : "Add admin"}</Button>
+          </div>
+        </div>
       </form>
     </DialogContent>
   </Dialog>

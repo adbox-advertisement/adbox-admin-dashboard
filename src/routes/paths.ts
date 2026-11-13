@@ -34,5 +34,8 @@ export const APP_ROUTES = {
   rewardCatalog: "/rewards/catalog",
   rewardPartners: "/rewards/partners",
   manageAdmins: "/manage-admins",
+  manageAdminsList: "/manage-admins/admins",
+  manageAdminsRoles: "/manage-admins/roles",
+  manageAdminsPermissions: "/manage-admins/permissions",
   settings: "/settings",
 } as const

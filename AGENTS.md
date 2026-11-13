@@ -43,8 +43,9 @@ Key wiring that spans several files:
   `npm run check:architecture` enforces this.
 - Theme is app-wide: one `next-themes` provider (`WorkspaceTheme` in `AppProviders`), stored as
   `adbox-theme`, toggled only from Settings → Appearance.
-- Dev API: requests go to `/api/v1`; Vite proxies `/api` to `http://localhost:3005`. Override with
-  `VITE_SUPER_ADMIN_API_URL` in `.env.local` (see `.env.example`). Sign-in needs that backend.
+- Dev API: requests go to `/api/v1`; Vite proxies `/api` to `http://localhost:3005`. Point the proxy
+  elsewhere with `ADBOX_API_PROXY_TARGET`, or call an API directly with `VITE_SUPER_ADMIN_API_URL`,
+  in `.env.local` (see `.env.example`). Sign-in needs that backend.
 
 RDI is a browser-only CMS and website UI. Its authentication uses the existing API independently.
 It is protected by the RDI rule below.
@@ -184,7 +185,7 @@ Axios client -> services -> TanStack Query hooks -> components
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
 local server and an installed Chrome browser. It mocks all API calls. Point it at another server
 with `ADBOX_TEST_URL=http://127.0.0.1:5174`, and narrow it with
-`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support` or `ADBOX_SMOKE_FEATURE=rewards`. See README for overrides.
+`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards` or `ADBOX_SMOKE_FEATURE=admins`. See README for overrides.
 
 Unit and component tests live beside the code they cover as `*.test.ts`/`*.test.tsx` (Vitest +
 React Testing Library, jsdom environment). Shared test setup and render helpers live in

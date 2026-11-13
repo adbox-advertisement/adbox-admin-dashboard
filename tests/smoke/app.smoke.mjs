@@ -18,7 +18,7 @@ import { checkRewards } from './rewards.smoke.mjs'
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const smokeFeature = process.env.ADBOX_SMOKE_FEATURE
-if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity', 'support', 'rewards'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity, support, rewards or unset')
+if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity', 'support', 'rewards', 'admins'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity, support, rewards, admins or unset')
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
@@ -118,6 +118,7 @@ try {
   if (smokeFeature === 'content') await checkUserContent(page, baseUrl)
   if (smokeFeature === 'financials') await checkFinancials(page, baseUrl)
   if (smokeFeature === 'ads') await checkAds(page, baseUrl)
+  if (smokeFeature === 'admins') await checkManageAdmins(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'activity') await checkActivity(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'support') await checkSupport(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'rewards') await checkRewards(page, baseUrl)

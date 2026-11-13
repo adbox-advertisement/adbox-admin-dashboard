@@ -22,7 +22,7 @@ export async function checkAppearance(page, baseUrl) {
       if (theme === 'light') await setThemeFromSettings(page, baseUrl, 'light')
       for (const [path, ready, surface] of [
         ['/dashboard', 'text=Total Users', 'article:has-text("Total Users")'],
-        ['/manage-admins', 'text=Roles and Permission', 'article'],
+        ['/manage-admins', 'text=Admins are the people', 'section[aria-label="Admin list"]'],
         ['/video-management/upload', 'nav[aria-label="Video Management pages"]', 'nav[aria-label="Video Management pages"]'],
         ['/video-management/posts', 'nav[aria-label="Video Management pages"]', 'nav[aria-label="Video Management pages"]'],
         ['/settings', 'h2:has-text("Appearance")', 'header'],
@@ -69,10 +69,9 @@ export async function checkAppearance(page, baseUrl) {
 
       await page.setViewportSize({ width: 1440, height: 1000 })
       await page.goto(baseUrl + '/manage-admins')
-      await page.getByRole('tab', { name: 'Admin', exact: true }).click()
-      await page.getByRole('button', { name: 'Add Admin', exact: true }).click()
-      const dialog = page.getByRole('dialog', { name: 'Add Admin', exact: true })
-      await dialog.getByLabel('First Name', { exact: true }).fill('Theme preview')
+      await page.getByRole('button', { name: 'Add admin', exact: true }).click()
+      const dialog = page.getByRole('dialog', { name: 'Add admin', exact: true })
+      await dialog.getByLabel('First name', { exact: true }).fill('Theme preview')
       await page.screenshot({ path: `/tmp/adbox-${theme}-admin-dialog.png`, animations: 'disabled' })
       await dialog.getByRole('button', { name: 'Cancel', exact: true }).click()
 
