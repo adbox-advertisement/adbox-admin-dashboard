@@ -28,7 +28,7 @@ architecture source of truth. Before making layout decisions, read `docs/grid.md
 the responsive grid guidance.
 
 Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
-Auth, Dashboard, Manage Users, User Content, Ads, Financials, Manage Admins, Recruitment, Rewards, Settings, Support, Video Management, and RDI own their lazy routes under `src/features/`.
+Auth, Dashboard, Manage Users, User Content, Recommendations, Ads, Financials, Manage Admins, Recruitment, Rewards, Settings, Support, Video Management, and RDI own their lazy routes under `src/features/`.
 Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
 
 Key wiring that spans several files:
@@ -185,7 +185,7 @@ Axios client -> services -> TanStack Query hooks -> components
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
 local server and an installed Chrome browser. It mocks all API calls. Point it at another server
 with `ADBOX_TEST_URL=http://127.0.0.1:5174`, and narrow it with
-`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards` or `ADBOX_SMOKE_FEATURE=admins`. See README for overrides.
+`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards`, `ADBOX_SMOKE_FEATURE=admins` or `ADBOX_SMOKE_FEATURE=recommendations`. See README for overrides.
 
 Unit and component tests live beside the code they cover as `*.test.ts`/`*.test.tsx` (Vitest +
 React Testing Library, jsdom environment). Shared test setup and render helpers live in

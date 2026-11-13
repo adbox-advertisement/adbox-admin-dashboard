@@ -2,6 +2,30 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Recommendations section: how backend parameters shape the app's lists (2026-11-13)
+
+- Request: a separate navigation page explaining how every adbox-backend parameter affects the recommendation flow in
+  the mobile app; modern and production grade. Built read-only: it explains and simulates, never saves.
+- Findings that shape the page (verified in adbox-backend 4f95072 and adbox-mobile-mvp db1c16e): the app's Home,
+  Shorts and videos-under-a-video use `GET /feed/shuffle` (freshness-weighted draw, constants in code only); the
+  ranked `GET /feed` is built and tunable (`/feed-ranking` policy) but the app does not call it; its quality,
+  half-lives, `exploration.impressionThreshold` and `windowHours` already reach the app via Discover (Explore pools,
+  topic Top). Sponsored posts: `GET /ads/feed` + gold settings; the app asks for 3 and places them at 4, 13, 22.
+  The daily poll card is not live (app uses `NoPollRepository`).
+- New feature `src/features/recommendations/` (see ARCHITECTURE.md bullet): routes `/recommendations`,
+  `/home-feed`, `/sponsored`, `/discover`, `/ranked-feed`, `/parameters`; catalog of 243 parameters
+  (`data/catalog.ts`, completeness test against both policies' bounds); live reads of `GET /feed-ranking`,
+  `/feed-ranking/policies`, `/discover-studio/policy`, `/gold-settings`; `?param=<id>` details sheet; ranked-feed
+  playground (port of libs/recommendation scoring/rerank, backend spec cases ported); trend calculator; SVG charts
+  with palette validated by the dataviz validator (indigo/orange/aqua, light and dark).
+- Shared files: `routes/paths.ts`, `routes/router.ts`, `config/navigation.ts` (Waypoints icon, after User Content),
+  `tests/smoke/app.smoke.mjs` (+ `recommendations.smoke.mjs`, `ADBOX_SMOKE_FEATURE=recommendations`); RDI untouched.
+- Checks: `npm run lint`, `check:architecture`, `typecheck:test`, `npm run build` pass; Vitest 474/476 with the
+  two known Recruitment timeouts under load (12/12 alone; this feature 49/49). Full `npm run test:smoke` passed.
+  Pages screenshotted at 320–1440 px, light and dark, no overflow.
+- Possible next steps: an editor for feed/Discover policy versions (the API has create/activate/deactivate, audited);
+  update the page if the app switches Home to `GET /feed` (move Ranked feed to "In the app").
+
 ## Admin API opened to every network for collaborators (2026-11-13)
 
 - Request: other networks couldn't reach the Super Admin API (Nginx IP allowlist); owner wants collaborators to use

@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { Banknote, CircleHelp, CirclePlay, Gift, GraduationCap, LayoutDashboard, LibraryBig, Settings, UserRound, UsersRound, Video } from "lucide-react"
+import { Banknote, CircleHelp, CirclePlay, Gift, GraduationCap, LayoutDashboard, LibraryBig, Settings, UserRound, UsersRound, Video, Waypoints } from "lucide-react"
 import rdiMark from "@/assets/brand/rdi-mark.svg"
 import { APP_ROUTES } from "@/routes/paths"
 
@@ -47,6 +47,19 @@ export const navItems: DashboardNavItem[] = [
       { label: "Posts", to: APP_ROUTES.userContentPosts, group: "Content" },
       { label: "Surveys", to: APP_ROUTES.userContentSurveys, group: "Content" },
       { label: "Reports", to: APP_ROUTES.userContentReports, group: "To review" },
+    ],
+  },
+  {
+    label: "Recommendations",
+    icon: Waypoints,
+    to: APP_ROUTES.recommendations,
+    children: [
+      { label: "Overview", to: APP_ROUTES.recommendations },
+      { label: "Home & videos", to: APP_ROUTES.recommendationsHome, group: "In the app" },
+      { label: "Sponsored posts", to: APP_ROUTES.recommendationsSponsored, group: "In the app" },
+      { label: "Discover", to: APP_ROUTES.recommendationsDiscover, group: "In the app" },
+      { label: "Ranked feed", to: APP_ROUTES.recommendationsRanked, group: "Not in the app yet" },
+      { label: "All parameters", to: APP_ROUTES.recommendationsParameters, group: "Reference" },
     ],
   },
   {

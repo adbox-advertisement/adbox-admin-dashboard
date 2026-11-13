@@ -17,6 +17,7 @@ import { financialsRoutes } from "@/features/financials"
 import { adsRoutes } from "@/features/ads"
 import { supportRoutes } from "@/features/support"
 import { rewardsRoutes } from "@/features/rewards"
+import { recommendationsRoutes } from "@/features/recommendations"
 import { DashboardLayout } from "@/layouts/DashboardLayout"
 import { requireAdminSession, redirectToWorkspace } from "./guards"
 import { APP_ROUTES } from "./paths"
@@ -45,7 +46,7 @@ export function createAppRouter(queryClient: QueryClient) {
         loader: requireAdminSession,
         shouldRevalidate: () => true,
         children: [
-          ...dashboardRoutes, ...videoRoutes, ...rdiRoutes, ...adminsRoutes, ...recruitmentRoutes, ...settingsRoutes, ...usersRoutes, ...contentRoutes, ...financialsRoutes, ...adsRoutes, ...supportRoutes, ...rewardsRoutes,
+          ...dashboardRoutes, ...videoRoutes, ...rdiRoutes, ...adminsRoutes, ...recruitmentRoutes, ...settingsRoutes, ...usersRoutes, ...contentRoutes, ...recommendationsRoutes, ...financialsRoutes, ...adsRoutes, ...supportRoutes, ...rewardsRoutes,
           ...pendingPages.map(({ path, ...page }) => ({
             path,
             handle: { title: page.title },
