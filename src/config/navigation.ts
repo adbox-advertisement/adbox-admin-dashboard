@@ -50,7 +50,7 @@ export const navItems: DashboardNavItem[] = [
     ],
   },
   {
-    label: "Recommendations",
+    label: "Algorithms",
     icon: Waypoints,
     to: APP_ROUTES.recommendations,
     children: [

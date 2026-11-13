@@ -4,8 +4,9 @@ import { LiveSettingsContext } from "../lib/live-context"
 import { ParameterSheet } from "../components/ParameterSheet"
 
 /**
- * The Recommendations section: reads the live settings once for every page and chip in it, and
- * opens any parameter's details over the page (`?param=<id>`). The sidebar moves between pages.
+ * The Algorithms section (its URLs are under /algorithms): reads the live settings once for
+ * every page and chip in it, and opens any parameter's details over the page (`?param=<id>`). The
+ * sidebar moves between pages.
  */
 export function RecommendationsLayout() {
   const live = useLiveSettings()

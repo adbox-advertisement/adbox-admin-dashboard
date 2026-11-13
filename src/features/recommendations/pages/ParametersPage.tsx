@@ -23,7 +23,7 @@ const isArea = (value: string | null): value is AreaId => AREA_IDS.includes(valu
 const isControl = (value: string | null): value is ControlId => CONTROL_IDS.includes(value as ControlId)
 const isReach = (value: string | null): value is Reach => value === "in-app" || value === "via-discover" || value === "not-yet"
 
-/** Recommendations › All parameters: every number, searchable, with its value in force. Filters live in the URL. */
+/** Algorithms › All parameters: every number, searchable, with its value in force. Filters live in the URL. */
 export function ParametersPage() {
   const live = useLive()
   const [params, setParams] = useSearchParams()

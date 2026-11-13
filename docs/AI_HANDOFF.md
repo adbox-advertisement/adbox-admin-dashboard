@@ -2,7 +2,11 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
-## Recommendations section: how backend parameters shape the app's lists (2026-11-13)
+## Algorithms section: how backend parameters shape the app's lists (2026-11-13)
+
+- Renamed at the owner's request: the sidebar entry, header, tab title and URLs (`/algorithms/*`) say
+  Algorithms; the feature folder and code names stay `recommendations`. `/recommendations` was never
+  shipped, so it has no redirect (it now shows the not-found screen).
 
 - Request: a separate navigation page explaining how every adbox-backend parameter affects the recommendation flow in
   the mobile app; modern and production grade. Built read-only: it explains and simulates, never saves.
@@ -12,7 +16,7 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
   half-lives, `exploration.impressionThreshold` and `windowHours` already reach the app via Discover (Explore pools,
   topic Top). Sponsored posts: `GET /ads/feed` + gold settings; the app asks for 3 and places them at 4, 13, 22.
   The daily poll card is not live (app uses `NoPollRepository`).
-- New feature `src/features/recommendations/` (see ARCHITECTURE.md bullet): routes `/recommendations`,
+- New feature `src/features/recommendations/` (see ARCHITECTURE.md bullet): routes `/algorithms`,
   `/home-feed`, `/sponsored`, `/discover`, `/ranked-feed`, `/parameters`; catalog of 243 parameters
   (`data/catalog.ts`, completeness test against both policies' bounds); live reads of `GET /feed-ranking`,
   `/feed-ranking/policies`, `/discover-studio/policy`, `/gold-settings`; `?param=<id>` details sheet; ranked-feed

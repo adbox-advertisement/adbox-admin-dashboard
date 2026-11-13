@@ -28,7 +28,7 @@ architecture source of truth. Before making layout decisions, read `docs/grid.md
 the responsive grid guidance.
 
 Current implementation: `src/main.tsx` mounts `src/app/App.tsx` inside the shared providers.
-Auth, Dashboard, Manage Users, User Content, Recommendations, Ads, Financials, Manage Admins, Recruitment, Rewards, Settings, Support, Video Management, and RDI own their lazy routes under `src/features/`.
+Auth, Dashboard, Manage Users, User Content, Algorithms, Ads, Financials, Manage Admins, Recruitment, Rewards, Settings, Support, Video Management, and RDI own their lazy routes under `src/features/`.
 Read `docs/ARCHITECTURE.md` for module ownership, data integration status, and extension steps.
 
 Key wiring that spans several files:

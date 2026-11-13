@@ -21,7 +21,7 @@ const drawSeries = [
   { id: "spotlight", label: "Spotlight author", tone: "second" as const, points: hours.map((x) => ({ x, y: drawWeight(x, { spotlight: true }) })) },
 ]
 
-/** Recommendations › Home & videos: the fresh shuffle behind Home, Shorts and the videos under a video. */
+/** Algorithms › Home & videos: the fresh shuffle behind Home, Shorts and the videos under a video. */
 export function HomeFeedPage() {
   const floorDays = floorAgeHours() / 24
   return <div className="flex min-w-0 flex-col gap-5 px-4 sm:px-6">

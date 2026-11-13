@@ -16,7 +16,7 @@ import { controlIcons, focusRing, hairline, ink, muted, surface } from "../compo
 
 const ago = (value: string | null) => (value ? `${formatDistanceToNowStrict(new Date(value))} ago` : null)
 
-/** Recommendations › Overview: every list the app shows, and every number that fills it. */
+/** Algorithms › Overview: every list the app shows, and every number that fills it. */
 export function OverviewPage() {
   const total = PARAMETERS.length
   const adjustable = PARAMETERS.filter((parameter) => ["feed-policy", "discover-policy", "gold"].includes(parameter.control)).length

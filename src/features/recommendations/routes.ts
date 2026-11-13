@@ -6,7 +6,7 @@ import type { AppRouteHandle } from "@/routes/types"
 // shows, each titled for the header. The sidebar lists them (src/config/navigation.ts).
 export const recommendationsRoutes: RouteObject[] = [{
   path: APP_ROUTES.recommendations,
-  handle: { title: "Recommendations" } satisfies AppRouteHandle,
+  handle: { title: "Algorithms" } satisfies AppRouteHandle,
   lazy: async () => ({ Component: (await import("./pages/RecommendationsLayout")).RecommendationsLayout }),
   children: [
     { index: true, lazy: async () => ({ Component: (await import("./pages/OverviewPage")).OverviewPage }) },

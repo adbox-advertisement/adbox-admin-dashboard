@@ -20,7 +20,7 @@ const SECTIONS = [
   { id: "topics", label: "Topic pages" },
 ]
 
-/** Recommendations › Discover: trends, the Explore grid, people to follow, search and topic pages. */
+/** Algorithms › Discover: trends, the Explore grid, people to follow, search and topic pages. */
 export function DiscoverPage() {
   const { discover } = useLive()
   const policy = discover.policy

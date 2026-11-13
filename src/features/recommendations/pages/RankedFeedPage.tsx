@@ -23,7 +23,7 @@ const when = (value: string | null) => (value ? `${formatDistanceToNowStrict(new
 const nameOf = (path: string) => parameterById(`feed.${path}`)?.name ?? path
 const show = (value: unknown) => (typeof value === "number" ? formatNumber(value) : String(value ?? "—"))
 
-/** Recommendations › Ranked feed: GET /feed, built and controllable, not yet called by the app. */
+/** Algorithms › Ranked feed: GET /feed, built and controllable, not yet called by the app. */
 export function RankedFeedPage() {
   const { feed } = useLive()
   const halfLives = feed.config.halfLifeHours

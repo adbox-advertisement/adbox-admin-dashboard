@@ -67,19 +67,19 @@ export async function checkRecommendations(page, baseUrl) {
   await page.route(settingsApi, route)
   await page.setViewportSize({ width: 1440, height: 1000 })
   try {
-    // Reached from the sidebar, its own section with an overview.
-    await page.goto(baseUrl + '/recommendations')
-    await page.getByRole('heading', { name: 'Recommendations', exact: true }).first().waitFor()
-    assert.equal(await page.title(), 'Recommendations | AdBox')
+    // Reached from the sidebar as Algorithms, its own section with an overview.
+    await page.goto(baseUrl + '/algorithms')
+    await page.getByRole('heading', { name: 'Algorithms', exact: true }).first().waitFor()
+    assert.equal(await page.title(), 'Algorithms | AdBox')
     const nav = page.getByRole('navigation', { name: 'Dashboard navigation', exact: true })
     for (const [path, label] of [['', 'Overview'], ['/home-feed', 'Home & videos'], ['/sponsored', 'Sponsored posts'], ['/discover', 'Discover'], ['/ranked-feed', 'Ranked feed'], ['/parameters', 'All parameters']]) {
-      await nav.locator(`a[href="/recommendations${path}"]`).getByText(label, { exact: true }).waitFor()
+      await nav.locator(`a[href="/algorithms${path}"]`).getByText(label, { exact: true }).waitFor()
     }
     await page.getByTestId('feed-version').getByText('policy-v2').waitFor()
     // Discover could not be read: its defaults are shown, and say so.
     await page.getByTestId('discover-version').getByText('discover-v1').waitFor()
     await page.getByText("Couldn't load", { exact: true }).waitFor()
-    await noOverflow('/recommendations')
+    await noOverflow('/algorithms')
 
     // Any value opens its details over the page; Escape closes them.
     await page.getByRole('link', { name: 'Share weight: 8, changed from the default' }).first().click()
@@ -93,9 +93,9 @@ export async function checkRecommendations(page, baseUrl) {
     assert.doesNotMatch(page.url(), /param=/)
 
     for (const [path, title, shows] of [
-      ['/recommendations/home-feed', 'Home & videos', 'Floor from 5.1 days'],
-      ['/recommendations/sponsored', 'Sponsored posts', 'Places 4, 13, 22'],
-      ['/recommendations/discover', 'Discover', 'Trend score'],
+      ['/algorithms/home-feed', 'Home & videos', 'Floor from 5.1 days'],
+      ['/algorithms/sponsored', 'Sponsored posts', 'Places 4, 13, 22'],
+      ['/algorithms/discover', 'Discover', 'Trend score'],
     ]) {
       await page.goto(baseUrl + path)
       await page.getByRole('heading', { name: title, exact: true }).first().waitFor()
@@ -104,17 +104,17 @@ export async function checkRecommendations(page, baseUrl) {
     }
 
     // The playground re-ranks the sample posts, and saves nothing.
-    await page.goto(baseUrl + '/recommendations/ranked-feed')
+    await page.goto(baseUrl + '/algorithms/ranked-feed')
     await page.getByText('“Shares count for more”').waitFor()
     await page.getByText('The order the settings in force give').waitFor()
     await page.getByLabel('Hide penalty', { exact: true }).fill('0')
     await page.getByText(/With your changes, \d+ of 12 posts move/).waitFor()
     await page.getByRole('button', { name: 'Back to live' }).click()
     await page.getByText('The order the settings in force give').waitFor()
-    await noOverflow('/recommendations/ranked-feed')
+    await noOverflow('/algorithms/ranked-feed')
 
     // Every parameter, filtered in the URL.
-    await page.goto(baseUrl + '/recommendations/parameters')
+    await page.goto(baseUrl + '/algorithms/parameters')
     const count = page.getByTestId('parameter-count')
     const total = Number((await count.textContent()).match(/\d+/)[0])
     assert.ok(total > 200, 'every parameter is listed')
@@ -130,15 +130,15 @@ export async function checkRecommendations(page, baseUrl) {
     await page.getByRole('link', { name: 'Views per person per ad, a day', exact: true }).waitFor()
     await page.getByRole('button', { name: 'Clear filters' }).click()
     await count.getByText(`${total} parameters`, { exact: true }).waitFor()
-    await noOverflow('/recommendations/parameters')
+    await noOverflow('/algorithms/parameters')
 
     await setThemeFromSettings(page, baseUrl, 'dark')
     await page.getByTestId('parameter-count').waitFor()
-    await noOverflow('/recommendations/parameters (dark)')
+    await noOverflow('/algorithms/parameters (dark)')
     await setThemeFromSettings(page, baseUrl, 'light')
-    assert.deepEqual(writes, [], 'Recommendations only reads')
+    assert.deepEqual(writes, [], 'Algorithms only reads')
   } finally {
     await page.unroute(settingsApi, route)
   }
-  console.log('Recommendations: live and default settings, parameter details, every page, the ranking playground, filters, dark mode and responsive layouts passed')
+  console.log('Algorithms: live and default settings, parameter details, every page, the ranking playground, filters, dark mode and responsive layouts passed')
 }

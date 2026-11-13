@@ -16,7 +16,7 @@ import { focusRing, hairline, ink, muted, pill, tones } from "../components/toke
 
 const clock = (hour: number) => `${String(Math.floor(hour) % 24 === 0 && hour > 0 ? 24 : Math.floor(hour)).padStart(2, "0")}:${hour % 1 ? "30" : "00"}`
 
-/** Recommendations › Sponsored posts: which ads a person is served, how fast, and where Home puts them. */
+/** Algorithms › Sponsored posts: which ads a person is served, how fast, and where Home puts them. */
 export function SponsoredPage() {
   const { gold } = useLive()
   const budgets = [...new Set([gold.values.adDailyBudgetMinBars, 1500, 5000, gold.values.adDailyBudgetMaxBars])]

@@ -39,7 +39,7 @@ let requested: string[] = []
 
 function renderSection(path: string) {
   return renderWithProviders(<Routes>
-    <Route path="/recommendations" element={<RecommendationsLayout />}>
+    <Route path="/algorithms" element={<RecommendationsLayout />}>
       <Route index element={<OverviewPage />} />
       <Route path="home-feed" element={<HomeFeedPage />} />
       <Route path="sponsored" element={<SponsoredPage />} />
@@ -53,7 +53,7 @@ function renderSection(path: string) {
 // These pages are large; under the full suite's parallel load they take seconds to render in jsdom.
 const slow = { timeout: 8000 }
 
-describe("Recommendations", { timeout: 20_000 }, () => {
+describe("Algorithms", { timeout: 20_000 }, () => {
   beforeEach(() => {
     permissions = ["*"]
     requested = []
@@ -73,7 +73,7 @@ describe("Recommendations", { timeout: 20_000 }, () => {
   })
 
   it("shows the live versions of all three settings and every list the app shows", async () => {
-    renderSection("/recommendations")
+    renderSection("/algorithms")
     await waitFor(() => expect(screen.getByTestId("feed-version")).toHaveTextContent("policy-v4"), slow)
     await waitFor(() => expect(screen.getByTestId("discover-version")).toHaveTextContent("discover-v2"), slow)
     expect(await screen.findByText("4 views a day", {}, slow)).toBeInTheDocument()
@@ -87,7 +87,7 @@ describe("Recommendations", { timeout: 20_000 }, () => {
 
   it("shows the built-in defaults, and asks for nothing, without read permissions", async () => {
     permissions = ["admins.read"]
-    renderSection("/recommendations")
+    renderSection("/algorithms")
     expect(await screen.findAllByText("Live values need", { exact: false }, slow)).toHaveLength(3)
     expect(screen.getByTestId("feed-version")).toHaveTextContent("heuristic-v1")
     expect(screen.getAllByText("Defaults shown")).toHaveLength(3)
@@ -96,13 +96,13 @@ describe("Recommendations", { timeout: 20_000 }, () => {
 
   it("explains a live version the gateway ignores", async () => {
     feedOverview = { active: policy(5, { ...v4, sessionSize: 5 }, { isActive: true }), defaults: DEFAULT_RANKING_CONFIG, bounds: RANKING_CONFIG_BOUNDS }
-    renderSection("/recommendations")
+    renderSection("/algorithms")
     expect(await screen.findByText(/fails validation, so the gateway uses the defaults: sessionSize must be between 20 and 500/, {}, slow)).toBeInTheDocument()
     expect(screen.getByTestId("feed-version")).toHaveTextContent("heuristic-v1")
   })
 
   it("opens any parameter's details from its chip", async () => {
-    renderSection("/recommendations/home-feed")
+    renderSection("/algorithms/home-feed")
     fireEvent.click((await screen.findAllByRole("link", { name: /Draw half-life: 24 h/ }, slow))[0])
     const details = await screen.findByRole("dialog", {}, slow)
     expect(within(details).getByText("SHUFFLE_HALF_LIFE_HOURS")).toBeInTheDocument()
@@ -111,7 +111,7 @@ describe("Recommendations", { timeout: 20_000 }, () => {
   })
 
   it("filters every parameter by area, control and words, from the URL", async () => {
-    renderSection("/recommendations/parameters?control=gold")
+    renderSection("/algorithms/parameters?control=gold")
     expect(await screen.findByTestId("parameter-count", {}, slow)).toHaveTextContent(`5 of ${PARAMETERS.length} parameters`)
     expect(screen.getByRole("link", { name: "Views per person per ad, a day" })).toBeInTheDocument()
 
@@ -127,7 +127,7 @@ describe("Recommendations", { timeout: 20_000 }, () => {
 
   it("re-ranks the sample posts as a setting moves, without saving anything", async () => {
     const post = vi.spyOn(superAdminApi, "post")
-    renderSection("/recommendations/ranked-feed")
+    renderSection("/algorithms/ranked-feed")
     expect(await screen.findByText("The order the settings in force give", {}, slow)).toBeInTheDocument()
     const posts = () => within(screen.getAllByRole("list").find((list) => list.getAttribute("aria-describedby"))!).getAllByRole("listitem").map((item) => item.textContent ?? "")
     const before = posts()
@@ -143,14 +143,14 @@ describe("Recommendations", { timeout: 20_000 }, () => {
   })
 
   it("lists the feed's versions with what each changed", async () => {
-    renderSection("/recommendations/ranked-feed")
+    renderSection("/algorithms/ranked-feed")
     expect(await screen.findByText("Version 4", {}, slow)).toBeInTheDocument()
     expect(screen.getByText("“Explore slot every 8”")).toBeInTheDocument()
     expect(screen.getByText(/Ranked share: 50% →/)).toBeInTheDocument()
   })
 
   it("works out a trend score with the live Discover policy", async () => {
-    renderSection("/recommendations/discover")
+    renderSection("/algorithms/discover")
     const score = await screen.findByTestId("trend-score", {}, slow)
     const first = score.textContent
     fireEvent.change(screen.getByLabelText("People taking part"), { target: { value: "1" } })
@@ -159,7 +159,7 @@ describe("Recommendations", { timeout: 20_000 }, () => {
   })
 
   it("shows where Home puts sponsored posts and how fast they are paced", async () => {
-    renderSection("/recommendations/sponsored")
+    renderSection("/algorithms/sponsored")
     expect(await screen.findByText("Places 4, 13, 22", {}, slow)).toBeInTheDocument()
     fireEvent.click(screen.getByRole("radio", { name: "5,000 bars a day" }))
     expect(screen.getByRole("radio", { name: "5,000 bars a day" })).toHaveAttribute("aria-checked", "true")
