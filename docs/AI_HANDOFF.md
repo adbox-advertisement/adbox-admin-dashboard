@@ -7,6 +7,36 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
 - Renamed at the owner's request: the sidebar entry, header, tab title and URLs (`/algorithms/*`) say
   Algorithms; the feature folder and code names stay `recommendations`. `/recommendations` was never
   shipped, so it has no redirect (it now shows the not-found screen).
+- Ranked share control (owner's request): Ranked feed page → "The policy in force" → *Change the ranked share*
+  (`components/RankedShareControl.tsx`), for admins with `feed.ranking.manage`. Presets 0/10/25/50/100 or any whole
+  number, optional note, confirmation dialog, then `POST /feed-ranking/policies` `{ rankedPercent, note?, activate: true }`
+  (config carried over by the server; audited; live within 30 s). It has no visible effect until the app calls `GET /feed`.
+- Trending overrides page (owner's request, all six kinds): `/algorithms/trending-overrides`, sidebar Manage group.
+  `pages/TrendingOverridesPage.tsx`, `components/{TrendList,OverrideList,OverrideDialog}.tsx`, `lib/overrides.ts`.
+  Reads trends status/report/overrides (`discover.read`), subjects via hashtags, institutions (campuses, halls),
+  people and approved events; writes create/end (`discover.trends.manage`). Only lists the job built are offered
+  (a campus without its own list uses its institution's overrides). Tests: `lib/overrides.test.ts`,
+  `pages/TrendingOverrides.test.tsx`; smoke pins a searched hashtag and ends a pin.
+- Top trends page (owner's request: the top 10 "with the fire ball besides them just like in the mobile side", and
+  everything about each): `/algorithms/top-trends`, sidebar In the app group. Read-only: `POST /discover-studio/preview`
+  with nothing unsaved (`discover.read`; Trending exactly as the app gets it) joined to `GET /discover-studio/trends`
+  (earned place, score parts, top post, overrides); lists are Nationwide or an institution (`?list=global|inst:<id>`,
+  what the app reads), chosen trend in `?trend=KIND:id`; re-read every minute. Flame = the app's `DiscoverFlame`
+  as SVG (`components/Flame.tsx`, keyframes sampled from the app's formula in `styles/flame.css`, error/warning
+  tokens, still with reduced motion); beside all 10 here (the app burns the top 3 only, and the page says so).
+  Files: `pages/TopTrendsPage.tsx`, `components/{TopTrendList,TrendInspector,TrendComparison,Flame}.tsx`,
+  `lib/top-trends.ts`, new schemas in `types.ts` (`appTrendListSchema`, `discoverPreviewSchema`, score `parts` on
+  report items). Tests: `lib/top-trends.test.ts`, `pages/TopTrends.test.tsx`; smoke checks 10 flames, choosing from the
+  list and the table, motion, dark mode, no overflow 320–1440. Not yet seen with real data (needs an admin login).
+  Checks: architecture, lint, test types, build pass; this section 83/83; `ADBOX_SMOKE_FEATURE=recommendations` smoke
+  passed. Full Vitest twice: 508/510 then 506/510, the failures 5 s timeouts under load in untouched files
+  (Recruitment, then User Content and Support), each passing alone. Screenshots checked: 1440 light/dark, 390.
+- Local testing: `.env.local` (ignored) leaves `ADBOX_API_PROXY_TARGET` commented, so `npm run dev` uses the local
+  super-admin on :3005, the same database `flutter run` reads through the gateway on :3000. Open questions: the live
+  Discover policy card's "Couldn't load" (the card now prints the server's reason; awaiting it), and a test pin may
+  still be in force on the live server (end it in Trending overrides against live if so).
+- `docs/ALGORITHMS_EXPLAINED.md`: the owner's plain-language guide to the section (defaults, worked examples
+  checked against the code, page tour, badges, FAQ, glossary). Update it if defaults or pages change.
 
 - Request: a separate navigation page explaining how every adbox-backend parameter affects the recommendation flow in
   the mobile app; modern and production grade. Built read-only: it explains and simulates, never saves.

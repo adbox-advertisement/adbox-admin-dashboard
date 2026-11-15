@@ -13,6 +13,8 @@ export const recommendationsRoutes: RouteObject[] = [{
     { path: "home-feed", handle: { title: "Home & videos" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/HomeFeedPage")).HomeFeedPage }) },
     { path: "sponsored", handle: { title: "Sponsored posts" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/SponsoredPage")).SponsoredPage }) },
     { path: "discover", handle: { title: "Discover" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/DiscoverPage")).DiscoverPage }) },
+    { path: "top-trends", handle: { title: "Top trends" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/TopTrendsPage")).TopTrendsPage }) },
+    { path: "trending-overrides", handle: { title: "Trending overrides" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/TrendingOverridesPage")).TrendingOverridesPage }) },
     { path: "ranked-feed", handle: { title: "Ranked feed" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/RankedFeedPage")).RankedFeedPage }) },
     { path: "parameters", handle: { title: "All parameters" } satisfies AppRouteHandle, lazy: async () => ({ Component: (await import("./pages/ParametersPage")).ParametersPage }) },
   ],

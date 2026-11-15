@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { Route, Routes } from "react-router-dom"
+import { AxiosError, AxiosHeaders } from "axios"
 import { fireEvent, renderWithProviders, screen, waitFor, within } from "@/test/test-utils"
 import { superAdminApi } from "@/api/client"
 import { profileFixture } from "@/test/rbac-fixtures"
@@ -35,6 +36,7 @@ const gold = {
 
 let permissions: string[] = ["*"]
 let feedOverview: unknown
+let versions: unknown[] = []
 let requested: string[] = []
 
 function renderSection(path: string) {
@@ -57,13 +59,14 @@ describe("Algorithms", { timeout: 20_000 }, () => {
   beforeEach(() => {
     permissions = ["*"]
     requested = []
+    versions = [...history]
     feedOverview = { active: history[0], defaults: DEFAULT_RANKING_CONFIG, bounds: RANKING_CONFIG_BOUNDS }
     vi.restoreAllMocks()
     vi.spyOn(superAdminApi, "get").mockImplementation(async (url) => {
       requested.push(url)
       if (url === "/auth/me") return { data: { ...profileFixture, permissions } }
       if (url === "/feed-ranking") return { data: feedOverview }
-      if (url === "/feed-ranking/policies") return { data: { items: history } }
+      if (url === "/feed-ranking/policies") return { data: { items: versions } }
       if (url === "/discover-studio/policy") {
         return { data: { active: { id: "d2", version: 2, isActive: true, config: { version: "discover-v2", score: { momentumExponent: 0.8 } }, note: null, createdAt: "2026-11-01T10:00:00.000Z", activatedAt: "2026-11-02T10:00:00.000Z" }, defaults: DEFAULT_DISCOVER_POLICY, bounds: DISCOVER_POLICY_BOUNDS } }
       }
@@ -165,5 +168,56 @@ describe("Algorithms", { timeout: 20_000 }, () => {
     expect(screen.getByRole("radio", { name: "5,000 bars a day" })).toHaveAttribute("aria-checked", "true")
     // 5,000 bars at 1,250 per 1,000 views.
     expect(screen.getAllByText("4,000").length).toBeGreaterThan(0)
+  })
+
+  it("changes the ranked share as a new live version, only after confirming", async () => {
+    const post = vi.spyOn(superAdminApi, "post").mockImplementation(async (_url, body) => {
+      const { rankedPercent, note } = body as { rankedPercent: number; note?: string }
+      const created = policy(5, { ...v4, version: "policy-v5" }, { isActive: true, rankedPercent, note: note ?? null, activatedAt: "2026-11-13T10:00:00.000Z" })
+      versions = [created, { ...history[0], isActive: false }, history[1]]
+      feedOverview = { active: created, defaults: DEFAULT_RANKING_CONFIG, bounds: RANKING_CONFIG_BOUNDS }
+      return { data: created }
+    })
+    renderSection("/algorithms/ranked-feed")
+    expect(await screen.findByTestId("ranked-share-now", {}, slow)).toHaveTextContent("Now: 100%")
+
+    fireEvent.click(screen.getByRole("button", { name: "50%" }))
+    expect(screen.getByTestId("ranked-share-split")).toHaveTextContent("50% ranked · 50% newest first.")
+    fireEvent.change(screen.getByLabelText(/^Why/), { target: { value: "Test ranked against newest first" } })
+    fireEvent.click(await screen.findByRole("button", { name: "Save as version 5" }, slow))
+
+    const dialog = await screen.findByRole("dialog", {}, slow)
+    expect(within(dialog).getByText("Give 50% of people the ranked feed?")).toBeInTheDocument()
+    expect(within(dialog).getByText(/Every other setting stays as it is in version 4/)).toBeInTheDocument()
+    expect(post).not.toHaveBeenCalled()
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save and make live" }))
+    await waitFor(() => expect(post).toHaveBeenCalledWith("/feed-ranking/policies", { rankedPercent: 50, note: "Test ranked against newest first", activate: true }), slow)
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument(), slow)
+    await waitFor(() => expect(screen.getByTestId("ranked-share-now")).toHaveTextContent("Now: 50%"), slow)
+    expect(screen.getByText("Version 5")).toBeInTheDocument()
+    expect(post).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps the dialog open and says why when a save is refused", async () => {
+    vi.spyOn(superAdminApi, "post").mockRejectedValue(new AxiosError("Forbidden", "ERR_BAD_REQUEST", undefined, undefined,
+      { status: 403, data: { message: "Forbidden resource" }, statusText: "Forbidden", headers: {}, config: { headers: new AxiosHeaders() } }))
+    renderSection("/algorithms/ranked-feed")
+    await screen.findByTestId("ranked-share-now", {}, slow)
+    fireEvent.click(screen.getByRole("button", { name: "0%" }))
+    expect(screen.getByTestId("ranked-share-split")).toHaveTextContent("Ranking off: everyone gets newest first.")
+    fireEvent.click(await screen.findByRole("button", { name: "Save as version 5" }, slow))
+    const dialog = await screen.findByRole("dialog", {}, slow)
+    expect(within(dialog).getByText("Switch ranking off for everyone?")).toBeInTheDocument()
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save and make live" }))
+    expect(await within(dialog).findByRole("alert", {}, slow)).toHaveTextContent(/don't have permission to change the feed ranking/)
+    expect(screen.getByRole("dialog")).toBeInTheDocument()
+  })
+
+  it("offers the ranked share control only to admins who manage the feed ranking", async () => {
+    permissions = ["feed.ranking.read"]
+    renderSection("/algorithms/ranked-feed")
+    expect(await screen.findByText("Changing the ranked share needs feed.ranking.manage.", {}, slow)).toBeInTheDocument()
+    expect(screen.queryByTestId("ranked-share-now")).not.toBeInTheDocument()
   })
 })

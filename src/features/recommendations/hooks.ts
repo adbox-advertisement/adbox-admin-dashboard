@@ -1,6 +1,22 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useCurrentAdmin } from "@/features/auth"
-import { getAdSettings, getDiscoverPolicy, getFeedRanking, getFeedRankingHistory } from "./api"
+import {
+  createOverride,
+  endOverride,
+  getAdSettings,
+  getAppTrends,
+  getApprovedEvents,
+  getDiscoverPolicy,
+  getFeedRanking,
+  getFeedRankingHistory,
+  getInstitutionDirectory,
+  getOverrides,
+  getTrendReport,
+  getTrendStatus,
+  saveRankedShare,
+  searchHashtags,
+  searchPeople,
+} from "./api"
 import { AD_SETTINGS_DEFAULTS, DEFAULT_DISCOVER_POLICY, DEFAULT_RANKING_CONFIG, DISCOVER_POLICY_BOUNDS, RANKING_CONFIG_BOUNDS } from "./data/backend-defaults"
 import { boundsProblems, mergeOver } from "./lib/values"
 import {
@@ -18,10 +34,14 @@ import {
 } from "./types"
 
 const keys = {
+  /** The overview and the version history both start with this. */
   feed: ["recommendations", "feed-ranking"] as const,
   history: (limit: number) => ["recommendations", "feed-ranking", "history", limit] as const,
   discover: ["recommendations", "discover-policy"] as const,
   ads: ["recommendations", "ad-settings"] as const,
+  /** Lists and their overrides: every override write refreshes both. */
+  trends: ["recommendations", "trends"] as const,
+  overrides: ["recommendations", "overrides"] as const,
 }
 
 /** Which live settings this admin may read. The backend decides; this only avoids certain 403s. */
@@ -32,8 +52,12 @@ export function useRecommendationAccess() {
   return {
     loading: profile.isPending,
     feed: can(RECOMMENDATION_PERMISSIONS.feedRanking),
+    manageFeed: can(RECOMMENDATION_PERMISSIONS.feedRankingManage),
     discover: can(RECOMMENDATION_PERMISSIONS.discover),
+    manageTrends: can(RECOMMENDATION_PERMISSIONS.discoverTrendsManage),
     gold: can(RECOMMENDATION_PERMISSIONS.gold),
+    institutions: can(RECOMMENDATION_PERMISSIONS.institutions),
+    people: can(RECOMMENDATION_PERMISSIONS.people),
   }
 }
 
@@ -46,6 +70,16 @@ export function useFeedRanking(enabled: boolean) {
 
 export function useFeedRankingHistory(enabled: boolean, limit = 12) {
   return useQuery({ queryKey: keys.history(limit), queryFn: ({ signal }) => getFeedRankingHistory(limit, signal), enabled, staleTime: STALE_MS })
+}
+
+/** Saves the ranked share as a new live version, then re-reads the policy and its history. */
+export function useSaveRankedShare() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: saveRankedShare,
+    // A failed or timed-out save may still have landed: re-read either way.
+    onSettled: () => client.invalidateQueries({ queryKey: keys.feed }),
+  })
 }
 
 export function useDiscoverPolicy(enabled: boolean) {
@@ -184,3 +218,65 @@ export function useLiveSettings() {
   return { feed: useFeedSettings(), discover: useDiscoverSettings(), gold: useGoldAdSettings() }
 }
 export type LiveSettings = ReturnType<typeof useLiveSettings>
+
+// ── Trending overrides ─────────────────────────────────────────────────────
+
+export function useTrendStatus(enabled: boolean) {
+  return useQuery({ queryKey: [...keys.trends, "status"], queryFn: ({ signal }) => getTrendStatus(signal), enabled, staleTime: STALE_MS })
+}
+
+/** `refetchInterval` keeps a page that watches the list current. */
+export function useTrendReport(scopeKey: string, enabled: boolean, refetchInterval?: number) {
+  return useQuery({ queryKey: [...keys.trends, "report", scopeKey], queryFn: ({ signal }) => getTrendReport(scopeKey, signal), enabled, staleTime: 30_000, refetchInterval })
+}
+
+/** Trending as the app shows it now, Nationwide (null) or at one institution. Re-read every minute. */
+export function useAppTrends(institutionId: string | null, enabled: boolean) {
+  return useQuery({
+    queryKey: [...keys.trends, "app", institutionId ?? "global"],
+    queryFn: ({ signal }) => getAppTrends(institutionId, signal),
+    enabled,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  })
+}
+
+export function useOverrides(scopeKey: string, includeEnded: boolean, enabled: boolean) {
+  return useQuery({ queryKey: [...keys.overrides, scopeKey, includeEnded], queryFn: ({ signal }) => getOverrides(scopeKey, includeEnded, signal), enabled, staleTime: 30_000 })
+}
+
+/** Re-reads every list now: the app's Trending, the trends reports and the job's status. */
+export function useRefreshTrends() {
+  const client = useQueryClient()
+  return () => client.invalidateQueries({ queryKey: keys.trends })
+}
+
+/** After any override write, success or not (it may still have landed), re-read lists and overrides. */
+function useOverrideWrite<T, R>(write: (input: T) => Promise<R>) {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: write,
+    onSettled: () => Promise.all([client.invalidateQueries({ queryKey: keys.overrides }), client.invalidateQueries({ queryKey: keys.trends })]),
+  })
+}
+
+export const useCreateOverride = () => useOverrideWrite(createOverride)
+export const useEndOverride = () => useOverrideWrite(endOverride)
+
+export function useHashtagSearch(q: string, enabled: boolean) {
+  const term = q.trim().replace(/^#/, "")
+  return useQuery({ queryKey: ["recommendations", "hashtags", term], queryFn: ({ signal }) => searchHashtags(term, signal), enabled: enabled && term.length > 0, staleTime: STALE_MS })
+}
+
+export function useInstitutionDirectory(enabled: boolean) {
+  return useQuery({ queryKey: ["recommendations", "institutions"], queryFn: ({ signal }) => getInstitutionDirectory(signal), enabled, staleTime: 5 * 60_000 })
+}
+
+export function usePeopleSearch(q: string, enabled: boolean) {
+  const term = q.trim()
+  return useQuery({ queryKey: ["recommendations", "people", term], queryFn: ({ signal }) => searchPeople(term, signal), enabled: enabled && term.length >= 2, staleTime: STALE_MS })
+}
+
+export function useApprovedEvents(enabled: boolean) {
+  return useQuery({ queryKey: ["recommendations", "events"], queryFn: ({ signal }) => getApprovedEvents(signal), enabled, staleTime: STALE_MS })
+}

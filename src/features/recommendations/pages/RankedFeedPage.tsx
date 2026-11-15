@@ -1,4 +1,5 @@
-import type { ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
+import { useLocation } from "react-router-dom"
 import { format, formatDistanceToNowStrict } from "date-fns"
 import { FlaskConical, History, ListOrdered, Sigma, Workflow } from "lucide-react"
 import { cn } from "../lib/cn"
@@ -12,6 +13,7 @@ import { Callout, Formula, Op, PageHero, Section, Steps, Term } from "../compone
 import { ParamChip, ParamValue } from "../components/ParamChip"
 import { ParameterTable } from "../components/ParameterTable"
 import { RankingPlayground } from "../components/RankingPlayground"
+import { RankedShareControl } from "../components/RankedShareControl"
 import { ErrorState, ReachPill, StatusPill } from "../components/Surface"
 import { hairline, ink, muted, pill, tones } from "../components/tokens"
 
@@ -26,6 +28,11 @@ const show = (value: unknown) => (typeof value === "number" ? formatNumber(value
 /** Algorithms › Ranked feed: GET /feed, built and controllable, not yet called by the app. */
 export function RankedFeedPage() {
   const { feed } = useLive()
+  const { hash } = useLocation()
+  // "Change it" in the ranked share's details links here; the control appears once the policy loads.
+  useEffect(() => {
+    if (hash === "#ranked-share" && feed.status === "live") document.getElementById("ranked-share")?.scrollIntoView({ block: "center" })
+  }, [hash, feed.status])
   const halfLives = feed.config.halfLifeHours
   const days = Array.from({ length: 85 }, (_, index) => index * 2)
   const curve = (halfLife: number) => days.map((x) => ({ x, y: Math.pow(0.5, x / halfLife) }))
@@ -136,6 +143,9 @@ function PolicySection() {
         {feed.ignored.length > 0 && <p className="mt-2 text-b3 font-semibold text-warning-700 dark:text-warning-300">Version {feed.active?.version} fails validation ({feed.ignored[0]}), so the gateway uses the defaults.</p>}
         {feed.status === "error" && <div className="-mx-5"><ErrorState message="Could not load the feed ranking settings." onRetry={feed.refetch} /></div>}
         <div className="mt-4 flex flex-wrap gap-1.5"><ParamChip id="feed.rankedPercent" /><ParamChip id="env.policyRefresh" /></div>
+        {feed.status === "live" && (access.manageFeed
+          ? <RankedShareControl />
+          : <p className={cn("mt-3 text-b3", muted)}>Changing the ranked share needs {RECOMMENDATION_PERMISSIONS.feedRankingManage}.</p>)}
         <div className={cn("mt-4 rounded-2xl border p-4", hairline)}>
           <p className={cn("mb-2 text-b3 font-semibold", ink)}>Against the built-in defaults</p>
           <ChangeList changes={fromDefaults} limit={8} />
@@ -162,7 +172,7 @@ function VersionRow({ version, previous, defaults }: { version: FeedRankingPolic
   return <li className={cn("rounded-2xl border p-4", hairline, version.isActive && "border-purple/40 bg-purple/[0.03] dark:bg-royal-500/5")}>
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className={cn("flex items-center gap-2 text-b2 font-semibold", ink)}>
-        Version {version.version}
+        <span>Version {version.version}</span>
         {version.isActive && <span className={cn(pill, tones.success)}>Live</span>}
       </p>
       <p className={cn("text-b4 tabular-nums", muted)} title={format(new Date(version.createdAt), "d MMM yyyy, HH:mm")}>Saved {when(version.createdAt)}</p>

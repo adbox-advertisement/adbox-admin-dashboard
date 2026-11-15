@@ -6,6 +6,7 @@ import { cn } from "../lib/cn"
 import { PARAM_QUERY, useLive } from "../lib/live-context"
 import { displayValue, provenance, resolveParameter } from "../lib/resolve"
 import { formatWithUnit } from "../lib/values"
+import { useRecommendationAccess } from "../hooks"
 import { AREAS, CONTROLS, STAGES, SURFACES, parameterById, reachOf } from "../data/catalog"
 import { ControlPill, ReachPill, StatusPill } from "./Surface"
 import { focusRing, hairline, ink, muted } from "./tokens"
@@ -14,6 +15,7 @@ import { focusRing, hairline, ink, muted } from "./tokens"
 export function ParameterSheet() {
   const [params, setParams] = useSearchParams()
   const live = useLive()
+  const access = useRecommendationAccess()
   const parameter = parameterById(params.get(PARAM_QUERY))
 
   const close = () => {
@@ -83,6 +85,10 @@ export function ParameterSheet() {
             <p className={cn("mt-1 text-b2 leading-6", muted)}>{CONTROLS[parameter.control].where}. {CONTROLS[parameter.control].speed}.</p>
             {parameter.control === "gold" && <Link to={APP_ROUTES.goldPricing} className={cn("mt-2 inline-flex items-center gap-1 rounded text-b3 font-semibold text-purple dark:text-royal-300", focusRing)}>
               Open Gold & pricing<ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>}
+            {parameter.id === "feed.rankedPercent" && access.manageFeed && <Link to={`${APP_ROUTES.recommendationsRanked}#ranked-share`} onClick={close}
+              className={cn("mt-2 inline-flex items-center gap-1 rounded text-b3 font-semibold text-purple dark:text-royal-300", focusRing)}>
+              Change it on the Ranked feed page<ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>}
           </section>
 

@@ -20,6 +20,8 @@ export const APP_ROUTES = {
   recommendationsHome: "/algorithms/home-feed",
   recommendationsSponsored: "/algorithms/sponsored",
   recommendationsDiscover: "/algorithms/discover",
+  recommendationsTopTrends: "/algorithms/top-trends",
+  recommendationsOverrides: "/algorithms/trending-overrides",
   recommendationsRanked: "/algorithms/ranked-feed",
   recommendationsParameters: "/algorithms/parameters",
   recruitment: "/recruitment",

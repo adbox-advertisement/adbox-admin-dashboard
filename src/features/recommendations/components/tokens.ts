@@ -1,5 +1,6 @@
-import { CodeXml, Coins, Compass, Server, SlidersHorizontal, Smartphone, type LucideIcon } from "lucide-react"
+import { Building2, CalendarDays, CodeXml, Coins, Compass, Hash, Landmark, School, Server, SlidersHorizontal, Smartphone, UserRound, type LucideIcon } from "lucide-react"
 import type { ControlId } from "../data/catalog"
+import type { TrendKind } from "../types"
 
 // The section's card, text and badge classes, as the rest of the dashboard draws them.
 
@@ -25,6 +26,15 @@ export const controlIcons: Record<ControlId, LucideIcon> = {
   environment: Server,
   code: CodeXml,
   app: Smartphone,
+}
+
+export const kindIcons: Record<TrendKind, LucideIcon> = {
+  HASHTAG: Hash,
+  INSTITUTION: Landmark,
+  CAMPUS: School,
+  PERSON: UserRound,
+  HALL: Building2,
+  EVENT: CalendarDays,
 }
 
 // Chart marks: the dashboard's validated categorical slots (light / dark), as the institution map

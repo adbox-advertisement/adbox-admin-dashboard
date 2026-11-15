@@ -1,4 +1,6 @@
-import { Compass, Flame, Hash, LayoutGrid, Search, UserPlus } from "lucide-react"
+import { Link } from "react-router-dom"
+import { ArrowRight, Compass, Flame, Hash, LayoutGrid, Search, UserPlus } from "lucide-react"
+import { APP_ROUTES } from "@/routes/paths"
 import { cn } from "../lib/cn"
 import { useLive } from "../lib/live-context"
 import { exploreTiles, PEOPLE_CODE } from "../lib/discover"
@@ -119,6 +121,9 @@ export function DiscoverPage() {
           <h4 className={cn("text-b2 font-semibold", ink)}>Admins' pins, boosts and features</h4>
           <p className={cn("mt-1 text-b3 leading-5", muted)}>Applied when a list is read: suppress removes a subject, a boost scales its score (the list is then re-ordered), a pin or feature places it, marked Featured in the app. Counts are never changed.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">{["overrides.pins", "overrides.featured", "overrides.minMultiplier", "overrides.maxMultiplier", "overrides.days"].map((id) => <ParamChip key={id} id={id} />)}</div>
+          <Link to={APP_ROUTES.recommendationsOverrides} className={cn("mt-3 inline-flex items-center gap-1 rounded text-b3 font-semibold text-purple dark:text-royal-300", focusRing)}>
+            Manage overrides<ArrowRight className="size-3.5" aria-hidden="true" />
+          </Link>
         </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-1.5">

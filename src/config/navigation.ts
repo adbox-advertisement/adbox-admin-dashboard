@@ -58,6 +58,8 @@ export const navItems: DashboardNavItem[] = [
       { label: "Home & videos", to: APP_ROUTES.recommendationsHome, group: "In the app" },
       { label: "Sponsored posts", to: APP_ROUTES.recommendationsSponsored, group: "In the app" },
       { label: "Discover", to: APP_ROUTES.recommendationsDiscover, group: "In the app" },
+      { label: "Top trends", to: APP_ROUTES.recommendationsTopTrends, group: "In the app" },
+      { label: "Trending overrides", to: APP_ROUTES.recommendationsOverrides, group: "Manage" },
       { label: "Ranked feed", to: APP_ROUTES.recommendationsRanked, group: "Not in the app yet" },
       { label: "All parameters", to: APP_ROUTES.recommendationsParameters, group: "Reference" },
     ],

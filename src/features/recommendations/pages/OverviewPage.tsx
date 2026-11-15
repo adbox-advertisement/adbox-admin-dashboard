@@ -6,6 +6,7 @@ import { APP_ROUTES } from "@/routes/paths"
 import { cn } from "../lib/cn"
 import { useLive } from "../lib/live-context"
 import { changesBetween, formatNumber } from "../lib/values"
+import { loadErrorDetail } from "../lib/errors"
 import { CONTROLS, CONTROL_IDS, PARAMETERS, type ControlId } from "../data/catalog"
 import { RECOMMENDATION_PERMISSIONS } from "../types"
 import type { LiveStatus } from "../hooks"
@@ -25,7 +26,8 @@ export function OverviewPage() {
     <PageHero icon={Waypoints} title="How the app decides what people see">
       Every list in the AdBox app (Home, Shorts, sponsored posts, Glances and Discover) is filled by the backend from{" "}
       <strong className={ink}>{formatNumber(total)} numbers</strong>, and {formatNumber(adjustable)} of them can be changed from super-admin without a release.
-      This section shows each one with the value in force, who can change it and what changing it does. It only reads: nothing here is saved.
+      This section shows each one with the value in force, who can change it and what changing it does. It changes only two things, each after you
+      confirm: the ranked share (Ranked feed) and Trending overrides, for admins allowed to.
     </PageHero>
 
     <Callout title="What runs in the app today">
@@ -69,10 +71,11 @@ function ControlCard({ control }: { control: ControlId }) {
   </li>
 }
 
-function PlaneCard({ icon, title, status, permission, onRetry, children, link }: {
+function PlaneCard({ icon, title, status, error, permission, onRetry, children, link }: {
   icon: LucideIcon
   title: string
   status: LiveStatus
+  error: unknown
   permission: string
   onRetry: () => void
   children: ReactNode
@@ -87,7 +90,10 @@ function PlaneCard({ icon, title, status, permission, onRetry, children, link }:
       <StatusPill status={status} />
     </div>
     <div className="mt-4 flex-1">
-      {status === "error" ? <div className="-m-5"><ErrorState message="Could not load the live settings; the built-in defaults are shown." onRetry={onRetry} /></div> : children}
+      {status === "error" ? <div className="-m-5">
+        <ErrorState message="Could not load the live settings; the built-in defaults are shown." onRetry={onRetry} />
+        <p className={cn("-mt-3 px-5 pb-4 text-b3 leading-5", muted)} data-testid="load-error-detail">{loadErrorDetail(error)}</p>
+      </div> : children}
       {status === "locked" && <p className={cn("mt-2 text-b3", muted)}>Live values need <code className="font-mono text-b4">{permission}</code>.</p>}
     </div>
     <Link to={link.to} className={cn("mt-4 inline-flex w-fit items-center gap-1 rounded text-b3 font-semibold text-purple dark:text-royal-300", focusRing)}>
@@ -98,7 +104,7 @@ function PlaneCard({ icon, title, status, permission, onRetry, children, link }:
 
 function FeedPolicyCard() {
   const { feed } = useLive()
-  return <PlaneCard icon={SlidersHorizontal} title="Feed ranking policy" status={feed.status} permission={RECOMMENDATION_PERMISSIONS.feedRanking} onRetry={feed.refetch}
+  return <PlaneCard icon={SlidersHorizontal} title="Feed ranking policy" status={feed.status} error={feed.error} permission={RECOMMENDATION_PERMISSIONS.feedRanking} onRetry={feed.refetch}
     link={{ to: APP_ROUTES.recommendationsRanked, label: "How the ranked feed works" }}>
     <p className={cn("font-heading text-h6 font-semibold", ink)} data-testid="feed-version">{feed.label}</p>
     <p className={cn("mt-1 text-b3", muted)}>
@@ -116,7 +122,7 @@ function FeedPolicyCard() {
 function DiscoverPolicyCard() {
   const { discover } = useLive()
   const differing = changesBetween(discover.defaults, discover.policy).length
-  return <PlaneCard icon={Compass} title="Discover policy" status={discover.status} permission={RECOMMENDATION_PERMISSIONS.discover} onRetry={discover.refetch}
+  return <PlaneCard icon={Compass} title="Discover policy" status={discover.status} error={discover.error} permission={RECOMMENDATION_PERMISSIONS.discover} onRetry={discover.refetch}
     link={{ to: APP_ROUTES.recommendationsDiscover, label: "How Discover ranks" }}>
     <p className={cn("font-heading text-h6 font-semibold", ink)} data-testid="discover-version">{discover.label}</p>
     <p className={cn("mt-1 text-b3", muted)}>
@@ -133,7 +139,7 @@ function DiscoverPolicyCard() {
 
 function GoldCard() {
   const { gold } = useLive()
-  return <PlaneCard icon={Coins} title="Gold settings" status={gold.status} permission={RECOMMENDATION_PERMISSIONS.gold} onRetry={gold.refetch}
+  return <PlaneCard icon={Coins} title="Gold settings" status={gold.status} error={gold.error} permission={RECOMMENDATION_PERMISSIONS.gold} onRetry={gold.refetch}
     link={{ to: APP_ROUTES.recommendationsSponsored, label: "How sponsored posts are served" }}>
     <p className={cn("font-heading text-h6 font-semibold", ink)}>{gold.values.adFrequencyCapPerDay} views a day</p>
     <p className={cn("mt-1 text-b3", muted)}>The most one person is served one ad.</p>

@@ -1,0 +1,118 @@
+/*
+ * The app's Trending flame (adbox-mobile-mvp lib/features/discover/presentation/discover_style.dart,
+ * DiscoverFlame): three teardrops whose tips sway and stretch on a 1.4 s cycle over a breathing glow.
+ * The keyframes sample the app's formula (scaleY for the reach, skewX to put the tip where the app's
+ * goes). Colours are the dashboard's red and amber tokens. Still when motion is reduced.
+ */
+
+.adbox-flame {
+  overflow: visible;
+}
+
+.adbox-flame :is(.adbox-flame-outer, .adbox-flame-middle, .adbox-flame-core) {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.adbox-flame-outer { transform: scaleY(0.92); }
+.adbox-flame-middle { transform: scaleY(0.9); }
+.adbox-flame-core { fill: var(--adbox-warning-200); transform: scaleY(0.85); }
+.adbox-flame-glow { opacity: 0.28; }
+
+.adbox-flame-red { stop-color: var(--adbox-error-600); }
+.adbox-flame-amber { stop-color: var(--adbox-warning-600); }
+.adbox-flame-gold { stop-color: var(--adbox-warning-500); }
+.adbox-flame-yellow { stop-color: var(--adbox-warning-400); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .adbox-flame :is(.adbox-flame-outer, .adbox-flame-middle, .adbox-flame-core, .adbox-flame-glow) {
+    animation-duration: 1.4s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-delay: var(--flame-delay, 0s);
+  }
+  .adbox-flame-outer { animation-name: adbox-flame-outer; }
+  .adbox-flame-middle { animation-name: adbox-flame-middle; }
+  .adbox-flame-core { animation-name: adbox-flame-core; }
+  .adbox-flame-glow { animation-name: adbox-flame-glow; }
+}
+
+@keyframes adbox-flame-outer {
+  0% { transform: skewX(0deg) scaleY(0.979); }
+  6.25% { transform: skewX(-2.51deg) scaleY(0.977); }
+  12.5% { transform: skewX(-5deg) scaleY(0.905); }
+  18.75% { transform: skewX(-6.93deg) scaleY(0.851); }
+  25% { transform: skewX(-7.24deg) scaleY(0.882); }
+  31.25% { transform: skewX(-6.15deg) scaleY(0.96); }
+  37.5% { transform: skewX(-4.58deg) scaleY(0.988); }
+  43.75% { transform: skewX(-2.63deg) scaleY(0.932); }
+  50% { transform: skewX(0deg) scaleY(0.861); }
+  56.25% { transform: skewX(2.84deg) scaleY(0.863); }
+  62.5% { transform: skewX(4.84deg) scaleY(0.935); }
+  68.75% { transform: skewX(5.97deg) scaleY(0.989); }
+  75% { transform: skewX(6.67deg) scaleY(0.958); }
+  81.25% { transform: skewX(6.71deg) scaleY(0.88); }
+  87.5% { transform: skewX(5.31deg) scaleY(0.852); }
+  93.75% { transform: skewX(2.7deg) scaleY(0.908); }
+  100% { transform: skewX(0deg) scaleY(0.979); }
+}
+
+@keyframes adbox-flame-middle {
+  0% { transform: skewX(5.7deg) scaleY(0.9); }
+  6.25% { transform: skewX(5.38deg) scaleY(0.931); }
+  12.5% { transform: skewX(-1.36deg) scaleY(0.957); }
+  18.75% { transform: skewX(-6.15deg) scaleY(0.974); }
+  25% { transform: skewX(-3.37deg) scaleY(0.98); }
+  31.25% { transform: skewX(3.58deg) scaleY(0.974); }
+  37.5% { transform: skewX(6.22deg) scaleY(0.957); }
+  43.75% { transform: skewX(1.16deg) scaleY(0.931); }
+  50% { transform: skewX(-5.7deg) scaleY(0.9); }
+  56.25% { transform: skewX(-5.75deg) scaleY(0.869); }
+  62.5% { transform: skewX(1.54deg) scaleY(0.843); }
+  68.75% { transform: skewX(7.24deg) scaleY(0.826); }
+  75% { transform: skewX(4.02deg) scaleY(0.82); }
+  81.25% { transform: skewX(-4.21deg) scaleY(0.826); }
+  87.5% { transform: skewX(-7.04deg) scaleY(0.843); }
+  93.75% { transform: skewX(-1.25deg) scaleY(0.869); }
+  100% { transform: skewX(5.7deg) scaleY(0.9); }
+}
+
+@keyframes adbox-flame-core {
+  0% { transform: skewX(0deg) scaleY(0.934); }
+  6.25% { transform: skewX(-1.25deg) scaleY(0.932); }
+  12.5% { transform: skewX(-2.61deg) scaleY(0.829); }
+  18.75% { transform: skewX(-3.75deg) scaleY(0.752); }
+  25% { transform: skewX(-3.83deg) scaleY(0.796); }
+  31.25% { transform: skewX(-3.11deg) scaleY(0.907); }
+  37.5% { transform: skewX(-2.28deg) scaleY(0.948); }
+  43.75% { transform: skewX(-1.35deg) scaleY(0.868); }
+  50% { transform: skewX(0deg) scaleY(0.766); }
+  56.25% { transform: skewX(1.52deg) scaleY(0.768); }
+  62.5% { transform: skewX(2.48deg) scaleY(0.871); }
+  68.75% { transform: skewX(2.97deg) scaleY(0.948); }
+  75% { transform: skewX(3.38deg) scaleY(0.904); }
+  81.25% { transform: skewX(3.56deg) scaleY(0.793); }
+  87.5% { transform: skewX(2.87deg) scaleY(0.752); }
+  93.75% { transform: skewX(1.4deg) scaleY(0.832); }
+  100% { transform: skewX(0deg) scaleY(0.934); }
+}
+
+@keyframes adbox-flame-glow {
+  0% { opacity: 0.364; }
+  6.25% { opacity: 0.362; }
+  12.5% { opacity: 0.259; }
+  18.75% { opacity: 0.182; }
+  25% { opacity: 0.226; }
+  31.25% { opacity: 0.337; }
+  37.5% { opacity: 0.378; }
+  43.75% { opacity: 0.298; }
+  50% { opacity: 0.196; }
+  56.25% { opacity: 0.198; }
+  62.5% { opacity: 0.301; }
+  68.75% { opacity: 0.378; }
+  75% { opacity: 0.334; }
+  81.25% { opacity: 0.223; }
+  87.5% { opacity: 0.182; }
+  93.75% { opacity: 0.262; }
+  100% { opacity: 0.364; }
+}
