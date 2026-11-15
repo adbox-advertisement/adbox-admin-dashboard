@@ -4,6 +4,10 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
 ## Dashboard on live figures (2026-11-15)
 
+- Committed and pushed at the owner's request: dashboard `3024e3c` on `user-content-and-users-redesign`; backend
+  `test`: `160076d` (Super Admin-only access), `c374647` (admin API open to every network, sign-in limit), `42093a9`
+  (sign-ups endpoint). Production super-admin has not been redeployed, so it still lacks the sign-ups endpoint.
+
 - Request: "keep the Institutions across Ghana card the way it is, but add whatever you think should be there".
   Every other card was placeholder data from the design (dollar revenue, "GTA 5 new online mod" approvals, stock-photo
   publishers, a made-up user chart, filters that did nothing); they were replaced with live figures from endpoints
@@ -21,7 +25,7 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
   build's `charts` chunk is empty); removing the dependency and its `manualChunks` entry is a separate decision.
 - Sign-ups chart (owner's follow-up: "add the sign-ups chart with the backend endpoint"): card under the tiles,
   30 days by day, 12 weeks by rolling week, 12 months by calendar month, each against the span before (the months
-  against the same dates a year earlier). Backend (`adbox-backend`, uncommitted, **not deployed**):
+  against the same dates a year earlier). Backend (`adbox-backend`, committed `42093a9`, **not deployed**):
   `GET /platform-users/signups?days=1..1096` (`platform.users.read`) in `platform-users.controller.ts` (before `:id`),
   `service.signups()` (one `GROUP BY` UTC day over `"User"."createdAt"`, zero days filled, `before` count),
   `PlatformUserSignupsQueryDto`, two specs in `platform-users-directory.spec.ts`, `docs/super-admin-api.md`. The
@@ -116,7 +120,7 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
   `.env.example`, README (Run locally, Vercel notes), AGENTS.md Dev API line. Checked a Vite on :5199 proxying to the
   live API (health 200, `/auth/me` 401, socket polling 200). `npm run build`, `npm run lint`, `npm run test`
   (427/427) pass.
-- Still to do: each collaborator needs their own admin account (Manage Admins); commit backend and dashboard changes.
+- Still to do: each collaborator needs their own admin account (Manage Admins). Backend committed 2026-11-15 (`c374647`).
 
 ## Manage Admins redesign + Super Admin-only access changes (2026-11-11)
 
@@ -144,8 +148,8 @@ Read alongside `AGENTS.md` and confirm the working tree before continuing.
   previous `20261110-212714` kept for rollback; no migrations. DB backup
   `~/adbox/backups/adbox_test-before-super-admin-20261112-020021.dump`. Health 200 on both APIs, routes 401 unauthenticated.
   Production then had 2 admins: 1 Super Admin and 1 with role ADMIN_MANAGER, who can no longer change access.
-- Still to do: commit the backend change (the server now runs code that isn't committed); deploy this dashboard to
-  Vercel for the new Manage Admins screens.
+- Backend committed 2026-11-15 (`160076d`). Still to do: deploy this dashboard to Vercel for the new Manage Admins
+  screens.
 
 ## Vercel deployment setup (2026-11-10)
 
