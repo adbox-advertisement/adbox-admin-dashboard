@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { APP_ROUTES } from "@/routes/paths"
-import { activityBadges } from "./sections"
+import { activityBadges, waitingQueues } from "./sections"
 import { activityCountsSchema } from "./types"
 
 describe("activityBadges", () => {
@@ -16,6 +16,18 @@ describe("activityBadges", () => {
   it("gives empty, hidden or unloaded queues no badge", () => {
     expect(activityBadges({ adRequests: 0, verification: 0 })).toEqual({})
     expect(activityBadges(undefined)).toEqual({})
+  })
+})
+
+describe("waitingQueues", () => {
+  it("lists every queue the admin can open, most waiting first, empty ones included", () => {
+    expect(waitingQueues({ verification: 0, adRequests: 2, contentReports: 5, honours: 0 })).toEqual([
+      { section: "contentReports", label: "User Content reports", route: APP_ROUTES.userContentReports, count: 5 },
+      { section: "adRequests", label: "Ad Requests", route: APP_ROUTES.adRequests, count: 2 },
+      { section: "verification", label: "Verification", route: APP_ROUTES.manageUsersVerification, count: 0 },
+      { section: "honours", label: "Honours", route: APP_ROUTES.manageUsersHonours, count: 0 },
+    ])
+    expect(waitingQueues(undefined)).toEqual([])
   })
 })
 

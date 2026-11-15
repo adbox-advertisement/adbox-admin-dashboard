@@ -1,4 +1,5 @@
-export { useLiveActivity } from "./hooks"
-export { activityBadges } from "./sections"
+export { useLiveActivity, useWaitingWork } from "./hooks"
+export { activityBadges, type WaitingQueue } from "./sections"
 export { useActivitySound } from "./store"
 export { playChime } from "./chime"
+export type { ActivitySection } from "./types"

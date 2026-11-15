@@ -36,3 +36,13 @@ export function activityBadges(counts: ActivityCounts | undefined): Record<strin
   }
   return badges
 }
+
+export type WaitingQueue = { section: ActivitySection; label: string; route: string; count: number }
+
+/** Every queue this admin can open (the server leaves the rest out), most waiting first. */
+export function waitingQueues(counts: ActivityCounts | undefined): WaitingQueue[] {
+  return activitySections
+    .filter((section) => counts?.[section] !== undefined)
+    .map((section) => ({ section, label: activitySectionInfo[section].label, route: activitySectionInfo[section].route, count: counts?.[section] ?? 0 }))
+    .sort((a, b) => b.count - a.count)
+}

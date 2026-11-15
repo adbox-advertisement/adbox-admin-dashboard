@@ -21,7 +21,7 @@ export async function checkAppearance(page, baseUrl) {
     for (const theme of ['dark', 'light']) {
       if (theme === 'light') await setThemeFromSettings(page, baseUrl, 'light')
       for (const [path, ready, surface] of [
-        ['/dashboard', 'text=Total Users', 'article:has-text("Total Users")'],
+        ['/dashboard', 'text=Who\'s on AdBox', 'article:has-text("Who\'s on AdBox")'],
         ['/manage-admins', 'text=Admins are the people', 'section[aria-label="Admin list"]'],
         ['/video-management/upload', 'nav[aria-label="Video Management pages"]', 'nav[aria-label="Video Management pages"]'],
         ['/video-management/posts', 'nav[aria-label="Video Management pages"]', 'nav[aria-label="Video Management pages"]'],

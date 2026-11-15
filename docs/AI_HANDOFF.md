@@ -2,6 +2,45 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Dashboard on live figures (2026-11-15)
+
+- Request: "keep the Institutions across Ghana card the way it is, but add whatever you think should be there".
+  Every other card was placeholder data from the design (dollar revenue, "GTA 5 new online mod" approvals, stock-photo
+  publishers, a made-up user chart, filters that did nothing); they were replaced with live figures from endpoints
+  other sections already use. The map card (`DashboardInstitutionMap`, its test, `DashboardGeographySection`,
+  `lib/institution-map.ts`, `data/ghana-*.ts`) is unchanged.
+- Page order: greeting + Refresh (refetches every active query) · Waiting for you (all queues the admin can open, live
+  counts) · 4 tiles (people, gold sales GHS, ads running, posts live) · Who's on AdBox (8) + Trending now (4) · the map ·
+  Largest institutions, Ads by stage, Top creators. Cards the admin can't read are left out (tiles say which
+  permission they need). See ARCHITECTURE.md's Dashboard bullet for endpoints and files.
+- Other features touched: `activity` exports `useWaitingWork` + `waitingQueues` (reads the layout's counts query, no
+  extra polling; test in `sections.test.ts`); `recommendations` exports `TrendingNowCard` lazily from `index.ts`
+  (`components/TrendingNowCard.tsx`, own chunk). Removed: the placeholder components, `data/{approvals,audience,
+  geography,user-overview}.ts`, `DateRangeDropdown`, and the assets only they used (`src/assets/dashboard/` sparkline,
+  user-icon pieces, publisher photos; `admin-avatar.jpg` left, it was already unused). Recharts is now unused (the
+  build's `charts` chunk is empty); removing the dependency and its `manualChunks` entry is a separate decision.
+- Sign-ups chart (owner's follow-up: "add the sign-ups chart with the backend endpoint"): card under the tiles,
+  30 days by day, 12 weeks by rolling week, 12 months by calendar month, each against the span before (the months
+  against the same dates a year earlier). Backend (`adbox-backend`, uncommitted, **not deployed**):
+  `GET /platform-users/signups?days=1..1096` (`platform.users.read`) in `platform-users.controller.ts` (before `:id`),
+  `service.signups()` (one `GROUP BY` UTC day over `"User"."createdAt"`, zero days filled, `before` count),
+  `PlatformUserSignupsQueryDto`, two specs in `platform-users-directory.spec.ts`, `docs/super-admin-api.md`. The
+  local super-admin container was rebuilt (`docker compose up -d --build --no-deps super-admin`, with an empty
+  `DOCKER_CONFIG` linking `cli-plugins`/`contexts`). Until production is deployed, the live dashboard's card says
+  the server is older than the chart. `User.createdAt` has no index; fine at today's size.
+  Frontend: `components/DashboardSignups.tsx`, `components/SignupsChart.tsx` (own SVG columns, one hue, running bar
+  lighter, tooltip by pointer/arrow keys, "Show the numbers" table), `lib/signups.ts` (+ tests, run in three time
+  zones), `lib/errors.ts`; card headers now wrap their action under the title on phones. Checks: backend
+  platform-users specs 27/27 and all super-admin specs 46 suites / 774 tests, `tsc` clean, Prettier clean, ESLint only the 3 older `no-unsafe-assignment` errors in
+  that spec's relationships test; the query ran read-only on local `adbox_test`; the rebuilt container has the
+  route (401 unauthenticated). Dashboard: architecture, lint, test types, build pass; Vitest 523/527 while the
+  Docker build loaded the machine (User Content and Recruitment timeouts; both pass alone); full smoke passed.
+- Tests: `pages/Dashboard.test.tsx` (6), `lib/figures.test.ts`; smoke `dashboard.smoke.mjs` rewritten (map checks kept)
+  and its `dashboardReply` serves the figures to every page from `app.smoke.mjs`; `appearance.smoke.mjs` finds the
+  dashboard by "Who's on AdBox". Checks: architecture, lint, test types, build pass; Vitest 515/517 with the two known
+  Recruitment timeouts under load (12/12 alone); full `npm run test:smoke` passed twice. Screenshots checked at 1440
+  light/dark, 820 and 390. Not yet seen with real data (needs an admin login).
+
 ## Algorithms section: how backend parameters shape the app's lists (2026-11-13)
 
 - Renamed at the owner's request: the sidebar entry, header, tab title and URLs (`/algorithms/*`) say

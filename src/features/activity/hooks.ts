@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { getActivityCounts } from "./api"
 import { playChime } from "./chime"
 import { createActivitySocket, isAuthRefusal } from "./realtime"
-import { activitySectionInfo } from "./sections"
+import { activitySectionInfo, waitingQueues } from "./sections"
 import { useActivitySound } from "./store"
 import { activityCountEventSchema, type ActivityCounts } from "./types"
 
@@ -26,6 +26,15 @@ export function useActivityCounts(live: boolean, enabled = true) {
     refetchInterval: live ? false : POLL_MS,
     enabled,
   })
+}
+
+/**
+ * What waits in each queue this admin can open, from the counts the layout keeps live
+ * (`useLiveActivity`). It adds no polling; a copy older than 30 seconds is re-read on mount.
+ */
+export function useWaitingWork() {
+  const counts = useQuery({ queryKey: activityCountsQueryKey, queryFn: fetchCounts, staleTime: 30_000 })
+  return { queues: waitingQueues(counts.data), isPending: counts.isPending, isError: counts.isError, error: counts.error, refetch: counts.refetch }
 }
 
 /**

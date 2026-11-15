@@ -3,7 +3,7 @@ import { chromium } from 'playwright'
 import { checkRdiScreens, checkRdiTouchScreens } from './rdi.smoke.mjs'
 import { checkRdiCms } from './rdi-cms.smoke.mjs'
 import { checkVideoManagement } from './video-management.smoke.mjs'
-import { checkDashboardContent, dashboardInstitutions } from './dashboard.smoke.mjs'
+import { checkDashboardContent, dashboardInstitutions, dashboardReply } from './dashboard.smoke.mjs'
 import { checkManageAdmins } from './manage-admins.smoke.mjs'
 import { checkManageUsers } from './manage-users.smoke.mjs'
 import { checkUserContent } from './user-content.smoke.mjs'
@@ -42,6 +42,9 @@ try {
       if (url.pathname.endsWith('/activity/counts')) return reply({})
       // The dashboard's institutions map; feature checks that need others route their own.
       if (url.pathname === '/api/v1/institutions') return reply(dashboardInstitutions)
+      // The dashboard's other figures (people, content, ads, gold sales, Trending).
+      const figures = dashboardReply(request.method(), url.pathname, url.search)
+      if (figures) return reply(figures)
       if (url.pathname.endsWith('/auth/login')) return reply(loginAllowed ? session : { message: 'Invalid credentials' }, loginAllowed ? 200 : 401)
       if (url.pathname.endsWith('/auth/logout')) return reply({ message: 'Server unavailable' }, 503)
       if (url.pathname.endsWith('/auth/me')) {
