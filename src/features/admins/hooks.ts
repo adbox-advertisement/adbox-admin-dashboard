@@ -3,6 +3,7 @@ import { useCurrentAdmin } from "@/features/auth"
 import type { Viewer } from "./lib/access"
 import { SUPER_ADMIN_ROLE } from "./lib/catalog"
 import { createAdmin, getAdmin, getAdmins, replaceAdminPermissions, replaceAdminRoles, updateAdmin, createRole, deleteRole, getPermissions, getRoles, replaceRolePermissions, updateRole } from "./api"
+import { hasPermission } from "@/lib/permissions"
 
 export const rolesQueryKey = ["admins", "roles"] as const
 export const permissionsQueryKey = ["admins", "permissions"] as const
@@ -20,7 +21,7 @@ export function useViewer(): Viewer & { ready: boolean } {
     id: profile.data?.id ?? "",
     ready: profile.isSuccess,
     isSuperAdmin: profile.data?.roles.includes(SUPER_ADMIN_ROLE) ?? false,
-    can: (permission: string) => permissions.includes("*") || permissions.includes(permission),
+    can: (permission: string) => hasPermission(permissions, permission),
   }
 }
 

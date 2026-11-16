@@ -4,21 +4,11 @@ import { Link, NavLink, useLocation } from "react-router-dom"
 
 import mainLogo from "@/assets/brand/mainlogo.svg"
 import { navItems, type DashboardNavItem } from "@/config/navigation"
+import { groupMatches, visibleNavItems } from "@/config/navigation-access"
+import { usePermissionAccess } from "@/lib/permissions"
 import { cn } from "@/lib/utils"
 import { APP_ROUTES } from "@/routes/paths"
 import { navItemCount, useNavBadges } from "./nav-badges"
-
-// A child owns its nested pages (/manage-users/people/:id belongs to People),
-// except one that shares its group's path, which would otherwise match them all.
-function childMatches(pathname: string, item: DashboardNavItem, to: string) {
-  return pathname === to || (to !== item.to && pathname.startsWith(to + "/"))
-}
-
-// Any page under a section's path belongs to it, including ones without a sidebar entry
-// (User Content's per-uploader Ads).
-function groupMatches(pathname: string, item: DashboardNavItem) {
-  return pathname === item.to || pathname.startsWith(item.to + "/") || Boolean(item.children?.some((child) => childMatches(pathname, item, child.to)))
-}
 
 type NavChild = NonNullable<DashboardNavItem["children"]>[number]
 
@@ -61,6 +51,9 @@ function DashboardNavigationContent({
   const { pathname } = useLocation()
   const navigationId = useId()
   const badges = useNavBadges()
+  // Only what this admin may open: the rest is left out, not shown locked.
+  const { can } = usePermissionAccess()
+  const items = visibleNavItems(navItems, can)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
     () =>
       new Set(
@@ -105,7 +98,7 @@ function DashboardNavigationContent({
         </div>
 
         <nav aria-label="Dashboard navigation" className="flex w-full flex-col gap-1.5">
-          {navItems.map((item) => {
+          {items.map((item) => {
             const isExpanded = expandedGroups.has(item.label)
             const groupId = `${navigationId}-${item.label.toLowerCase().replace(/\s+/g, "-")}-subnavigation`
             const isGroupActive = groupMatches(pathname, item)

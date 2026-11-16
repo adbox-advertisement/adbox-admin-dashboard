@@ -2,6 +2,48 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Roles decide the navigation (2026-11-16)
+
+- Request: "design the system in such a way that your roles or permissions determine what navigation you will
+  see and interact with". Owner chose the admin dashboard, and **hide** what an admin may not use (opened by
+  link, a short "no access" page). Frontend only; the backend already enforced every permission.
+- `src/lib/permissions.ts`: `hasPermission` (wildcard or the key), `meetsRequirement` (a key, or any of several),
+  `PermissionsContext` + `usePermissionAccess` (nothing requiring a permission is allowed until the admin's
+  permissions are known). The eight per-feature copies of the wildcard rule (ads, financials, content, admins,
+  recommendations, dashboard, users, recruitment hooks) now call `hasPermission`.
+- `src/config/navigation.ts`: every entry has `permission`, taken from what its page already checked or its
+  endpoints require: Manage Users as `ManageUsersLayout` maps them; User Content `user.content.read`; Algorithms
+  explainers `feed.ranking.read` or `discover.read`, Sponsored posts also `ads.read`/`gold.settings.read`, Top
+  trends and overrides `discover.read`, Ranked feed `feed.ranking.read`; Ads `ads.read`; Gold & pricing
+  `gold.settings.read`; Advertisers Payment and Withdrawals `payments.read`; Video Upload `media.create`, Posts
+  `media.read`; Recruitment `recruitment.applications.read`; Manage Admins `admins.read`/`roles.read`/
+  `permissions.read`; **Rewards and Support `*`** (sample data, no permission on the server yet: Super Admin only);
+  Dashboard and Settings need nothing.
+- Follow-up, owner: "rdi is for only super admin" (RDI named, so the RDI rule allowed exactly this). The RDI
+  entry now carries `permission: SUPER_ADMIN_ONLY`, so every `/rdi` page closes to other admins ("Only a Super
+  Admin can open it."). To check it, `DashboardLayout` reads the signed-in admin on RDI pages too (the
+  `enabled` option added to `useCurrentAdmin` was removed again); live activity stays off there. RDI's own
+  screens still make no requests: `rdi.smoke.mjs` and `rdi-cms.smoke.mjs` answer and skip only `GET /auth/me`
+  (`isAccountCheck`), everything else they assert is unchanged. The standalone previews (`/rdi/preview/:pageId`,
+  outside the layout, used inside the editor) still need only an admin session.
+- `src/config/navigation-access.ts`: `childMatches`/`groupMatches` (moved from the sidebar), `visibleNavItems`,
+  `pageRequirements` (a section's own path and its pages without an entry need any of its entries, so Manage Users
+  still forwards a verification reviewer to Verification). `DashboardSidebar` shows `visibleNavItems`; badges add
+  up only behind visible entries. `DashboardLayout` reads `useCurrentAdmin()`, provides the context and wraps the outlet in `components/layout/PageGate.tsx`
+  (checking → `CheckingAccess`, failed → `AccessCheckFailed` with Try again, closed → `components/feedback/
+  NoAccessPage.tsx` with the keys it needs or "Only a Super Admin…"). `AppRouteHandle.permission` adds
+  requirements for a page outside the sidebar (none use it yet). AGENTS.md and ARCHITECTURE.md describe the rule.
+- An ads reviewer (`ADS_REVIEWER`) is offered: Dashboard, Algorithms › Sponsored posts, Ads Management,
+  Settings.
+- Tests: `lib/permissions.test.ts`, `config/navigation-access.test.ts` (whole sidebar per role, page rules),
+  `components/layout/PageGate.test.tsx`, `DashboardSidebar.test.tsx` (existing cases now as Super Admin, new
+  access cases). Smoke: `tests/smoke/access.smoke.mjs` (`ADBOX_SMOKE_FEATURE=access`; RDI lines of app.smoke.mjs
+  untouched). Checks: `npm run check` (architecture, lint, test types, Vitest 79 files / 552 tests including the
+  new ones, build) passed; full `npm run test:smoke` passed against the running dev server.
+- Not done: Video Management's in-page actions (publish, delete) are on demo data and not gated; Rewards and
+  Support get real permissions (`rewards.*`, `support.*` in `permission.constants.ts`) when they get endpoints —
+  then replace their `*` in navigation.ts.
+
 ## Dashboard on live figures (2026-11-15)
 
 - Committed and pushed at the owner's request: dashboard `3024e3c` on `user-content-and-users-redesign`; backend

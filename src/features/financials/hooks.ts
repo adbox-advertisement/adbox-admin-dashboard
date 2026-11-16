@@ -11,6 +11,7 @@ import {
   updateGoldSettings,
   updateSpotlightPlan,
 } from "./api"
+import { hasPermission } from "@/lib/permissions"
 
 const keys = {
   settings: ["gold", "settings"] as const,
@@ -23,7 +24,7 @@ export function useFinanceAccess() {
   const permissions = profile.data?.permissions ?? []
   return {
     loading: profile.isPending,
-    can: (permission: string) => permissions.includes("*") || permissions.includes(permission),
+    can: (permission: string) => hasPermission(permissions, permission),
   }
 }
 

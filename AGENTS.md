@@ -37,6 +37,12 @@ Key wiring that spans several files:
   `src/routes/router.ts` composes public, protected, pending, and not-found routes. Protected
   routes share `DashboardLayout`. Sidebar labels/groups come from `src/config/navigation.ts`;
   unbuilt modules live in `src/config/pending-pages.ts` until they get a feature directory.
+- Roles and permissions decide what an admin is offered: every sidebar entry declares the backend
+  permission its page needs (`permission` in `navigation.ts`), the sidebar leaves out what the
+  admin's roles do not open, and `DashboardLayout` shows "no access" for those pages reached by
+  link (`src/config/navigation-access.ts`, `PageGate`). A new page needs its entry's `permission`
+  (or a route `handle.permission` outside the sidebar); check permissions with `hasPermission` /
+  `usePermissionAccess` from `src/lib/permissions.ts`, never a copy of the wildcard rule.
 - Each feature's `index.ts` is its public API (route definitions, no eager page imports). Use
   relative imports inside a feature and `@/features/<name>` outside it. Shared code must not
   import features or the app shell, and UI must not import API services directly;
@@ -48,7 +54,9 @@ Key wiring that spans several files:
   in `.env.local` (see `.env.example`). Sign-in needs that backend.
 
 RDI is a browser-only CMS and website UI. Its authentication uses the existing API independently.
-It is protected by the RDI rule below.
+It is protected by the RDI rule below. RDI is open only to the Super Admin (owner's decision,
+2026-11-16): its sidebar entry carries the wildcard permission, and the dashboard's account check
+(`GET /auth/me`) is the only request an RDI page may make; the RDI smoke tests allow that one.
 
 ## RDI Is Off-Limits Unless Explicitly Requested
 
@@ -185,7 +193,7 @@ Axios client -> services -> TanStack Query hooks -> components
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
 local server and an installed Chrome browser. It mocks all API calls. Point it at another server
 with `ADBOX_TEST_URL=http://127.0.0.1:5174`, and narrow it with
-`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards`, `ADBOX_SMOKE_FEATURE=admins` or `ADBOX_SMOKE_FEATURE=recommendations`. See README for overrides.
+`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards`, `ADBOX_SMOKE_FEATURE=admins`, `ADBOX_SMOKE_FEATURE=recommendations` or `ADBOX_SMOKE_FEATURE=access`. See README for overrides.
 
 Unit and component tests live beside the code they cover as `*.test.ts`/`*.test.tsx` (Vitest +
 React Testing Library, jsdom environment). Shared test setup and render helpers live in

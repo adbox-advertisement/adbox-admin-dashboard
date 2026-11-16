@@ -2,10 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useCurrentAdmin } from "@/features/auth"
 import { changeStatus, exportApplications, getApplication, getApplications, getRecruitmentCampaigns, getRecruitmentStats, getVideoUrl, saveReview } from "./api"
 import type { ApplicationFilters } from "./types"
+import { hasPermission } from "@/lib/permissions"
 
 export function useRecruitmentAccess() {
   const profile = useCurrentAdmin()
-  const can = (key: string) => Boolean(profile.data?.permissions.some(permission => permission === "*" || permission === key))
+  const can = (key: string) => hasPermission(profile.data?.permissions ?? [], key)
   return { profile, canRead: can("recruitment.applications.read"), canReview: can("recruitment.applications.review"), canExport: can("recruitment.applications.export"), canManageCampaigns: can("recruitment.campaigns.manage") }
 }
 export function useApplications(filters: ApplicationFilters, enabled: boolean) {

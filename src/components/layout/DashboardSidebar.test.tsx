@@ -1,18 +1,29 @@
 import { render, screen, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it } from "vitest"
+import { PermissionsContext, type PermissionAccess } from "@/lib/permissions"
 import { APP_ROUTES } from "@/routes/paths"
 import { DashboardSidebar } from "./DashboardSidebar"
 import { NavBadgesContext } from "./nav-badges"
 
-function renderSidebar(badges: Record<string, number>, path: string = APP_ROUTES.adRequests) {
+const superAdmin: PermissionAccess = { ready: true, granted: ["*"] }
+
+function renderSidebar(badges: Record<string, number>, path: string = APP_ROUTES.adRequests, access: PermissionAccess = superAdmin) {
   return render(
-    <NavBadgesContext value={badges}>
-      <MemoryRouter initialEntries={[path]}>
-        <DashboardSidebar />
-      </MemoryRouter>
-    </NavBadgesContext>,
+    <PermissionsContext value={access}>
+      <NavBadgesContext value={badges}>
+        <MemoryRouter initialEntries={[path]}>
+          <DashboardSidebar />
+        </MemoryRouter>
+      </NavBadgesContext>
+    </PermissionsContext>,
   )
+}
+
+/** The sidebar's top-level entries, as read: sections are buttons, plain entries links. */
+function topLevel() {
+  const nav = screen.getByRole("navigation", { name: "Dashboard navigation" })
+  return Array.from(nav.children).map((entry) => (entry.querySelector(":scope > a, :scope > button")?.textContent ?? "").trim())
 }
 
 describe("DashboardSidebar badges", () => {
@@ -68,5 +79,38 @@ describe("DashboardSidebar groups", () => {
     expect(within(content.getByRole("group", { name: "Content" })).getAllByRole("link").map((link) => link.textContent)).toEqual(["Posts", "Surveys"])
     expect(within(content.getByRole("group", { name: "To review" })).getAllByRole("link").map((link) => link.textContent)).toEqual(["Reports"])
     expect(content.queryByRole("link", { name: "Ads" })).not.toBeInTheDocument()
+  })
+})
+
+describe("DashboardSidebar access", () => {
+  it("offers an ads reviewer the ads, how sponsored posts are placed, and what anyone may open", () => {
+    renderSidebar({}, APP_ROUTES.adRequests, { ready: true, granted: ["ads.read", "ads.review", "ads.manage"] })
+
+    expect(topLevel()).toEqual(["Dashboard", "Algorithms", "Ads Management", "Settings"])
+    expect(screen.getByRole("link", { name: "Ad Requests" })).toBeVisible()
+    expect(screen.queryByRole("button", { name: /^Manage Users/ })).not.toBeInTheDocument()
+  })
+
+  it("keeps only the parts of a section the admin may open", () => {
+    renderSidebar({}, APP_ROUTES.manageUsersVerification, { ready: true, granted: ["verification.read", "verification.review"] })
+
+    const id = screen.getByRole("button", { name: /^Manage Users/ }).getAttribute("aria-controls")
+    const users = within(document.getElementById(id ?? "") as HTMLElement)
+    expect(users.getAllByRole("link").map((link) => link.textContent)).toEqual(["Verification"])
+    expect(users.queryByRole("group", { name: "Directory" })).not.toBeInTheDocument()
+  })
+
+  it("adds up waiting work only behind entries the admin can see", () => {
+    renderSidebar(
+      { [APP_ROUTES.manageUsersVerification]: 2, [APP_ROUTES.manageUsersPageRequests]: 5 },
+      APP_ROUTES.dashboard,
+      { ready: true, granted: ["verification.read"] },
+    )
+    expect(screen.getByRole("button", { name: "Manage Users, 2 waiting" })).toBeVisible()
+  })
+
+  it("shows only what anyone may open until the admin's permissions are known", () => {
+    renderSidebar({}, APP_ROUTES.dashboard, { ready: false, granted: [] })
+    expect(topLevel()).toEqual(["Dashboard", "Settings"])
   })
 })

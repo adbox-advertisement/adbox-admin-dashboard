@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
+// RDI is the Super Admin's (owner's decision, 2026-11-16): before an RDI page opens, the dashboard
+// checks the signed-in account (GET /auth/me). That check is the dashboard's, not RDI's, so it is
+// answered here and not counted; RDI's own screens must still make no API requests.
+const isAccountCheck = url => new URL(url).pathname.endsWith('/auth/me')
+const superAdmin = { id: '30000000-0000-4000-8000-000000000001', sessionId: 'smoke-session', email: 'admin@example.com', roles: ['SUPER_ADMIN'], permissions: ['*'] }
+
 const storageKey = 'adbox-rdi-cms-v1'
 const waitForSave = page => page.waitForFunction(key => {
   const draft = localStorage.getItem(key)
@@ -9,7 +15,7 @@ const waitForSave = page => page.waitForFunction(key => {
 
 export async function checkRdiCms(page, baseUrl) {
   const requests = []
-  const record = request => { if (['fetch', 'xhr'].includes(request.resourceType()) || request.method() !== 'GET') requests.push(request.method() + ' ' + request.url()) }
+  const record = request => { if (!isAccountCheck(request.url()) && (['fetch', 'xhr'].includes(request.resourceType()) || request.method() !== 'GET')) requests.push(request.method() + ' ' + request.url()) }
   page.on('request', record)
   try {
     await page.setViewportSize({width:1440,height:1000})
@@ -172,6 +178,7 @@ async function checkDraftRecovery(browser, baseUrl) {
         }
       }, { key: storageKey, failure })
       await context.route('**/*', route => {
+        if (isAccountCheck(route.request().url())) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(superAdmin) })
         if (new URL(route.request().url()).pathname.startsWith('/api/')) {
           apiRequests.push(route.request().url())
           return route.abort()

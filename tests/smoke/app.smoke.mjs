@@ -15,11 +15,12 @@ import { checkActivity } from './activity.smoke.mjs'
 import { checkSupport } from './support.smoke.mjs'
 import { checkRewards } from './rewards.smoke.mjs'
 import { checkRecommendations } from './recommendations.smoke.mjs'
+import { checkAccess } from './access.smoke.mjs'
 
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const smokeFeature = process.env.ADBOX_SMOKE_FEATURE
-if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity', 'support', 'rewards', 'admins', 'recommendations'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity, support, rewards, admins, recommendations or unset')
+if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity', 'support', 'rewards', 'admins', 'recommendations', 'access'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity, support, rewards, admins, recommendations, access or unset')
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
@@ -127,6 +128,7 @@ try {
   if (!smokeFeature || smokeFeature === 'support') await checkSupport(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'rewards') await checkRewards(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'recommendations') await checkRecommendations(page, baseUrl)
+  if (!smokeFeature || smokeFeature === 'access') await checkAccess(page, baseUrl, currentAdmin)
   if (!smokeFeature) {
     await checkDashboardContent(page, baseUrl)
     await checkVideoManagement(page, baseUrl)

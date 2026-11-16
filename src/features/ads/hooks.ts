@@ -4,6 +4,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { useCurrentAdmin } from "@/features/auth"
 import { actOnAd, getAd, getAds, getReportedAds } from "./api"
 import type { AdListQuery } from "./types"
+import { hasPermission } from "@/lib/permissions"
 
 const keys = {
   all: ["ads"] as const,
@@ -17,7 +18,7 @@ export function useAdsAccess() {
   const permissions = profile.data?.permissions ?? []
   return {
     loading: profile.isPending,
-    can: (permission: string) => permissions.includes("*") || permissions.includes(permission),
+    can: (permission: string) => hasPermission(permissions, permission),
   }
 }
 

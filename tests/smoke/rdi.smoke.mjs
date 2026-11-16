@@ -2,6 +2,12 @@ import assert from 'node:assert/strict'
 import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
+// RDI is the Super Admin's (owner's decision, 2026-11-16): before an RDI page opens, the dashboard
+// checks the signed-in account (GET /auth/me). That check is the dashboard's, not RDI's, so it is
+// answered here and not counted; RDI's own screens must still make no API requests.
+const isAccountCheck = url => new URL(url).pathname.endsWith('/auth/me')
+const superAdmin = { id: '30000000-0000-4000-8000-000000000001', sessionId: 'smoke-session', email: 'admin@example.com', roles: ['SUPER_ADMIN'], permissions: ['*'] }
+
 export async function checkRdiTouchScreens(browser, baseUrl, sessionKey, session) {
   const context = await browser.newContext({ viewport: { width: 320, height: 900 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' })
   const apiRequests = []
@@ -9,6 +15,7 @@ export async function checkRdiTouchScreens(browser, baseUrl, sessionKey, session
     await context.addInitScript(({ key, value }) => sessionStorage.setItem(key, JSON.stringify(value)), { key: sessionKey, value: session })
     await context.route('**/*', route => {
       const request = route.request()
+      if (isAccountCheck(request.url())) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(superAdmin) })
       if (['xhr', 'fetch'].includes(request.resourceType()) || new URL(request.url()).pathname.startsWith('/api/')) {
         apiRequests.push(request.url())
         return route.abort()
@@ -42,6 +49,7 @@ export async function checkRdiTouchScreens(browser, baseUrl, sessionKey, session
 export async function checkRdiScreens(page, baseUrl) {
   const apiRequests = []
   const recordRequest = request => {
+    if (isAccountCheck(request.url())) return
     if (['fetch', 'xhr'].includes(request.resourceType()) || request.method() !== 'GET') {
       apiRequests.push(request.method() + ' ' + request.url())
     }

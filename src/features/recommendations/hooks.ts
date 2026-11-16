@@ -32,6 +32,7 @@ import {
   type FeedRankingPolicy,
   type RankingConfig,
 } from "./types"
+import { hasPermission } from "@/lib/permissions"
 
 const keys = {
   /** The overview and the version history both start with this. */
@@ -48,7 +49,7 @@ const keys = {
 export function useRecommendationAccess() {
   const profile = useCurrentAdmin()
   const permissions = profile.data?.permissions ?? []
-  const can = (permission: string) => permissions.includes("*") || permissions.includes(permission)
+  const can = (permission: string) => hasPermission(permissions, permission)
   return {
     loading: profile.isPending,
     feed: can(RECOMMENDATION_PERMISSIONS.feedRanking),

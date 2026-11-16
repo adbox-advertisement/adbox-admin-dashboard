@@ -22,6 +22,7 @@ import {
 } from "./api"
 import { contentPath } from "./lib/paths"
 import type { AdQuery, ChatReportQuery, ContentReportQuery, PostQuery, SurveyQuery } from "./validation"
+import { hasPermission } from "@/lib/permissions"
 
 export const contentQueryKey = ["user-content"] as const
 
@@ -32,7 +33,7 @@ export function useContentAccess() {
     isPending: profile.isPending,
     isError: profile.isError,
     retry: () => void profile.refetch(),
-    can: (permission: string) => permissions.includes("*") || permissions.includes(permission),
+    can: (permission: string) => hasPermission(permissions, permission),
   }
 }
 

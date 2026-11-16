@@ -3,6 +3,7 @@ import { useCurrentAdmin } from "@/features/auth"
 import { getAdStages, getContentSummary, getGoldSales, getInstitutions, getPeopleStats, getSignups, getTopCreators } from "./api"
 import { daysToFetch, type SignupRange } from "./lib/signups"
 import { DASHBOARD_PERMISSIONS } from "./types"
+import { hasPermission } from "@/lib/permissions"
 
 /** Every institution, for the map. The catalogue changes rarely, so it is kept for a while. */
 export function useMapInstitutions() {
@@ -17,7 +18,7 @@ export function useMapInstitutions() {
 export function useDashboardAccess() {
   const admin = useCurrentAdmin()
   const permissions = admin.data?.permissions ?? []
-  const can = (permission: string) => permissions.includes("*") || permissions.includes(permission)
+  const can = (permission: string) => hasPermission(permissions, permission)
   return {
     loading: admin.isPending,
     people: can(DASHBOARD_PERMISSIONS.people),

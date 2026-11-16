@@ -44,6 +44,7 @@ import type {
   BusinessRequestDetail, BusinessRequestQuery, CompanyQuery, ConnectionsQuery, HonourQuery, PageRequestDetail, PageRequestQuery, PlatformUserQuery,
   VerificationQuery,
 } from "./validation"
+import { hasPermission } from "@/lib/permissions"
 
 // Every key lives under one root so a mutation can refresh the whole module:
 // suspending a publisher changes people, companies and stats alike.
@@ -73,7 +74,7 @@ const keys = {
 export function useUserAccess() {
   const profile = useCurrentAdmin()
   const permissions = profile.data?.permissions ?? []
-  return (permission: string) => permissions.includes("*") || permissions.includes(permission)
+  return (permission: string) => hasPermission(permissions, permission)
 }
 
 export function useDebouncedValue<T>(value: T, delay = 300) {
