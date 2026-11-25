@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { checkRdiScreens, checkRdiTouchScreens } from './rdi.smoke.mjs'
 import { checkRdiCms } from './rdi-cms.smoke.mjs'
-import { checkVideoManagement } from './video-management.smoke.mjs'
+import { checkVideoManagement, studioReply } from './video-management.smoke.mjs'
 import { checkDashboardContent, dashboardInstitutions, dashboardReply } from './dashboard.smoke.mjs'
 import { checkManageAdmins } from './manage-admins.smoke.mjs'
 import { checkManageUsers } from './manage-users.smoke.mjs'
@@ -20,7 +20,7 @@ import { checkAccess } from './access.smoke.mjs'
 // Run against a local dev or preview server. All API requests are intercepted.
 const baseUrl = process.env.ADBOX_TEST_URL ?? 'http://127.0.0.1:5173'
 const smokeFeature = process.env.ADBOX_SMOKE_FEATURE
-if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity', 'support', 'rewards', 'admins', 'recommendations', 'access'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity, support, rewards, admins, recommendations, access or unset')
+if (smokeFeature && !['recruitment', 'appearance', 'users', 'content', 'financials', 'ads', 'activity', 'support', 'rewards', 'admins', 'recommendations', 'access', 'videos'].includes(smokeFeature)) throw new Error('ADBOX_SMOKE_FEATURE must be recruitment, appearance, users, content, financials, ads, activity, support, rewards, admins, recommendations, access, videos or unset')
 const browser = await chromium.launch({ channel: process.env.ADBOX_BROWSER_CHANNEL ?? 'chrome', headless: true })
 const sessionKey = 'adbox-super-admin-session'
 const session = { accessToken: 'smoke-access', refreshToken: 'smoke-refresh', tokenType: 'Bearer', expiresIn: 900 }
@@ -46,6 +46,9 @@ try {
       // The dashboard's other figures (people, content, ads, gold sales, Trending).
       const figures = dashboardReply(request.method(), url.pathname, url.search)
       if (figures) return reply(figures)
+      // The studio's reads (Video Management); its check routes what it writes.
+      const studio = studioReply(request.method(), url.pathname, url.search)
+      if (studio) return reply(studio)
       if (url.pathname.endsWith('/auth/login')) return reply(loginAllowed ? session : { message: 'Invalid credentials' }, loginAllowed ? 200 : 401)
       if (url.pathname.endsWith('/auth/logout')) return reply({ message: 'Server unavailable' }, 503)
       if (url.pathname.endsWith('/auth/me')) {
@@ -75,7 +78,7 @@ try {
   page.on('request', request => { if (request.resourceType() === 'script') startupScripts.push(request.url()) })
   await page.goto(baseUrl + '/login')
   await page.getByRole('button', { name: 'Sign in', exact: true }).waitFor()
-  assert.equal(startupScripts.some(url => /DashboardPage|RdiWebsiteLayout|RdiHomePage|VideoUploadPage|charts-/.test(url)), false, 'Feature bundles should load on demand')
+  assert.equal(startupScripts.some(url => /DashboardPage|RdiWebsiteLayout|RdiHomePage|StudioHomePage|StudioCreatePage|charts-/.test(url)), false, 'Feature bundles should load on demand')
   await page.goto(baseUrl + '/video-management/upload')
   await page.waitForURL('**/login')
   await page.getByRole('textbox', { name: 'Email', exact: true }).fill('admin@example.com')
@@ -102,7 +105,7 @@ try {
     await page.getByRole('heading', { name: title, exact: true }).waitFor()
     assert.equal(await page.getByRole('navigation', { name: 'Dashboard navigation', exact: true }).count(), 1)
   }
-  for (const path of ['/dashboard', '/video-management/upload', '/video-management/posts', '/settings']) {
+  for (const path of ['/dashboard', '/video-management', '/video-management/upload', '/video-management/posts', '/settings']) {
     await page.goto(baseUrl + path)
     await page.locator('#page-content').waitFor()
     for (const width of [1440, 768, 390, 320]) {
@@ -129,9 +132,9 @@ try {
   if (!smokeFeature || smokeFeature === 'rewards') await checkRewards(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'recommendations') await checkRecommendations(page, baseUrl)
   if (!smokeFeature || smokeFeature === 'access') await checkAccess(page, baseUrl, currentAdmin)
+  if (!smokeFeature || smokeFeature === 'videos') await checkVideoManagement(page, baseUrl)
   if (!smokeFeature) {
     await checkDashboardContent(page, baseUrl)
-    await checkVideoManagement(page, baseUrl)
     await checkManageAdmins(page, baseUrl)
     await checkManageUsers(page, baseUrl)
     await checkUserContent(page, baseUrl)

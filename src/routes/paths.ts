@@ -31,6 +31,8 @@ export const APP_ROUTES = {
   videoManagement: "/video-management",
   videoUpload: "/video-management/upload",
   videoPosts: "/video-management/posts",
+  videoAccounts: "/video-management/accounts",
+  videoGroups: "/video-management/groups",
   rdi: "/rdi",
   financials: "/financials",
   goldPricing: "/financials/gold-pricing",

@@ -2,6 +2,46 @@
 
 Read alongside `AGENTS.md` and confirm the working tree before continuing.
 
+## Video Management is the studio (2026-11-16/17)
+
+- Request: admins create accounts to post videos, text, Shorts (later ads and surveys) from the dashboard, track
+  who made what, a dynamic way through the 265+ institutions, full parity with the phone, groups such as
+  "Legon hall week" and "Pent hall week", and a striking design. Owner chose: accounts are **regular profiles**;
+  a group is a **hashtag** (name, place, dates, cover); **posts first** (text, pictures, video, Shorts), then
+  surveys, ads (paid from the account's gold) and Glances.
+- Backend (`adbox-backend`, branch `test`, **uncommitted**, beside another session's survey/campus-profile work
+  in the same tree): super-admin `src/studio/` (accounts, app sessions, groups, posts, summary; `studio.read`,
+  `studio.accounts.manage`, `studio.post`, `studio.groups.manage`; audited), `prisma/schema/studio.prisma`,
+  migrations `20261116120000_studio` and `20261116130000_studio_plain_admin_ids` (both applied to the local DB).
+  Posting goes through the gateway's own API with a 60-minute session super-admin signs with the gateway's
+  `JWT_SECRET`; the gateway (`post.controller/service`) copies `Session.actorAdminId` to
+  `Resource.postedByAdminId`. Those two are plain ids (feature-flows' platform/staff rule: no relation to
+  `Admin`); deactivating an admin now also revokes their studio sessions (`admins.service.ts`). Edits keep a field
+  left out and clear one sent as null. Docs: super-admin-api.md "Studio", feature-flows.md "Studio posting",
+  `.env.example`.
+- Dashboard (**uncommitted**): `src/features/videos/` rewritten (old mock upload/folders/posts and
+  `src/assets/schools`, `src/assets/posts` deleted). Routes: `/video-management` (Studio), `/upload` (Create,
+  `?account=`/`?group=`; its handle adds `studio.read`), `/accounts`, `/accounts/:accountId`, `/groups`,
+  `/groups/:groupId`, `/posts` (filters in the address). Sidebar entries now use `studio.*` instead of
+  `media.create`/`media.read`, which settles this file's "Video Management actions not gated" note below.
+- Fixed on the way: the reduced-motion rule in `video-management.css` set `transition-duration: 0.01ms` on
+  every element, which turns on transitions for **all** properties, so right after a resize `main` kept the
+  sidebar's 290px padding for a frame. That caused the recurring "`/video-management/… overflows at 320`" smoke
+  flake recorded below; now 0s. Radix Select reports "" from its hidden native select while an option is still
+  loading, which dropped `?group=`; the studio's selects ignore "".
+- Checks run: dashboard architecture, `npm run lint`, test types, Vitest 80 files / 537 tests (with
+  `--maxWorkers=3`: the default run timed out across unrelated files with the machine at load ~70), build, full
+  `npm run test:smoke` and `ADBOX_SMOKE_FEATURE=videos` (new) passed. Backend: studio, admin-deactivation and
+  gateway post specs pass; super-admin and gateway `tsc` clean; ESLint clean on the files changed (gateway
+  `post.controller.ts`/`post.service.ts` keep their earlier lint errors, untouched).
+- Local: super-admin container rebuilt with the final code (it has `JWT_SECRET`). The gateway container was
+  **not** rebuilt (the other session's gateway work shares the tree), so posting works but posts don't record
+  the admin until it is. Storage CORS (PUT from the dashboard origin, `ETag` exposed) is unverified: pictures and
+  video may be refused by the bucket until it allows them; text posts don't need it.
+- Not done: phase 2 (surveys, ads from the account's gold, Glances). Nothing committed, pushed or deployed;
+  production needs both migrations, super-admin with `JWT_SECRET` and `STUDIO_APP_API_URL`, the gateway change
+  and bucket CORS.
+
 ## Roles decide the navigation (2026-11-16)
 
 - Request: "design the system in such a way that your roles or permissions determine what navigation you will

@@ -66,6 +66,10 @@ default for contributors.
 
 ## Task 2 — Schools and collections
 
+> Superseded (16 November 2026): Video Management no longer has hardcoded schools or local
+> collections. It is the studio (super-admin `/studio/*`, `docs/super-admin-api.md` in the
+> backend): places come from the institutions directory and posts are grouped by hashtag.
+
 The frontend has hardcoded schools in `src/features/videos/data/schools.ts`
 (`ug`, `knust`, `uds`, `gh-media`, `umat`, `gis`) and a local-only `PostCollection` type.
 The backend has no equivalent. Add to `prisma/schema/media.prisma`:

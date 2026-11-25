@@ -116,8 +116,11 @@ export const navItems: DashboardNavItem[] = [
     icon: Video,
     to: APP_ROUTES.videoManagement,
     children: [
-      { label: "Upload", to: APP_ROUTES.videoUpload, permission: "media.create" },
-      { label: "Posts", to: APP_ROUTES.videoPosts, permission: "media.read" },
+      { label: "Studio", to: APP_ROUTES.videoManagement, permission: "studio.read" },
+      { label: "Create", to: APP_ROUTES.videoUpload, permission: "studio.post" },
+      { label: "Accounts", to: APP_ROUTES.videoAccounts, permission: "studio.read" },
+      { label: "Groups", to: APP_ROUTES.videoGroups, permission: "studio.read" },
+      { label: "Posts", to: APP_ROUTES.videoPosts, permission: "studio.read" },
     ],
   },
   {

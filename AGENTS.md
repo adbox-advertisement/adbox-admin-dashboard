@@ -193,7 +193,7 @@ Axios client -> services -> TanStack Query hooks -> components
 `npm run test:smoke` runs the Playwright browser smoke script against an already running
 local server and an installed Chrome browser. It mocks all API calls. Point it at another server
 with `ADBOX_TEST_URL=http://127.0.0.1:5174`, and narrow it with
-`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards`, `ADBOX_SMOKE_FEATURE=admins`, `ADBOX_SMOKE_FEATURE=recommendations` or `ADBOX_SMOKE_FEATURE=access`. See README for overrides.
+`ADBOX_SMOKE_FEATURE=recruitment`, `ADBOX_SMOKE_FEATURE=appearance`, `ADBOX_SMOKE_FEATURE=users`, `ADBOX_SMOKE_FEATURE=content`, `ADBOX_SMOKE_FEATURE=support`, `ADBOX_SMOKE_FEATURE=rewards`, `ADBOX_SMOKE_FEATURE=admins`, `ADBOX_SMOKE_FEATURE=recommendations`, `ADBOX_SMOKE_FEATURE=videos` or `ADBOX_SMOKE_FEATURE=access`. See README for overrides.
 
 Unit and component tests live beside the code they cover as `*.test.ts`/`*.test.tsx` (Vitest +
 React Testing Library, jsdom environment). Shared test setup and render helpers live in
